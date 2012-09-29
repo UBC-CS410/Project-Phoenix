@@ -4,11 +4,40 @@
     android:layout_height="match_parent" >
 
     <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:text="@string/hello_world"
-        tools:context=".Main" />
+        android:layout_marginLeft="347dp"
+        android:text="map here"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <ZoomControls
+        android:id="@+id/zoomControls1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="60dp"
+        android:layout_toRightOf="@+id/textView1" />
+
+    <QuickContactBadge
+        android:id="@+id/quickContactBadge1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" />
+
+    <ImageButton
+        android:id="@+id/imageButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/zoomControls1"
+        android:layout_below="@+id/quickContactBadge1"
+        android:layout_marginLeft="68dp"
+        android:layout_marginTop="38dp"
+        android:layout_toRightOf="@+id/quickContactBadge1"
+        android:src="@android:drawable/ic_menu_compass" />
 
 </RelativeLayout>

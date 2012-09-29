@@ -58,6 +58,7 @@ public class Splash extends Activity {
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
+		
 	}
 
     /**@Override
