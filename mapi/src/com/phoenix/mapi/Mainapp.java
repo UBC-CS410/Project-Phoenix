@@ -18,7 +18,9 @@ public class Mainapp extends MapActivity{
 	@Override
 	protected boolean isRouteDisplayed() {
 		// TODO Auto-generated method stub
+		//dfdsf
 		return false;
+		
 	}
 	
 	@Override
