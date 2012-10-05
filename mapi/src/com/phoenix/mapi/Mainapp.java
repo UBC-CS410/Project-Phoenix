@@ -19,6 +19,7 @@ public class Mainapp extends MapActivity{
 	protected boolean isRouteDisplayed() {
 		// TODO Auto-generated method stub
 		//dfdsf
+		// blah blah blah
 		return false;
 		
 	}
