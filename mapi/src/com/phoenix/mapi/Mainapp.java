@@ -4,6 +4,7 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -14,6 +15,7 @@ public class Mainapp extends MapActivity{
 	MapController mControl;
 	GeoPoint GeoP;
 	MapView mapV;
+	MyLocationOverlay compass;
 
 	@Override
 	protected boolean isRouteDisplayed() {
@@ -32,6 +34,8 @@ public class Mainapp extends MapActivity{
 		mapV = (MapView) findViewById(R.id.mapView);
 		mapV.displayZoomControls(true);
 		mapV.setBuiltInZoomControls(true);
+		mapV.setSatellite(true);
+		
 		
 		double lat = 49.25;
 		double lng = -123.11;
@@ -43,6 +47,23 @@ public class Mainapp extends MapActivity{
 		mControl.setZoom(13);
 		
 		
+		compass = new MyLocationOverlay(this, mapV);
+		mapV.getOverlays().add(compass);
+		
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		compass.disableCompass();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		compass.enableCompass();
 	}
 	
 }
