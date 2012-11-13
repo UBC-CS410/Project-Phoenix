@@ -24,6 +24,7 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.TabActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -35,10 +36,13 @@ import android.provider.MediaStore.Images;
 import android.text.Html;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,6 +78,8 @@ public class MainActivity extends Activity {
     //private static String KEY_CREATED_AT = "created_at";
 	
     private ArrayList<String> imageList = new ArrayList<String>();
+    
+    private TabHost tabHost;
 
 	// Login button
 	Button btnLoginTwitter;
@@ -85,6 +91,7 @@ public class MainActivity extends Activity {
 	// Show profile image button   @#@#
 	Button btnProfileImage;
 	//Button btnBackToCenter;
+	Button btnGetTweets;
 	
 	// EditText for update
 	EditText txtUpdate;
@@ -114,6 +121,7 @@ public class MainActivity extends Activity {
 	// Alert Dialog Manager
 	AlertDialogManager alert = new AlertDialogManager();
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -140,11 +148,37 @@ public class MainActivity extends Activity {
 		}
 
 		// All UI elements
+		//****************************************************************************************************
+		// Create steve shen's tabs
+		tabHost=(TabHost)findViewById(R.id.tabHost);
+		tabHost.setup();
+		//LayoutInflater.from(this).inflate(R.layout.activity_main, tabHost.getTabContentView(), true);
+		
+		// Add steve shen's tabs
+		TabSpec spec1=tabHost.newTabSpec("Tab 1");
+		spec1.setContent(R.id.tab1_Main);
+		spec1.setIndicator("Main");
+		
+		TabSpec spec2=tabHost.newTabSpec("Tab 2");
+		spec2.setContent(R.id.tab2_Image);
+		spec2.setIndicator("Image");
+		
+		TabSpec spec3=tabHost.newTabSpec("Tab 3");
+		spec3.setContent(R.id.tab3_Tweets);
+		spec3.setIndicator("Tweets");
+		
+		tabHost.addTab(spec1);
+		tabHost.addTab(spec2);
+		tabHost.addTab(spec3);
+		
+		//****************************************************************************************************
+		
 		btnLoginTwitter = (Button) findViewById(R.id.btnLoginTwitter);
 		btnUpdateStatus = (Button) findViewById(R.id.btnUpdateStatus);
 		
 		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // @#@#
 		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
+		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
 		
 		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
@@ -223,6 +257,15 @@ public class MainActivity extends Activity {
 			}
 			
 		});
+		
+		
+		btnGetTweets.setOnClickListener(new View.OnClickListener(){
+
+			public void onClick(View arg0) {
+				
+			}
+			
+		});
 	/*	
 		btnBackToCenter.setOnClickListener(new View.OnClickListener(){
 
@@ -282,6 +325,7 @@ public class MainActivity extends Activity {
 					
 					btnProfileImage.setVisibility(View.VISIBLE);
 					btnLogoutTwitter.setVisibility(View.VISIBLE);
+					btnGetTweets.setVisibility(View.VISIBLE);
 					
 					
 					// Getting user details from twitter
