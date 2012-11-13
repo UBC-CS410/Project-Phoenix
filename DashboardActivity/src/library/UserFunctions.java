@@ -17,9 +17,11 @@ public class UserFunctions {
     // use http://10.0.2.2/ to connect to your localhost ie http://localhost/
     private static String loginURL = "http://70.79.75.130:3721/";
     private static String registerURL = "http://70.79.75.130:3721/";
+    private static String imageURL = "http://70.79.75.130:3721/"; //http://70.79.75.130:3721/storePhoto.php
  
     private static String login_tag = "login";
     private static String register_tag = "register";
+    private static String image_tag = "storeImage";
  
     // constructor
     public UserFunctions(){
@@ -61,6 +63,19 @@ public class UserFunctions {
         JSONObject json = jsonParser.getJSONFromUrl(registerURL, params);
         // return json
         return json;
+    }
+    
+    //*************************************************************************************
+    public JSONObject getImageUrl(String email, String url){
+    	
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("tag", image_tag));
+    	params.add(new BasicNameValuePair("email", email));
+    	params.add(new BasicNameValuePair("photo_ref", url));
+    	
+    	
+    	JSONObject json = jsonParser.getJSONFromUrl(imageURL, params);
+    	return json;
     }
  
     /**

@@ -19,6 +19,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
  
     // Login table name
     private static final String TABLE_LOGIN = "login";
+    private static final String TABLE_IMAGE = "photos";//************
  
     // Login Table Columns names
     private static final String KEY_ID = "id";
@@ -26,6 +27,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_EMAIL = "email";
     private static final String KEY_UID = "uid";
     private static final String KEY_CREATED_AT = "created_at";
+    //************************************************************8
+    
+    // Image Table Columns names
+    private static final String IMAGE_ID = "photo_uid";
+    private static final String IMAGE_TBL_EMAIL = "email";
+    private static final String IMAGE_TBL_URL = "photo_ref";
+    
  
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,6 +49,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_UID + " TEXT,"
                 + KEY_CREATED_AT + " TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
+        //*************************************************
+        /*
+        String CREATE_IMAGE_TABLE = "CREATE TABLE " + TABLE_IMAGE + "("
+        		+ IMAGE_ID + " INTEGER PRIMARY KEY,"
+                + IMAGE_TBL_EMAIL + " TEXT UNIQUE,"
+                + IMAGE_TBL_URL + " TEXT," + ")";
+        db.execSQL(CREATE_IMAGE_TABLE);
+        */
+        
     }
  
     // Upgrading database
@@ -67,6 +84,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
  
         // Inserting Row
         db.insert(TABLE_LOGIN, null, values);
+        db.close(); // Closing database connection
+    }
+    
+    //*********************************************************************88
+  
+    public void addImage(String email, String id, String url){
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	ContentValues values = new ContentValues();
+    	values.put(IMAGE_TBL_EMAIL, email); // user eamil
+    	values.put(IMAGE_TBL_URL, url); // image url
+    	
+    	db.insert(TABLE_IMAGE, null, values);
         db.close(); // Closing database connection
     }
  

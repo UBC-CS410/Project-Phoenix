@@ -11,6 +11,16 @@
               android:textSize="40dip"
               android:gravity="center"
               android:layout_marginTop="20dip"/>
+    
+    
+    <!-- Connect to Twitter Button -->
+    <Button android:id="@+id/btnConnectTwitter"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Go To Twitter"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"/>
+    
  
     <Button android:layout_width="fill_parent"
         android:layout_height="wrap_content"
