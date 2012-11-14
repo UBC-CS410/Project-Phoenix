@@ -83,6 +83,8 @@ public class MainActivity extends Activity {
 	
     private ArrayList<String> imageList = new ArrayList<String>();
     private ArrayList<String> tweetList = new ArrayList<String>();
+    private ArrayList<String> peopleList = new ArrayList<String>();
+    
     
     private TabHost tabHost;
 
@@ -97,11 +99,14 @@ public class MainActivity extends Activity {
 	Button btnProfileImage;
 	//Button btnBackToCenter;
 	Button btnGetTweets;
+	Button btnSearchPeople;
 	
-	ListView listView;
+	ListView tweetListView;  // @#@#
+	ListView peopleListView;
 	
 	// EditText for update
 	EditText txtUpdate;
+	EditText txtSearchPeople;
 	// lbl update
 	TextView lblUpdate;
 	TextView lblUserName;
@@ -174,9 +179,14 @@ public class MainActivity extends Activity {
 		spec3.setContent(R.id.tab3_Tweets);
 		spec3.setIndicator("Tweets");
 		
+		TabSpec spec4=tabHost.newTabSpec("Tab 4");
+		spec4.setContent(R.id.tab4_Pepple);
+		spec4.setIndicator("People");		
+		
 		tabHost.addTab(spec1);
 		tabHost.addTab(spec2);
 		tabHost.addTab(spec3);
+		tabHost.addTab(spec4);
 		
 		//****************************************************************************************************
 		
@@ -186,11 +196,14 @@ public class MainActivity extends Activity {
 		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // @#@#
 		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
 		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
+		btnSearchPeople = (Button) findViewById(R.id.btnSearchPeople);
 		
-		listView = (ListView) findViewById(R.id.mylist);
+		tweetListView = (ListView) findViewById(R.id.mylist);  // @#@#
+		peopleListView = (ListView) findViewById(R.id.mylist2);
 		
 		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
+		txtSearchPeople = (EditText) findViewById(R.id.txtSearchPeople); //@#@#
 		lblUpdate = (TextView) findViewById(R.id.lblUpdate);
 		lblUserName = (TextView) findViewById(R.id.lblUserName);
 		
@@ -234,8 +247,7 @@ public class MainActivity extends Activity {
 				} else {
 					// EditText is empty
 					Toast.makeText(getApplicationContext(),
-							"Please enter status message", Toast.LENGTH_SHORT)
-							.show();
+							"Please enter status message", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -260,7 +272,6 @@ public class MainActivity extends Activity {
 		//@#@#@
 		
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
-
 			public void onClick(View arg0) {
 				showProfileImage();
 			}
@@ -269,9 +280,27 @@ public class MainActivity extends Activity {
 		
 		
 		btnGetTweets.setOnClickListener(new View.OnClickListener(){
-
 			public void onClick(View arg0) {
 				getRecentTweets();
+			}
+			
+		});
+		
+		btnSearchPeople.setOnClickListener(new View.OnClickListener(){
+			public void onClick(View arg0) {
+				String name = txtSearchPeople.getText().toString();
+				
+				// Check for blank text
+				if (name.trim().length() > 0) {
+					// update status
+					searchPeople(name);
+				} else {
+					// EditText is empty
+					Toast.makeText(getApplicationContext(),
+							"Please enter a name", Toast.LENGTH_SHORT).show();
+				}
+				
+				
 			}
 			
 		});
@@ -330,11 +359,13 @@ public class MainActivity extends Activity {
 					// Show Update Twitter
 					lblUpdate.setVisibility(View.VISIBLE);
 					txtUpdate.setVisibility(View.VISIBLE);
+					txtSearchPeople.setVisibility(View.VISIBLE);// @#@#
 					btnUpdateStatus.setVisibility(View.VISIBLE);
 					
 					btnProfileImage.setVisibility(View.VISIBLE);
 					btnLogoutTwitter.setVisibility(View.VISIBLE);
 					btnGetTweets.setVisibility(View.VISIBLE);
+					btnSearchPeople.setVisibility(View.VISIBLE);
 					
 					
 					// Getting user details from twitter
@@ -501,16 +532,34 @@ public class MainActivity extends Activity {
 		return mSharedPreferences.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
 	}
 	
+	private void searchPeople(String name){
+		try {
+			List<User> listOfUsers = twitter.searchUsers(name, 10);
+			
+			for (User user : listOfUsers){
+				peopleList.add(user.getScreenName());
+			}
+			
+			String[] simpleArray = new String[peopleList.size()];
+			peopleList.toArray(simpleArray);
+			
+			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+			peopleListView.setAdapter(arrayAdapter);
+			
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void getRecentTweets(){
 		System.out.println("Get Tweets button is clicked");		
 		try {			
-			User user = twitter.verifyCredentials();
-			
+			//User user = twitter.verifyCredentials();
+			User user = twitter.showUser(twitter.getId());
 			List<Status> statuses = twitter.getHomeTimeline();
             System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
             
-            for (Status status : statuses) {
-            	
+            for (Status status : statuses) {            	
             	tweetList.add(status.getText());
                 //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
             }			
@@ -519,7 +568,7 @@ public class MainActivity extends Activity {
             tweetList.toArray(simpleArray);
             
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
-            listView.setAdapter(arrayAdapter);
+            tweetListView.setAdapter(arrayAdapter);
 			
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -646,6 +695,12 @@ public class MainActivity extends Activity {
 
 	protected void onResume() {
 		super.onResume();
+		Log.d("TAG", "-----onResume-----");
+	}
+	
+	protected void onPause(){
+		super.onPause();
+		Log.d("TAG", "-----onPause-----");
 	}
 	//******************************************************************************
 	
