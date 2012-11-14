@@ -8,12 +8,14 @@ import library.UserFunctions;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
 import twitter4j.IDs;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -38,9 +40,11 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
@@ -78,6 +82,7 @@ public class MainActivity extends Activity {
     //private static String KEY_CREATED_AT = "created_at";
 	
     private ArrayList<String> imageList = new ArrayList<String>();
+    private ArrayList<String> tweetList = new ArrayList<String>();
     
     private TabHost tabHost;
 
@@ -92,6 +97,8 @@ public class MainActivity extends Activity {
 	Button btnProfileImage;
 	//Button btnBackToCenter;
 	Button btnGetTweets;
+	
+	ListView listView;
 	
 	// EditText for update
 	EditText txtUpdate;
@@ -180,6 +187,8 @@ public class MainActivity extends Activity {
 		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
 		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
 		
+		listView = (ListView) findViewById(R.id.mylist);
+		
 		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
 		lblUpdate = (TextView) findViewById(R.id.lblUpdate);
@@ -262,7 +271,7 @@ public class MainActivity extends Activity {
 		btnGetTweets.setOnClickListener(new View.OnClickListener(){
 
 			public void onClick(View arg0) {
-				
+				getRecentTweets();
 			}
 			
 		});
@@ -490,6 +499,34 @@ public class MainActivity extends Activity {
 	private boolean isTwitterLoggedInAlready() {
 		// return twitter login status from Shared Preferences
 		return mSharedPreferences.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
+	}
+	
+	private void getRecentTweets(){
+		System.out.println("Get Tweets button is clicked");		
+		try {			
+			User user = twitter.verifyCredentials();
+			
+			List<Status> statuses = twitter.getHomeTimeline();
+            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
+            
+            for (Status status : statuses) {
+            	
+            	tweetList.add(status.getText());
+                //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+            }			
+            
+            String[] simpleArray = new String[tweetList.size()];
+            tweetList.toArray(simpleArray);
+            
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+            listView.setAdapter(arrayAdapter);
+			
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private void showProfileImage(){
