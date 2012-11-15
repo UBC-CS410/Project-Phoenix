@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="libs/signpost-core-1.2.1.2.jar"/>
 	<classpathentry kind="lib" path="libs/signpost-commonshttp4-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/twitter4j-core-android-2.2.6.jar"/>
+	<classpathentry kind="lib" path="libs/universal-image-loader-1.6.3.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

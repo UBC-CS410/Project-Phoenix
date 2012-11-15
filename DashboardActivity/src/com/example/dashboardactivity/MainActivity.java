@@ -4,6 +4,7 @@ import library.AlertDialogManager;
 import library.ConnectionDetector;
 import library.DatabaseHandler;
 import library.UserFunctions;
+import library.ExtendedImageDownloader;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,6 +13,13 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.example.dashboardactivity.ImageGridActivity;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.example.dashboardactivity.ImageSource.Extra;
 
 
 import twitter4j.IDs;
@@ -26,7 +34,6 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.TabActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -40,10 +47,12 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
@@ -205,15 +214,12 @@ public class MainActivity extends Activity {
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
 		txtSearchPeople = (EditText) findViewById(R.id.txtSearchPeople); //@#@#
 		lblUpdate = (TextView) findViewById(R.id.lblUpdate);
-		lblUserName = (TextView) findViewById(R.id.lblUserName);
-		
+		lblUserName = (TextView) findViewById(R.id.lblUserName);		
 		
 
 		// Shared Preferences
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
 				"MyPref", 0);
-		
-		
 		
 
 		/**
@@ -250,10 +256,7 @@ public class MainActivity extends Activity {
 							"Please enter status message", Toast.LENGTH_SHORT).show();
 				}
 			}
-		});
-		
-		
-		
+		});		
 		
 
 		/**
@@ -268,12 +271,41 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+	    .threadPriority(Thread.NORM_PRIORITY - 2)
+	    .memoryCacheSize(2 * 1024 * 1024) // 2 Mb
+	    .denyCacheImageMultipleSizesInMemory()
+	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
+	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
+	    .tasksProcessingOrder(QueueProcessingType.LIFO)
+	    .enableLogging() // Not necessary in common
+	    .build();
+    
+		// Initialize ImageLoader with configuration.
+		ImageLoader.getInstance().init(config);
+	  
+	  
 		//@#@#@
+		
+		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				System.out.println("This is clicked");
+				
+			}
+			
+		});
 		
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
-				showProfileImage();
+				//showProfileImage();
+				
+				Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
+			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			    intent.putExtra(Extra.IMAGES, showProfileImage());
+			    startActivity(intent);
+			    finish();				
 			}
 			
 		});
@@ -298,9 +330,7 @@ public class MainActivity extends Activity {
 					// EditText is empty
 					Toast.makeText(getApplicationContext(),
 							"Please enter a name", Toast.LENGTH_SHORT).show();
-				}
-				
-				
+				}				
 			}
 			
 		});
@@ -354,7 +384,7 @@ public class MainActivity extends Activity {
 
 					// Hide login button
 					btnLoginTwitter.setVisibility(View.GONE);
-					//btnBackToCenter.setVisibility(View.GONE);
+					//btnBackToCenter.setVisibility(View.GONE);  //@#@#
 
 					// Show Update Twitter
 					lblUpdate.setVisibility(View.VISIBLE);
@@ -578,7 +608,7 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	private void showProfileImage(){
+	private String[] showProfileImage(){
 		System.out.println("Show image button is clicked");
 		try {
 			
@@ -586,9 +616,8 @@ public class MainActivity extends Activity {
 			//URL url = user.getProfileImageURL();
 			//System.out.println(url.toString());			
 			
-			System.out.println("Listing of  following's ids.");           
-			
-		    
+			System.out.println("Listing of  following's ids.");
+			// Specify that the image size is original
 			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
 			
             //ids = twitter.getFollowersIDs(-1);
@@ -597,25 +626,21 @@ public class MainActivity extends Activity {
             for (long id2 : ids2.getIDs()) {
                     	
             	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
-            	System.out.println(image.getURL());
+            	//System.out.println(image.getURL());
             	imageList.add(image.getURL());
                     	
                 //user = twitter.showUser(id2);
                 //url = user.getProfileImageURL();
             	
                 //System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
-                //System.out.println(url.toString());
-            	
-                    	
-                       // System.out.println(id);
+                //System.out.println(url.toString());  
+                // System.out.println(id);
              }
             
-            Iterator<String> it = imageList.iterator();
-            while(it.hasNext()){
-            	System.out.println("The url is: "+ it.next());
-            }
-			
-			
+            //Iterator<String> it = imageList.iterator();
+            //while(it.hasNext()){
+            	//System.out.println("The url is: "+ it.next());
+            //}
 			
 			
 			//UserFunctions userFunction = new UserFunctions();
@@ -641,10 +666,6 @@ public class MainActivity extends Activity {
 			*/
 			//ids = twitter.getFollowersIDs(-1);
 /*			
-			System.out.println("Listing of  following's ids.");
-            
-			
-				    
 			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
 			
             ids = twitter.getFollowersIDs(-1);
@@ -676,11 +697,6 @@ public class MainActivity extends Activity {
                 url = user.getProfileImageURL();
                 System.out.println("The follower with this id: "+ id + "has his profile link below");
                 System.out.println(url.toString());
-                	
-                	
-                	
-                	
-                	
                    // System.out.println(id);
                 }*/
 			
@@ -691,6 +707,9 @@ public class MainActivity extends Activity {
 		} catch (TwitterException e) {
 			e.printStackTrace();
 		}
+		
+	   String[] url_arr = new String[imageList.size()];
+	    return imageList.toArray(url_arr);
 	}
 
 	protected void onResume() {

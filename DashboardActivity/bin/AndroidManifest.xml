@@ -47,6 +47,10 @@
             </intent-filter>
         </activity>
         
+        <!--  Image Grid Activity -->
+        <activity
+            android:label="Image Grid Activity"
+            android:name=".ImageGridActivity"></activity>         
         
     </application>
 
