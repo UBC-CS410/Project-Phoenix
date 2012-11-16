@@ -32,6 +32,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -46,6 +47,7 @@ import android.text.Html;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -58,7 +60,9 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.PopupMenu;
 
+@SuppressLint("NewApi")
 public class MainActivity extends Activity {
 	// Constants
 	/**
@@ -93,6 +97,7 @@ public class MainActivity extends Activity {
     private ArrayList<String> imageList = new ArrayList<String>();
     private ArrayList<String> tweetList = new ArrayList<String>();
     private ArrayList<String> peopleList = new ArrayList<String>();
+    private ArrayList<Long> peopleIdList = new ArrayList<Long>();
     
     
     private TabHost tabHost;
@@ -289,10 +294,11 @@ public class MainActivity extends Activity {
 		
 		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
 
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 				System.out.println("This is clicked");
-				
+				System.out.println("this int is: " + position);
+				//System.out.println("This long is: " + id);
+				showPopupMenu(view, position);	
 			}
 			
 		});
@@ -568,6 +574,7 @@ public class MainActivity extends Activity {
 			
 			for (User user : listOfUsers){
 				peopleList.add(user.getScreenName());
+				peopleIdList.add(user.getId());
 			}
 			
 			String[] simpleArray = new String[peopleList.size()];
@@ -579,6 +586,29 @@ public class MainActivity extends Activity {
 		} catch (TwitterException e) {
 			e.printStackTrace();
 		}
+	}
+	
+
+	private void showPopupMenu(View v, final int position){
+		PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
+	    popupMenu.getMenuInflater().inflate(R.menu.popupmenu, popupMenu.getMenu());
+	    
+	    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+			public boolean onMenuItemClick(MenuItem item) {
+				try {
+					twitter.createFriendship(peopleIdList.get(position));
+					System.out.println("after create Friendship");
+					Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+				} catch (TwitterException e) {					
+					e.printStackTrace();
+				}				
+				
+				return true;
+			}
+	    	
+	    });
+	    popupMenu.show();
 	}
 	
 	private void getRecentTweets(){

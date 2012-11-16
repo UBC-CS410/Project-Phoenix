@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <group android:id="@+id/group_popupmenu">
+      <item android:id="@+id/menu1"
+          android:title="Follow"/>
+      <item android:id="@+id/menu2"
+          android:title="Block"/>
+      <item android:id="@+id/menu3"
+          android:title="Remove from list"/>
+  </group>
+</menu>
