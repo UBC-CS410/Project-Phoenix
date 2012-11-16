@@ -295,9 +295,6 @@ public class MainActivity extends Activity {
 		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-				System.out.println("This is clicked");
-				System.out.println("this int is: " + position);
-				//System.out.println("This long is: " + id);
 				showPopupMenu(view, position);	
 			}
 			
@@ -590,16 +587,33 @@ public class MainActivity extends Activity {
 	
 
 	private void showPopupMenu(View v, final int position){
+		
 		PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
 	    popupMenu.getMenuInflater().inflate(R.menu.popupmenu, popupMenu.getMenu());
 	    
 	    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-			public boolean onMenuItemClick(MenuItem item) {
+	    	public boolean onMenuItemClick(MenuItem item) {
 				try {
-					twitter.createFriendship(peopleIdList.get(position));
-					System.out.println("after create Friendship");
-					Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+					int id = item.getItemId();
+					//System.out.println("This menu item has this order " + id);					
+					switch(id)
+					{
+						case 2131230756: // follow
+							twitter.createFriendship(peopleIdList.get(position));
+							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+							break;
+						case 2131230757: // unfollow
+							twitter.destroyFriendship(peopleIdList.get(position));
+							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+							break;
+						case 2131230758: // block
+							twitter.createBlock(peopleIdList.get(position));
+							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+							break;
+						default:
+							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+					
+					}
 				} catch (TwitterException e) {					
 					e.printStackTrace();
 				}				

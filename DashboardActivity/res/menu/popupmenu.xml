@@ -3,8 +3,8 @@
       <item android:id="@+id/menu1"
           android:title="Follow"/>
       <item android:id="@+id/menu2"
-          android:title="Block"/>
+          android:title="Unfollow"/>
       <item android:id="@+id/menu3"
-          android:title="Remove from list"/>
+          android:title="Block"/>
   </group>
 </menu>
