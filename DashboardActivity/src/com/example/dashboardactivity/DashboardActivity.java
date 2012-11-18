@@ -32,10 +32,12 @@ public class DashboardActivity extends Activity {
             btnConnectTwitter.setOnClickListener(new View.OnClickListener() { //@#@#
 
 				public void onClick(View v) {
-					Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
-					twitterPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(twitterPage);
-					finish();
+					startActivity(new Intent(getApplicationContext(), MainActivity.class));
+					
+					//Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
+					//twitterPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					//startActivity(twitterPage);
+					//finish();
 				}
             	
             });

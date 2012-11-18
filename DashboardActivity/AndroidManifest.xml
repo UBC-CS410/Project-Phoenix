@@ -17,7 +17,7 @@
             android:label="@string/title_activity_dashboard" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+				<category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -26,12 +26,16 @@
         <!--  Login Activity -->
         <activity
             android:label="Login Account"
-            android:name=".LoginActivity"></activity>
+            android:name=".LoginActivity">
+            <category android:name="android.intent.category.DEFAULT" />
+        </activity>
  
         <!--  Register Activity -->
         <activity
             android:label="Register New Account"
-            android:name=".RegisterActivity"></activity>
+            android:name=".RegisterActivity">
+            <category android:name="android.intent.category.DEFAULT" />
+        </activity>
         
         
         <!--  Twitter Activity -->
@@ -50,7 +54,9 @@
         <!--  Image Grid Activity -->
         <activity
             android:label="Image Grid Activity"
-            android:name=".ImageGridActivity"></activity>         
+            android:name=".ImageGridActivity">
+            <category android:name="android.intent.category.DEFAULT" />
+        </activity>         
         
     </application>
 

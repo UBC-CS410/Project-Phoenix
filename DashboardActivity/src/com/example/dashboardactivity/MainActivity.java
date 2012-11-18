@@ -304,11 +304,13 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) {
 				//showProfileImage();
 				
-				Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
+				startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
+				
+				//Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
 			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			    intent.putExtra(Extra.IMAGES, showProfileImage());
-			    startActivity(intent);
-			    finish();				
+			    //intent.putExtra(Extra.IMAGES, showProfileImage());
+			    //startActivity(intent);
+			    //finish();				
 			}
 			
 		});
@@ -531,10 +533,10 @@ public class MainActivity extends Activity {
 		e.commit();
 		
 		//@#@#
-		Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
+		/*Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
 		twitterPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(twitterPage);
-		finish();
+		finish();*/
 		//@#@#@
 		
 
@@ -546,14 +548,20 @@ public class MainActivity extends Activity {
 		btnLogoutTwitter.setVisibility(View.GONE);
 		btnUpdateStatus.setVisibility(View.GONE);
 		txtUpdate.setVisibility(View.GONE);
+		txtSearchPeople.setVisibility(View.GONE);
 		lblUpdate.setVisibility(View.GONE);
 		lblUserName.setText("");
 		lblUserName.setVisibility(View.GONE);
 		
 		btnProfileImage.setVisibility(View.GONE);
+		btnGetTweets.setVisibility(View.GONE);
+		btnSearchPeople.setVisibility(View.GONE);
 
 		btnLoginTwitter.setVisibility(View.VISIBLE); */
 		//btnBackToCenter.setVisibility(View.VISIBLE);
+		
+		// this line is very important!!, it ends this current activity
+		finish();//@#@#
 	}
 
 	/**
