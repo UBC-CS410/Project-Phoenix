@@ -121,26 +121,25 @@
     
     <!-- Search People EditText -->
     <EditText android:id="@+id/txtSearchPeople"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dip"
-        android:layout_margin="10dip"        
-        android:hint="Search"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"   
+        android:layout_alignParentLeft="true"    
+        android:hint="Search People"
         android:visibility="gone"/>
 
     <!-- Search People Button -->
-    <Button android:id="@+id/btnSearchPeople"
-        android:layout_width="fill_parent"
+    <ImageButton android:id="@+id/btnSearchPeople"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
-        android:text="Search People"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_below="@id/txtSearchPeople"
+        android:src="@drawable/search_medium"
+        android:background="@android:color/white"
+        android:layout_alignParentRight="true" 
         android:visibility="gone"/>
     
     <ListView android:id="@+id/mylist2"
     	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/txtSearchPeople"
         />
     
  </RelativeLayout>

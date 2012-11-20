@@ -53,6 +53,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -113,7 +114,7 @@ public class MainActivity extends Activity {
 	Button btnProfileImage;
 	//Button btnBackToCenter;
 	Button btnGetTweets;
-	Button btnSearchPeople;
+	ImageButton btnSearchPeople;
 	
 	ListView tweetListView;  // @#@#
 	ListView peopleListView;
@@ -210,7 +211,7 @@ public class MainActivity extends Activity {
 		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // @#@#
 		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
 		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
-		btnSearchPeople = (Button) findViewById(R.id.btnSearchPeople);
+		btnSearchPeople = (ImageButton) findViewById(R.id.btnSearchPeople);
 		
 		tweetListView = (ListView) findViewById(R.id.mylist);  // @#@#
 		peopleListView = (ListView) findViewById(R.id.mylist2);
