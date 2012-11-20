@@ -74,7 +74,7 @@
         android:visibility="gone"/>
 </LinearLayout>
 
-<LinearLayout android:id="@+id/tab2_Image"
+<RelativeLayout android:id="@+id/tab2_Image"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -88,7 +88,19 @@
         android:layout_marginTop="50dip"
         android:layout_marginRight="10dip"
         android:visibility="gone"/>
- </LinearLayout>
+    
+    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/gridview_test"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:columnWidth="100dip"
+	    android:gravity="center"
+	    android:horizontalSpacing="4dip"
+	    android:numColumns="auto_fit"
+	    android:stretchMode="columnWidth"
+	    android:verticalSpacing="4dip" 
+	    android:layout_below="@id/btnProfileImage"/>
+ </RelativeLayout>
  
 <LinearLayout android:id="@+id/tab3_Tweets"
 	android:orientation="vertical"
@@ -143,6 +155,13 @@
         />
     
  </RelativeLayout>
+ 
+ <LinearLayout android:id="@+id/tab5_Maps"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">   
+ 
+ </LinearLayout>
  
 </FrameLayout>
 

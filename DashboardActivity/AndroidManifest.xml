@@ -58,14 +58,7 @@
                 <data android:scheme="oauth" android:host="t4jsample"/>
             </intent-filter>
         </activity>
-        
-        <!--  Image Grid Activity -->
-        <activity
-            android:label="Image Grid Activity"
-            android:name=".ImageGridActivity">
-            <category android:name="android.intent.category.DEFAULT" />
-        </activity>         
-        
+               
     </application>
 
 </manifest>

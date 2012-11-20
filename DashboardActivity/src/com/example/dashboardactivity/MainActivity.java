@@ -14,11 +14,12 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.dashboardactivity.ImageGridActivity;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.example.dashboardactivity.ImageSource.Extra;
 
 
@@ -39,6 +40,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -49,10 +51,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -99,6 +106,11 @@ public class MainActivity extends Activity {
     private ArrayList<String> tweetList = new ArrayList<String>();
     private ArrayList<String> peopleList = new ArrayList<String>();
     private ArrayList<Long> peopleIdList = new ArrayList<Long>();
+    
+	 ImageLoader imageLoader = ImageLoader.getInstance();
+
+	 String[] imageUrls;
+	 DisplayImageOptions options;
     
     
     private TabHost tabHost;
@@ -198,10 +210,15 @@ public class MainActivity extends Activity {
 		spec4.setContent(R.id.tab4_Pepple);
 		spec4.setIndicator("People");		
 		
+		TabSpec spec5=tabHost.newTabSpec("Tab 5");
+		spec5.setContent(R.id.tab5_Maps);
+		spec5.setIndicator("Map");	
+		
 		tabHost.addTab(spec1);
 		tabHost.addTab(spec2);
 		tabHost.addTab(spec3);
 		tabHost.addTab(spec4);
+		tabHost.addTab(spec5);
 		
 		//****************************************************************************************************
 		
@@ -305,15 +322,33 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) {
 				//showProfileImage();
 				
-				startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
+//				startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
 				
 				//Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
 			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			    //intent.putExtra(Extra.IMAGES, showProfileImage());
 			    //startActivity(intent);
 			    //finish();				
-			}
 			
+//				Bundle bundle = getIntent().getExtras();
+				imageUrls = showProfileImage();
+
+				options = new DisplayImageOptions.Builder()
+					.showStubImage(R.drawable.stub_image)
+					.showImageForEmptyUri(R.drawable.image_for_empty_url)
+					.cacheInMemory()
+					.cacheOnDisc()
+					.build();
+
+				GridView gridView = (GridView) findViewById(R.id.gridview_test);
+				gridView.setAdapter(new ImageAdapter());
+//				gridView.setOnItemClickListener(new OnItemClickListener() {
+//					@Override
+//					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//						startImageGalleryActivity(position);
+//					}
+//				});
+			}			
 		});
 		
 		
@@ -764,6 +799,39 @@ public class MainActivity extends Activity {
 	   String[] url_arr = new String[imageList.size()];
 	    return imageList.toArray(url_arr);
 	}
+	
+	public class ImageAdapter extends BaseAdapter {
+		public int getCount() {
+			return imageUrls.length;
+		}
+
+		public Object getItem(int position) {
+			return null;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final ImageView imageView;
+			if (convertView == null) {
+				imageView = (ImageView) getLayoutInflater().inflate(R.layout.item_grid_image, parent, false);
+			} else {
+				imageView = (ImageView) convertView;
+			}
+
+			imageLoader.displayImage(imageUrls[position], imageView, options, new SimpleImageLoadingListener() {
+				@Override
+				public void onLoadingComplete(Bitmap loadedImage) {
+					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in);
+					imageView.setAnimation(anim);
+					anim.start();
+				}
+			});
+			return imageView;
+		}
+	}
 
 	protected void onResume() {
 		super.onResume();
@@ -774,8 +842,7 @@ public class MainActivity extends Activity {
 		super.onPause();
 		Log.d("TAG", "-----onPause-----");
 	}
-	//******************************************************************************
-	
 	
 
+	//******************************************************************************
 }
