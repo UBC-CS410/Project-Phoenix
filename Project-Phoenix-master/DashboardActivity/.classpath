@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="libs/flickrj-android-2.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-android-1.6.1-RC1.jar"/>
+	<classpathentry kind="lib" path="libs/signpost-core-1.2.1.2.jar"/>
+	<classpathentry kind="lib" path="libs/signpost-commonshttp4-1.2.jar"/>
+	<classpathentry kind="lib" path="libs/twitter4j-core-android-2.2.6.jar"/>
+	<classpathentry kind="lib" path="libs/universal-image-loader-1.6.3.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

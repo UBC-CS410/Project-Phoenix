@@ -1,0 +1,159 @@
+<TabHost android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/tabHost"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    
+<TabWidget
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@android:id/tabs"
+    />
+
+<FrameLayout
+     android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@android:id/tabcontent"
+     >
+
+<LinearLayout android:id="@+id/tab1_Main"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!-- Twitter Login Button -->
+    <Button android:id="@+id/btnLoginTwitter"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_with_twitter"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="50dip"/> 
+   
+    <!-- user name label -->
+    <TextView android:id="@+id/lblUserName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dip"
+        android:layout_marginTop="40dip"/>
+ 
+    <!-- label update status -->
+    <TextView android:id="@+id/lblUpdate"
+        android:text="Update Status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:visibility="gone"/>
+ 
+    <!-- Tweet EditText -->
+    <EditText android:id="@+id/txtUpdateStatus"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Compose new Tweet..."
+        android:visibility="gone"/>
+ 
+    <!-- Tweet Button -->
+    <Button android:id="@+id/btnUpdateStatus"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Tweet"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:visibility="gone"/>    
+ 
+    <!-- Twitter Logout button -->
+    <Button android:id="@+id/btnLogoutTwitter"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Logout from Twitter"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="50dip"
+        android:visibility="gone"/>
+
+    <!--@@@@@@@@@@@@@@ facebook button -->
+    <Button
+        android:id="@+id/facebookbtn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Facebooklogin"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="50dip"/> 
+
+</LinearLayout>
+
+<LinearLayout android:id="@+id/tab2_Image"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!-- Show Profile Image Button -->
+    <Button android:id="@+id/btnProfileImage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Profile Image"
+        android:layout_marginLeft="10dip"
+        android:layout_marginTop="50dip"
+        android:layout_marginRight="10dip"
+        android:visibility="gone"/>
+ </LinearLayout>
+ 
+<LinearLayout android:id="@+id/tab3_Tweets"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">   
+    
+    
+    <!-- Get Tweets Button -->
+    <Button android:id="@+id/btnGetTweets"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Tweets"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="50dip"
+        android:visibility="gone"/>  
+        
+    <ListView android:id="@+id/mylist"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        /> 
+    
+ </LinearLayout>
+ 
+ <LinearLayout android:id="@+id/tab4_Pepple"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <!-- Search People EditText -->
+    <EditText android:id="@+id/txtSearchPeople"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dip"
+        android:layout_margin="10dip"        
+        android:hint="Search"
+        android:visibility="gone"/>
+
+    <!-- Search People Button -->
+    <Button android:id="@+id/btnSearchPeople"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Search People"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:visibility="gone"/>
+    
+    <ListView android:id="@+id/mylist2"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+    
+ </LinearLayout>
+ 
+</FrameLayout>
+
+</TabHost>

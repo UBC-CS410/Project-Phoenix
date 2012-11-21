@@ -1,0 +1,62 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.dashboardactivity"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".DashboardActivity"
+            android:label="@string/title_activity_dashboard" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        
+        <!--  Login Activity -->
+        <activity
+            android:label="Login Account"
+            android:name=".LoginActivity"></activity>
+ 
+        <!--  Register Activity -->
+        <activity
+            android:label="Register New Account"
+            android:name=".RegisterActivity"></activity>
+        
+        
+        <!--  Twitter Activity -->
+         <activity
+            android:name=".MainActivity"
+            android:label="Twitter Activity" >
+            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="oauth" android:host="t4jsample"/>
+            </intent-filter>
+        </activity>
+        
+        <!--  Image Grid Activity -->
+        <activity
+            android:label="Image Grid Activity"
+            android:name=".ImageGridActivity"></activity>
+        
+        <!--  Fb Activity -->
+        <activity
+            android:label="Facebook Activity"
+            android:name=".FbActivity"></activity>
+        
+    </application>
+
+</manifest>
