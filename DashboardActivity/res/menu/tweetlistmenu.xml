@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <group android:id="@+id/group_tweetlistmenu">
+      <item android:id="@+id/tweetmenu1"
+          android:title="Comment"/>
+      <item android:id="@+id/tweetmenu2"
+          android:title="Item 2"/>
+      <item android:id="@+id/tweetmenu3"
+          android:title="Item 3"/>
+  </group>
+</menu>

@@ -46,9 +46,11 @@ import android.provider.MediaStore.Images;
 import android.text.Html;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -57,6 +59,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
@@ -102,6 +105,11 @@ public class MainActivity extends Activity {
     
     
     private TabHost tabHost;
+   /* 
+    LayoutInflater layoutInflater; //!!!	// popupwindow 
+	View popupView;  //!!!
+	PopupWindow commentPopupWindow; // !!!
+	*/
 
 	// Login button
 	Button btnLoginTwitter;
@@ -116,12 +124,16 @@ public class MainActivity extends Activity {
 	Button btnGetTweets;
 	ImageButton btnSearchPeople;
 	
+	Button btnSendComment; // !!
+	
 	ListView tweetListView;  // @#@#
 	ListView peopleListView;
 	
 	// EditText for update
 	EditText txtUpdate;
 	EditText txtSearchPeople;
+	EditText txtTweetComment; //!!
+	
 	// lbl update
 	TextView lblUpdate;
 	TextView lblUserName;
@@ -205,6 +217,8 @@ public class MainActivity extends Activity {
 		
 		//****************************************************************************************************
 		
+		
+		
 		btnLoginTwitter = (Button) findViewById(R.id.btnLoginTwitter);
 		btnUpdateStatus = (Button) findViewById(R.id.btnUpdateStatus);
 		
@@ -219,9 +233,17 @@ public class MainActivity extends Activity {
 		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
 		txtSearchPeople = (EditText) findViewById(R.id.txtSearchPeople); //@#@#
+		
 		lblUpdate = (TextView) findViewById(R.id.lblUpdate);
 		lblUserName = (TextView) findViewById(R.id.lblUserName);		
 		
+		
+		//layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);//!!
+		
+		//popupView = layoutInflater.inflate(R.layout.comment_popup, null);//!!
+		
+		txtTweetComment = (EditText) findViewById(R.id.txtComment); //!!
+		//btnSendComment = (Button) popupView.findViewById(R.id.btnSendComment); // !!
 
 		// Shared Preferences
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
@@ -301,6 +323,14 @@ public class MainActivity extends Activity {
 			
 		});
 		
+		tweetListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showTweetMenu(view, position);	
+			}
+			
+		});
+		
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
 				//showProfileImage();
@@ -340,6 +370,15 @@ public class MainActivity extends Activity {
 			}
 			
 		});
+		
+		/*	
+		btnSendComment.setOnClickListener(new View.OnClickListener(){  //!!!
+			public void onClick(View arg0) {
+				commentPopupWindow.dismiss(); // for now, just close the window
+			}
+		});*/
+		
+		
 	/*	
 		btnBackToCenter.setOnClickListener(new View.OnClickListener(){
 
@@ -395,6 +434,7 @@ public class MainActivity extends Activity {
 					// Show Update Twitter
 					lblUpdate.setVisibility(View.VISIBLE);
 					txtUpdate.setVisibility(View.VISIBLE);
+					txtTweetComment.setVisibility(View.VISIBLE); //!!!
 					txtSearchPeople.setVisibility(View.VISIBLE);// @#@#
 					btnUpdateStatus.setVisibility(View.VISIBLE);
 					
@@ -594,6 +634,76 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	/*
+	private void showCommentWindow(){
+		//LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+		
+		//View popupView = layoutInflater.inflate(R.layout.comment_popup, null);
+		
+		//final PopupWindow commentPopupWindow = new PopupWindow(popupView, 400,300);
+		commentPopupWindow = new PopupWindow(popupView, 400,300);
+		
+		//PopupWindow commentPopupWindow = new PopupWindow(); // old
+		//commentPopupWindow.setContentView(getLayoutInflater().inflate(R.layout.comment_popup, null)); // old
+		
+		commentPopupWindow.showAtLocation(getLayoutInflater().inflate(R.layout.comment_popup, null), Gravity.CENTER, 0, 175);
+		commentPopupWindow.setFocusable(true);
+		
+		//EditText txtComment = (EditText)popupView.findViewById(R.id.txtComment);		
+		//Button btnSendComment = (Button)popupView.findViewById(R.id.btnSendComment);
+		//txtComment.setFocusable(true);
+	}*/
+	
+	private void sendComment(String comment){
+		// Todo
+		System.out.println("The comment is: " + comment);
+	}
+	
+	private void showTweetMenu(View v, final int position){
+		PopupMenu tweetMenu = new PopupMenu(MainActivity.this, v);
+		tweetMenu.getMenuInflater().inflate(R.menu.tweetlistmenu, tweetMenu.getMenu());
+		
+		tweetMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+				int id = item.getItemId();
+				System.out.println("This menu item has this order " + id);					
+				
+				switch(id)
+				{
+					case 2131230763: // Comment
+						//showCommentWindow(); //!!
+						System.out.println("Comment is clicked");	
+						
+						String comment = txtTweetComment.getText().toString();
+						
+						if (comment.trim().length() > 0) {
+							sendComment(comment);
+							Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
+						} else {
+							// EditText is empty
+							Toast.makeText(getApplicationContext(),
+									"Your comment can not be empty", Toast.LENGTH_SHORT).show();
+						}	
+						break;
+					case 2131230764: // Item 2
+						System.out.println("Item 2 is clicked");		
+						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+						break;
+					case 2131230765: // Item 3
+						System.out.println("Item 3 is clicked");
+						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+						break;
+					default:
+						System.out.println("Noting is clicked");
+						//Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+				}				
+				return true;
+			}
+		});
+		tweetMenu.show();
+	}
+
+	
 
 	private void showPopupMenu(View v, final int position){
 		
@@ -625,14 +735,14 @@ public class MainActivity extends Activity {
 					}
 				} catch (TwitterException e) {					
 					e.printStackTrace();
-				}				
-				
+				}
 				return true;
 			}
 	    	
 	    });
 	    popupMenu.show();
 	}
+	
 	
 	private void getRecentTweets(){
 		System.out.println("Get Tweets button is clicked");		
@@ -667,17 +777,15 @@ public class MainActivity extends Activity {
 			
 			//User user = twitter.showUser(twitter.getId());
 			//URL url = user.getProfileImageURL();
-			//System.out.println(url.toString());			
+			//System.out.println(url.toString());	
 			
-			System.out.println("Listing of  following's ids.");
 			// Specify that the image size is original
 			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
 			
             //ids = twitter.getFollowersIDs(-1);
             ids2= twitter.getFriendsIDs(-1); // friend = following
                     
-            for (long id2 : ids2.getIDs()) {
-                    	
+            for (long id2 : ids2.getIDs()) {                    	
             	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
             	//System.out.println(image.getURL());
             	imageList.add(image.getURL());
@@ -717,44 +825,6 @@ public class MainActivity extends Activity {
             }
 
 			*/
-			//ids = twitter.getFollowersIDs(-1);
-/*			
-			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
-			
-            ids = twitter.getFollowersIDs(-1);
-            ids2= twitter.getFriendsIDs(-1); // friend = following
-                    
-            for (long id2 : ids2.getIDs()) {
-                    	
-            	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
-            	System.out.println(image.getURL());
-                //followerIds.add(ids);
-                    	
-                user = twitter.showUser(id2);
-                url = user.getProfileImageURL();
-            	
-                System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
-                System.out.println(url.toString());
-            	
-                    	
-                       // System.out.println(id);
-             }
-*/		
-             /*       
-               System.out.println("Listing follower's ids.");   
-                
-                for (long id : ids.getIDs()) {
-                	//followerIds.add(ids);
-                	
-               	user = twitter.showUser(id);
-                url = user.getProfileImageURL();
-                System.out.println("The follower with this id: "+ id + "has his profile link below");
-                System.out.println(url.toString());
-                   // System.out.println(id);
-                }*/
-			
-			//System.out.println(twitter.getFollowersIDs(-1).toString());
-			
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (TwitterException e) {
@@ -774,8 +844,5 @@ public class MainActivity extends Activity {
 		super.onPause();
 		Log.d("TAG", "-----onPause-----");
 	}
-	//******************************************************************************
 	
-	
-
 }
