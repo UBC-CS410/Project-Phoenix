@@ -252,7 +252,7 @@ public class MainActivity extends Activity {
 
 		/**
 		 * Twitter login button click event will call loginToTwitter() function
-		 * */
+		 */
 		btnLoginTwitter.setOnClickListener(new View.OnClickListener() {
 
 			//@Override
@@ -265,7 +265,7 @@ public class MainActivity extends Activity {
 		/**
 		 * Button click event to Update Status, will call updateTwitterStatus()
 		 * function
-		 * */
+		 */
 		btnUpdateStatus.setOnClickListener(new View.OnClickListener() {
 
 			//@Override
@@ -289,7 +289,7 @@ public class MainActivity extends Activity {
 
 		/**
 		 * Button click event for logout from twitter
-		 * */
+		 */
 		btnLogoutTwitter.setOnClickListener(new View.OnClickListener() {
 
 			//@Override
@@ -333,10 +333,8 @@ public class MainActivity extends Activity {
 		
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
-				//showProfileImage();
-				
-				startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
-				
+				//showProfileImage();				
+				startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));				
 				//Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
 			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			    //intent.putExtra(Extra.IMAGES, showProfileImage());
@@ -397,7 +395,7 @@ public class MainActivity extends Activity {
 		/** This if conditions is tested once is
 		 * redirected from twitter page. Parse the uri to get oAuth
 		 * Verifier
-		 * */
+		 */
 		if (!isTwitterLoggedInAlready()) {
 			Uri uri = getIntent().getData();
 			if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
@@ -463,7 +461,7 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Function to login twitter
-	 * */
+	 */
 	private void loginToTwitter() {
 		// Check if already logged in
 		if (!isTwitterLoggedInAlready()) {
@@ -492,7 +490,7 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Function to update status
-	 * */
+	 */
 	class updateTwitterStatus extends AsyncTask<String, String, String> {
 
 		/**
@@ -564,7 +562,7 @@ public class MainActivity extends Activity {
 	/**
 	 * Function to logout from twitter
 	 * It will just clear the application shared preferences
-	 * */
+	 */
 	private void logoutFromTwitter() {
 		// Clear the shared preferences
 		Editor e = mSharedPreferences.edit();
@@ -585,7 +583,7 @@ public class MainActivity extends Activity {
 		// I am showing the hiding/showing buttons again
 		// You might not needed this code
 		
-		/*
+		/*// not used for now
 		btnLogoutTwitter.setVisibility(View.GONE);
 		btnUpdateStatus.setVisibility(View.GONE);
 		txtUpdate.setVisibility(View.GONE);
@@ -608,12 +606,24 @@ public class MainActivity extends Activity {
 	/**
 	 * Check user already logged in your application using twitter Login flag is
 	 * fetched from Shared Preferences
-	 * */
+	 */
 	private boolean isTwitterLoggedInAlready() {
 		// return twitter login status from Shared Preferences
 		return mSharedPreferences.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
 	}
 	
+	/*
+	 * Send Comment on a tweet
+	 */
+	private void sendComment(String comment){
+		// TODO
+		System.out.println("The comment is: " + comment);
+	}
+	
+	/**
+	 * search other twitter user by user name
+	 * collects a list of 
+	 */
 	private void searchPeople(String name){
 		try {
 			List<User> listOfUsers = twitter.searchUsers(name, 10);
@@ -634,31 +644,83 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	/*
-	private void showCommentWindow(){
-		//LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+	/**
+	 * Get the most recent 20 tweet from other real twitter user
+	 */
+	private void getRecentTweets(){
+		System.out.println("Get Tweets button is clicked");		
+		try {			
+			//User user = twitter.verifyCredentials();
+			User user = twitter.showUser(twitter.getId());
+			List<Status> statuses = twitter.getHomeTimeline();
+            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
+            
+            for (Status status : statuses) {            	
+            	tweetList.add(status.getText());
+                //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+            }			
+            
+            String[] simpleArray = new String[tweetList.size()];
+            tweetList.toArray(simpleArray);
+            
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+            tweetListView.setAdapter(arrayAdapter);
+			
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
 		
-		//View popupView = layoutInflater.inflate(R.layout.comment_popup, null);
-		
-		//final PopupWindow commentPopupWindow = new PopupWindow(popupView, 400,300);
-		commentPopupWindow = new PopupWindow(popupView, 400,300);
-		
-		//PopupWindow commentPopupWindow = new PopupWindow(); // old
-		//commentPopupWindow.setContentView(getLayoutInflater().inflate(R.layout.comment_popup, null)); // old
-		
-		commentPopupWindow.showAtLocation(getLayoutInflater().inflate(R.layout.comment_popup, null), Gravity.CENTER, 0, 175);
-		commentPopupWindow.setFocusable(true);
-		
-		//EditText txtComment = (EditText)popupView.findViewById(R.id.txtComment);		
-		//Button btnSendComment = (Button)popupView.findViewById(R.id.btnSendComment);
-		//txtComment.setFocusable(true);
-	}*/
-	
-	private void sendComment(String comment){
-		// Todo
-		System.out.println("The comment is: " + comment);
 	}
 	
+	
+	/**
+	 * Show a popup menu after click on a searched user
+	 */
+	private void showPopupMenu(View v, final int position){
+		
+		PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
+	    popupMenu.getMenuInflater().inflate(R.menu.popupmenu, popupMenu.getMenu());
+	    
+	    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+	    	public boolean onMenuItemClick(MenuItem item) {
+				try {
+					int id = item.getItemId();
+					//System.out.println("This menu item has this order " + id);					
+					switch(id)
+					{
+						case 2131230759: // follow
+							twitter.createFriendship(peopleIdList.get(position));
+							Toast.makeText(MainActivity.this,"You have followed " + peopleList.get(position) ,Toast.LENGTH_LONG).show();
+							break;
+						case 2131230760: // unfollow
+							twitter.destroyFriendship(peopleIdList.get(position));
+							Toast.makeText(MainActivity.this,"You have unfollowed " + peopleList.get(position),Toast.LENGTH_LONG).show();
+							break;
+						case 2131230761: // block
+							twitter.createBlock(peopleIdList.get(position));
+							Toast.makeText(MainActivity.this,"You have blocked " + peopleList.get(position),Toast.LENGTH_LONG).show();
+							break;
+						default:
+							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+					
+					}
+				} catch (TwitterException e) {					
+					e.printStackTrace();
+				}
+				return true;
+			}
+	    	
+	    });
+	    popupMenu.show();
+	}
+	
+
+	
+	/**
+	 * Show a popup menu when click on a recent tweet
+	 */
 	private void showTweetMenu(View v, final int position){
 		PopupMenu tweetMenu = new PopupMenu(MainActivity.this, v);
 		tweetMenu.getMenuInflater().inflate(R.menu.tweetlistmenu, tweetMenu.getMenu());
@@ -704,77 +766,12 @@ public class MainActivity extends Activity {
 	}
 
 	
-
-	private void showPopupMenu(View v, final int position){
-		
-		PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
-	    popupMenu.getMenuInflater().inflate(R.menu.popupmenu, popupMenu.getMenu());
-	    
-	    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-	    	public boolean onMenuItemClick(MenuItem item) {
-				try {
-					int id = item.getItemId();
-					//System.out.println("This menu item has this order " + id);					
-					switch(id)
-					{
-						case 2131230756: // follow
-							twitter.createFriendship(peopleIdList.get(position));
-							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
-							break;
-						case 2131230757: // unfollow
-							twitter.destroyFriendship(peopleIdList.get(position));
-							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
-							break;
-						case 2131230758: // block
-							twitter.createBlock(peopleIdList.get(position));
-							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
-							break;
-						default:
-							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
-					
-					}
-				} catch (TwitterException e) {					
-					e.printStackTrace();
-				}
-				return true;
-			}
-	    	
-	    });
-	    popupMenu.show();
-	}
-	
-	
-	private void getRecentTweets(){
-		System.out.println("Get Tweets button is clicked");		
-		try {			
-			//User user = twitter.verifyCredentials();
-			User user = twitter.showUser(twitter.getId());
-			List<Status> statuses = twitter.getHomeTimeline();
-            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
-            
-            for (Status status : statuses) {            	
-            	tweetList.add(status.getText());
-                //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
-            }			
-            
-            String[] simpleArray = new String[tweetList.size()];
-            tweetList.toArray(simpleArray);
-            
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
-            tweetListView.setAdapter(arrayAdapter);
-			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
+	/**
+	 * collects follower's profile image urls
+	 */
 	private String[] showProfileImage(){
 		System.out.println("Show image button is clicked");
 		try {
-			
 			//User user = twitter.showUser(twitter.getId());
 			//URL url = user.getProfileImageURL();
 			//System.out.println(url.toString());	
@@ -788,6 +785,8 @@ public class MainActivity extends Activity {
             for (long id2 : ids2.getIDs()) {                    	
             	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
             	//System.out.println(image.getURL());
+            	
+            	// store these follower's profile pic url into an arraylist
             	imageList.add(image.getURL());
                     	
                 //user = twitter.showUser(id2);
@@ -795,13 +794,7 @@ public class MainActivity extends Activity {
             	
                 //System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
                 //System.out.println(url.toString());  
-                // System.out.println(id);
              }
-            
-            //Iterator<String> it = imageList.iterator();
-            //while(it.hasNext()){
-            	//System.out.println("The url is: "+ it.next());
-            //}
 			
 			
 			//UserFunctions userFunction = new UserFunctions();
@@ -834,6 +827,27 @@ public class MainActivity extends Activity {
 	   String[] url_arr = new String[imageList.size()];
 	    return imageList.toArray(url_arr);
 	}
+	
+	
+	/*// not used for now
+	private void showCommentWindow(){
+		//LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+		
+		//View popupView = layoutInflater.inflate(R.layout.comment_popup, null);
+		
+		//final PopupWindow commentPopupWindow = new PopupWindow(popupView, 400,300);
+		commentPopupWindow = new PopupWindow(popupView, 400,300);
+		
+		//PopupWindow commentPopupWindow = new PopupWindow(); // old
+		//commentPopupWindow.setContentView(getLayoutInflater().inflate(R.layout.comment_popup, null)); // old
+		
+		commentPopupWindow.showAtLocation(getLayoutInflater().inflate(R.layout.comment_popup, null), Gravity.CENTER, 0, 175);
+		commentPopupWindow.setFocusable(true);
+		
+		//EditText txtComment = (EditText)popupView.findViewById(R.id.txtComment);		
+		//Button btnSendComment = (Button)popupView.findViewById(R.id.btnSendComment);
+		//txtComment.setFocusable(true);
+	}*/
 
 	protected void onResume() {
 		super.onResume();
