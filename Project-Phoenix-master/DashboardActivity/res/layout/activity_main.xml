@@ -26,7 +26,7 @@
     <Button android:id="@+id/btnLoginTwitter"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/login_with_twitter"
+        android:text="Login with Twitter"
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
         android:layout_marginTop="50dip"/> 
@@ -72,17 +72,6 @@
         android:layout_marginRight="10dip"
         android:layout_marginTop="50dip"
         android:visibility="gone"/>
-
-    <!--@@@@@@@@@@@@@@ facebook button -->
-    <Button
-        android:id="@+id/facebookbtn"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Facebooklogin"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="50dip"/> 
-
 </LinearLayout>
 
 <LinearLayout android:id="@+id/tab2_Image"

@@ -20,8 +20,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.example.dashboardactivity.ImageSource.Extra;
-import com.facebook.android.AsyncFacebookRunner;
-import com.facebook.android.Facebook;
 
 
 import twitter4j.IDs;
@@ -103,8 +101,7 @@ public class MainActivity extends Activity {
     
     
     private TabHost tabHost;
-   
-    
+
 	// Login button
 	Button btnLoginTwitter;
 	// Update status button
@@ -156,7 +153,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
 		
 		cd = new ConnectionDetector(getApplicationContext());
 
@@ -230,9 +226,7 @@ public class MainActivity extends Activity {
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
 				"MyPref", 0);
 		
-//facebook onclick
-		
-		
+
 		/**
 		 * Twitter login button click event will call loginToTwitter() function
 		 * */

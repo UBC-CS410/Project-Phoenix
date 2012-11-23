@@ -20,7 +20,6 @@
         android:text="Go To Twitter"
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"/>
-
     
     <!-- Connect to facebook Button -->
     <Button
@@ -30,6 +29,7 @@
         android:text="Facebook Login"
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"/>
+    
  
     <Button android:layout_width="fill_parent"
         android:layout_height="wrap_content"

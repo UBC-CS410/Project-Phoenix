@@ -15,5 +15,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/fail" />
+    
+     <EditText
+        android:id="@+id/commenttxt"
+        android:layout_width="239dp"
+        android:layout_height="wrap_content"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="send" />
+
+    <Button
+        android:id="@+id/FBLOGIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FB" />
 
 </LinearLayout>

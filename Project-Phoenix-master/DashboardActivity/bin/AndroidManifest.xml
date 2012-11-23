@@ -50,12 +50,12 @@
         <!--  Image Grid Activity -->
         <activity
             android:label="Image Grid Activity"
-            android:name=".ImageGridActivity"></activity>
-        
+            android:name=".ImageGridActivity"></activity>    
         <!--  Fb Activity -->
         <activity
             android:label="Facebook Activity"
-            android:name=".FbActivity"></activity>
+            android:name=".FbActivity"></activity>       
+             
         
     </application>
 

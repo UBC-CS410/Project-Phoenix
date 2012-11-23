@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import library.UserFunctions;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +22,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,6 +36,11 @@ public class FbActivity extends Activity  {
 	private SharedPreferences mPrefs;
 	TextView w;
 	ImageView pic;
+	
+	
+	//comment
+	Button submit;
+	EditText input;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -45,6 +55,11 @@ public class FbActivity extends Activity  {
         loginToFacebook();
         w =(TextView) findViewById(R.id.userID);
         pic=(ImageView) findViewById(R.id.profilpic);
+
+        //comment
+        input=(EditText)findViewById(R.id.commenttxt);
+        submit=(Button)findViewById(R.id.submit);
+        
         String access=mPrefs.getString("access_token", null);
         long expire=mPrefs.getLong("access_expires",0);
         if(access!=null)
@@ -74,7 +89,24 @@ public class FbActivity extends Activity  {
     	catch (IOException e) 
     	{e.printStackTrace();}
     	
-    	
+    	submit.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String comment=input.getText().toString();
+				String email="email";
+				String url="www.com";
+				UserFunctions user=new UserFunctions();
+				JSONObject json=user.comment_Image(url, email, comment);
+				try {
+					input.setText(json.get("message").toString());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
     	
     	
 	}

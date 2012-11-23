@@ -17,7 +17,8 @@ public class UserFunctions {
     // use http://10.0.2.2/ to connect to your localhost ie http://localhost/
     private static String loginURL = "http://70.79.75.130:3721/";
     private static String registerURL = "http://70.79.75.130:3721/";
-    private static String imageURL = "http://70.79.75.130:3721/"; //http://70.79.75.130:3721/storePhoto.php
+    private static String imageURL = "http://70.79.75.130:3721/storePhoto.php";
+    private static String commentURL="http://70.79.75.130:3721/comment.php";
  
     private static String login_tag = "login";
     private static String register_tag = "register";
@@ -75,6 +76,18 @@ public class UserFunctions {
     	
     	
     	JSONObject json = jsonParser.getJSONFromUrl(imageURL, params);
+    	return json;
+    }
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+    //comment
+    public JSONObject comment_Image(String url,String email,String comment)
+    {
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("photoref", url));
+        params.add(new BasicNameValuePair("email", email));
+        params.add(new BasicNameValuePair("comment", comment));
+        
+    	JSONObject json = jsonParser.getJSONFromUrl(commentURL, params);
     	return json;
     }
  

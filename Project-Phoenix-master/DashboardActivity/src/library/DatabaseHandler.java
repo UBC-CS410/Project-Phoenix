@@ -20,7 +20,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Login table name
     private static final String TABLE_LOGIN = "login";
     private static final String TABLE_IMAGE = "photos";//************
- 
+    //comment
+    private static final String TABLE_COMMENT="comment";
+    
     // Login Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
@@ -33,6 +35,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String IMAGE_ID = "photo_uid";
     private static final String IMAGE_TBL_EMAIL = "email";
     private static final String IMAGE_TBL_URL = "photo_ref";
+    
+  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    //Comment table 
+    private static final String CID="cid";
+    private static final String IMAGE_URL="photoref";
+    private static final String USER_ID="email";
+    private static final String COMMENTS="comment";
     
  
     public DatabaseHandler(Context context) {
@@ -58,6 +67,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_IMAGE_TABLE);
         */
         
+      //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        //comment table here
+        String CREATE_COMMENT_TABLE="CREATE TABLE "+TABLE_COMMENT+"("
+        		+CID+" INTEGER PRIMARY KEY,"
+        		+IMAGE_URL+" TEXT,"
+        		+USER_ID+" TEXT,"
+        		+COMMENTS+" TEXT,"+")";
+        db.execSQL(CREATE_COMMENT_TABLE);
     }
  
     // Upgrading database
@@ -99,6 +116,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
  
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // function comment here
+    
+    public void addcomment(String url,String email,String comment)
+    {
+    	SQLiteDatabase db= this.getWritableDatabase();
+    	ContentValues values=new ContentValues();
+    	values.put(IMAGE_URL, url);
+    	values.put(USER_ID, email);
+    	values.put(COMMENTS, comment);
+    	db.insert(TABLE_COMMENT, null, values);
+    	db.close();
+    }
+    
     /**
      * Getting user data from database
      * */
