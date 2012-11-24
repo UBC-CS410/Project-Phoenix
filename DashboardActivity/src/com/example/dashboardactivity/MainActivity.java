@@ -127,6 +127,7 @@ public class MainActivity extends Activity {
 	//Button btnBackToCenter;
 	Button btnGetTweets;
 	ImageButton btnSearchPeople;
+	Button btnShowMap;
 	
 	ListView tweetListView;  // @#@#
 	ListView peopleListView;
@@ -229,6 +230,7 @@ public class MainActivity extends Activity {
 		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
 		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
 		btnSearchPeople = (ImageButton) findViewById(R.id.btnSearchPeople);
+		btnShowMap = (Button) findViewById(R.id.btnShowMap);
 		
 		tweetListView = (ListView) findViewById(R.id.mylist);  // @#@#
 		peopleListView = (ListView) findViewById(R.id.mylist2);
@@ -375,6 +377,13 @@ public class MainActivity extends Activity {
 			}
 			
 		});
+		
+		btnShowMap.setOnClickListener(new View.OnClickListener(){
+			public void onClick(View arg0) {
+				startActivity(new Intent(getApplicationContext(), AndroidGoogleMapsActivity.class));
+			}
+		});
+		
 	/*	
 		btnBackToCenter.setOnClickListener(new View.OnClickListener(){
 
@@ -611,6 +620,9 @@ public class MainActivity extends Activity {
 	
 	private void searchPeople(String name){
 		try {
+			peopleList.clear();
+			peopleIdList.clear();
+
 			List<User> listOfUsers = twitter.searchUsers(name, 10);
 			
 			for (User user : listOfUsers){
@@ -621,8 +633,18 @@ public class MainActivity extends Activity {
 			String[] simpleArray = new String[peopleList.size()];
 			peopleList.toArray(simpleArray);
 			
+//			peopleListView.setAdapter(null);
+			peopleListView.invalidateViews();
+			peopleListView.refreshDrawableState();
+			
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
 			peopleListView.setAdapter(arrayAdapter);
+			arrayAdapter.notifyDataSetChanged();
+			peopleListView.invalidateViews();
+			peopleListView.refreshDrawableState();
+			
+			
+			//arrayAdapter.clear();//!!
 			
 		} catch (TwitterException e) {
 			e.printStackTrace();
