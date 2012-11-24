@@ -347,7 +347,7 @@ public class MainActivity extends Activity {
 		
 		btnGetTweets.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
-				getRecentTweets();
+				getRecentTweets();				
 			}
 			
 		});
@@ -548,9 +548,7 @@ public class MainActivity extends Activity {
 			runOnUiThread(new Runnable() {
 				//@Override
 				public void run() {
-					Toast.makeText(getApplicationContext(),
-							"Status tweeted successfully", Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(getApplicationContext(),"Status tweeted successfully", Toast.LENGTH_SHORT).show();
 					// Clearing EditText field
 					txtUpdate.setText("");
 				}
@@ -626,16 +624,24 @@ public class MainActivity extends Activity {
 	 */
 	private void searchPeople(String name){
 		try {
+			// get searched user
 			List<User> listOfUsers = twitter.searchUsers(name, 10);
 			
+			// clear user_name arraylist and user_id arraylist every time before use
+			peopleList.clear(); // @@@@
+			peopleIdList.clear(); // @@@@
+			
+			// add user name and user id to corresponding arraylist for future use
 			for (User user : listOfUsers){
 				peopleList.add(user.getScreenName());
 				peopleIdList.add(user.getId());
 			}
 			
+			// convert an arraylist to an string array
 			String[] simpleArray = new String[peopleList.size()];
 			peopleList.toArray(simpleArray);
 			
+			// set array adapter and display in list view
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
 			peopleListView.setAdapter(arrayAdapter);
 			
@@ -645,24 +651,31 @@ public class MainActivity extends Activity {
 	}
 	
 	/**
-	 * Get the most recent 20 tweet from other real twitter user
+	 * Get the most recent 20 tweets from other real twitter user
 	 */
 	private void getRecentTweets(){
 		System.out.println("Get Tweets button is clicked");		
 		try {			
+			// clear tweet array list every time before use
+			tweetList.clear();//@@@@
+			
 			//User user = twitter.verifyCredentials();
+			
 			User user = twitter.showUser(twitter.getId());
 			List<Status> statuses = twitter.getHomeTimeline();
             System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
             
+            // add these recent status to corresponding arraylist for future use
             for (Status status : statuses) {            	
             	tweetList.add(status.getText());
                 //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
             }			
             
+            // convert an arraylist to an string array
             String[] simpleArray = new String[tweetList.size()];
             tweetList.toArray(simpleArray);
             
+            // set array adapter and display in list view
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
             tweetListView.setAdapter(arrayAdapter);
 			
@@ -772,6 +785,8 @@ public class MainActivity extends Activity {
 	private String[] showProfileImage(){
 		System.out.println("Show image button is clicked");
 		try {
+			
+			imageList.clear();
 			//User user = twitter.showUser(twitter.getId());
 			//URL url = user.getProfileImageURL();
 			//System.out.println(url.toString());	
