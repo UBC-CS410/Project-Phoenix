@@ -45,12 +45,6 @@ public class RegisterActivityTest extends ActivityInstrumentationTestCase2<Regis
 		solo.assertCurrentActivity("should launch DashboardActivity", DashboardActivity.class);		
 	}
 	
-	//public void testSoloLinkToLogin(){ // can't go from 2 to 1 without creating 1
-		//solo.clickOnButton("Already registred. Login Me!");
-		//solo.assertCurrentActivity("should go back to LoginActivity", LoginActivity.class);	
-	//}
-	
-	
 	 // previsouly passed GUI tests
 	public void testRegisterActivityClassNotNull() {
 	   assertNotNull(activityWeTest);

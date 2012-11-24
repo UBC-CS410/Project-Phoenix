@@ -34,7 +34,7 @@ public class DashboardActivityTest extends ActivityInstrumentationTestCase2<Dash
 	
 	//passed
 	public void testSolo(){
-		solo.assertCurrentActivity("check on 1st activity", DashboardActivity.class);
+		solo.assertCurrentActivity("current should be dashboardActivity", DashboardActivity.class);
 	}
 	
 	// passed

@@ -56,14 +56,14 @@ public class LoginActivityTest extends ActivityInstrumentationTestCase2<LoginAct
 		// way 1
 		solo.clickOnButton("I don't have account. Register Me!");
 		solo.assertCurrentActivity("should launch RegisterActivity", RegisterActivity.class);		
-		solo.goBack(); // remove virtual keboard
+		//solo.goBack(); // remove virtual keboard
 		solo.goBack();
 		solo.assertCurrentActivity("should go back to LoginActivity", LoginActivity.class);
 		
 		// way 2
 		solo.clickOnButton("I don't have account. Register Me!");
 		solo.assertCurrentActivity("should launch RegisterActivity", RegisterActivity.class);
-		solo.goBack(); // remove virtual keboard
+		//solo.goBack(); // remove virtual keboard
 		solo.clickOnButton("Already registred. Login Me!");
 		solo.assertCurrentActivity("should go back to LoginActivity", LoginActivity.class);
 	}

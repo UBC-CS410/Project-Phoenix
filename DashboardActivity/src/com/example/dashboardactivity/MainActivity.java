@@ -143,6 +143,7 @@ public class MainActivity extends Activity {
 
 	// Twitter
 	private static Twitter twitter;
+	private static Twitter twitterForTesting;
 	private static RequestToken requestToken;
 	
 	
@@ -472,19 +473,20 @@ public class MainActivity extends Activity {
 			
 			TwitterFactory factory = new TwitterFactory(configuration);
 			twitter = factory.getInstance();
+			
+			// nextline is for testing 
+			setTwitterForTesting(twitter);
 
 			try {
-				requestToken = twitter
-						.getOAuthRequestToken(TWITTER_CALLBACK_URL);
-				this.startActivity(new Intent(Intent.ACTION_VIEW, Uri
-						.parse(requestToken.getAuthenticationURL())));
+				requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
+				this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthenticationURL())));
 			} catch (TwitterException e) {
 				e.printStackTrace();
 			}
 		} else {
-			// user already logged into twitter
-			Toast.makeText(getApplicationContext(),
-					"Already Logged into twitter", Toast.LENGTH_LONG).show();
+			// user already logged into twitter 
+			logoutFromTwitter(); // already login so log our for user
+			//Toast.makeText(getApplicationContext(),"Already Logged into twitter", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -633,7 +635,7 @@ public class MainActivity extends Activity {
 			
 			// add user name and user id to corresponding arraylist for future use
 			for (User user : listOfUsers){
-				peopleList.add(user.getScreenName());
+				peopleList.add(user.getScreenName()); // let me try getName(), instead of get ScreenName()
 				peopleIdList.add(user.getId());
 			}
 			
@@ -841,6 +843,23 @@ public class MainActivity extends Activity {
 		
 	   String[] url_arr = new String[imageList.size()];
 	    return imageList.toArray(url_arr);
+	}
+	
+	private void setTwitterForTesting(Twitter tw){
+		twitterForTesting = tw;
+	}
+	
+	public Twitter getTwitterForTesting(){
+		return twitterForTesting;
+	}
+	
+	
+	public ArrayList<String> getPeopleList(){
+		return peopleList;
+	}
+	
+	public ArrayList<Long> getPeopleIdList(){
+		return peopleIdList;
 	}
 	
 	
