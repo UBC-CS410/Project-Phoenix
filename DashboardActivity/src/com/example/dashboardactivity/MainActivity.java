@@ -16,9 +16,12 @@ import org.json.JSONObject;
 
 import com.example.dashboardactivity.ImageGridActivity;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.example.dashboardactivity.ImageGridActivity.ImageAdapter;
 import com.example.dashboardactivity.ImageSource.Extra;
 
 
@@ -39,6 +42,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -50,11 +54,16 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -105,6 +114,11 @@ public class MainActivity extends Activity {
     
     
     private TabHost tabHost;
+    
+    protected ImageLoader imageLoader = ImageLoader.getInstance();
+
+	private String[] imageUrls = {};
+	private DisplayImageOptions options;
    /* 
     LayoutInflater layoutInflater; //!!!	// popupwindow 
 	View popupView;  //!!!
@@ -128,6 +142,7 @@ public class MainActivity extends Activity {
 	
 	ListView tweetListView;  // @#@#
 	ListView peopleListView;
+	GridView imageGridView;
 	
 	// EditText for update
 	EditText txtUpdate;
@@ -230,6 +245,7 @@ public class MainActivity extends Activity {
 		
 		tweetListView = (ListView) findViewById(R.id.mylist);  // @#@#
 		peopleListView = (ListView) findViewById(R.id.mylist2);
+		imageGridView = (GridView) findViewById(R.id.gridview_test);// @#@#
 		
 		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
@@ -335,7 +351,28 @@ public class MainActivity extends Activity {
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
 				//showProfileImage();				
-				startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));				
+				//startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
+				
+				//Bundle bundle = getIntent().getExtras();
+				imageUrls = showProfileImage();
+
+				options = new DisplayImageOptions.Builder()
+					.showStubImage(R.drawable.stub_image)
+					.showImageForEmptyUri(R.drawable.image_for_empty_url)
+					.cacheInMemory()
+					.cacheOnDisc()
+					.build();
+
+				//GridView gridView = (GridView) findViewById(R.id.gridview_test);
+				//imageGridView = (GridView) findViewById(R.id.gridview_test);
+				imageGridView.setAdapter(new ImageAdapter());
+//				gridView.setOnItemClickListener(new OnItemClickListener() {
+//					@Override
+//					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//						startImageGalleryActivity(position);
+//					}
+//				});
+				
 				//Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
 			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			    //intent.putExtra(Extra.IMAGES, showProfileImage());
@@ -705,15 +742,15 @@ public class MainActivity extends Activity {
 					//System.out.println("This menu item has this order " + id);					
 					switch(id)
 					{
-						case 2131230759: // follow
+						case 2131230760: // follow
 							twitter.createFriendship(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have followed " + peopleList.get(position) ,Toast.LENGTH_LONG).show();
 							break;
-						case 2131230760: // unfollow
+						case 2131230761: // unfollow
 							twitter.destroyFriendship(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have unfollowed " + peopleList.get(position),Toast.LENGTH_LONG).show();
 							break;
-						case 2131230761: // block
+						case 2131230762: // block
 							twitter.createBlock(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have blocked " + peopleList.get(position),Toast.LENGTH_LONG).show();
 							break;
@@ -862,6 +899,40 @@ public class MainActivity extends Activity {
 		return peopleIdList;
 	}
 	
+	
+	public class ImageAdapter extends BaseAdapter {
+		public int getCount() {
+			return imageUrls.length;
+		}
+
+		public Object getItem(int position) {
+			return null;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final ImageView imageView;
+			if (convertView == null) {
+				imageView = (ImageView) getLayoutInflater().inflate(R.layout.item_grid_image, parent, false);
+			} else {
+				imageView = (ImageView) convertView;
+			}
+
+			imageLoader.displayImage(imageUrls[position], imageView, options, new SimpleImageLoadingListener() {
+				@Override
+				public void onLoadingComplete(Bitmap loadedImage) {
+					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in);
+					imageView.setAnimation(anim);
+					anim.start();
+				}
+			});
+
+			return imageView;
+		}
+	}
 	
 	/*// not used for now
 	private void showCommentWindow(){

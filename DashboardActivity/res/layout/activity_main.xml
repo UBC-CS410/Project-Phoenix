@@ -88,6 +88,17 @@
         android:layout_marginTop="50dip"
         android:layout_marginRight="10dip"
         android:visibility="gone"/>
+    
+    <GridView android:id="@+id/gridview_test"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:columnWidth="100dip"
+    android:gravity="center"
+    android:horizontalSpacing="4dip"
+    android:numColumns="auto_fit"
+    android:stretchMode="columnWidth"
+    android:verticalSpacing="4dip" />
+    
  </LinearLayout>
  
 <LinearLayout android:id="@+id/tab3_Tweets"
