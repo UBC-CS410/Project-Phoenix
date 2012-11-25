@@ -6,10 +6,11 @@ import java.net.URL;
 
 import library.UserFunctions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.facebook.android.AsyncFacebookRunner;
+//import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
@@ -18,9 +19,11 @@ import com.facebook.android.Util;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -28,15 +31,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+
+
 public class FbActivity extends Activity  {
 	private static String APP_ID="441750162554944";
 	private Facebook facebook;
-	private AsyncFacebookRunner mAsyncRunner;
+	//private AsyncFacebookRunner mAsyncRunner;
 	String FILENAME="AndroidSSO_data";
 	private SharedPreferences mPrefs;
 	TextView w;
 	ImageView pic;
 	
+	//comment
+	private static String txtlist="";
 	
 	//comment
 	Button submit;
@@ -48,8 +55,39 @@ public class FbActivity extends Activity  {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fblayout);
 		
+		//new Loadcomment().execute();
+		//##################################################
+		//getcomment
+		UserFunctions user=new UserFunctions();
+		JSONObject json=user.getcomment("www.com");
+		try{
+			//get item
+			int success =json.getInt("success");
+			
+			if(success==1)
+			{
+				JSONArray comments=json.getJSONArray("comments");
+				for(int i=0;i<comments.length();i++)
+				{
+					JSONObject c=comments.getJSONObject(i);
+					String id=c.get("email").toString();
+					String comment=c.get("comment").toString();
+					txtlist=txtlist+comment+"\n\t\t"+id+"\n";
+				}
+			}
+			else
+			{}
+		}
+		catch(JSONException e)
+		{e.printStackTrace();}
+		TextView txtbox=(TextView)findViewById(R.id.txtbox);
+    	txtbox.setText(txtlist);
+    	//end
+		//#######################################
+		
+		
 		facebook = new Facebook(APP_ID);
-        mAsyncRunner = new AsyncFacebookRunner(facebook);
+       // mAsyncRunner = new AsyncFacebookRunner(facebook);
         mPrefs=getPreferences(MODE_PRIVATE);
         
         loginToFacebook();
@@ -97,6 +135,7 @@ public class FbActivity extends Activity  {
 				String comment=input.getText().toString();
 				String email="email";
 				String url="www.com";
+				
 				UserFunctions user=new UserFunctions();
 				JSONObject json=user.comment_Image(url, email, comment);
 				try {
@@ -110,7 +149,69 @@ public class FbActivity extends Activity  {
     	
     	
 	}
-
+/*
+	//################################
+	//load comment function
+	// Progress Dialog
+    private ProgressDialog pDialog;
+	class Loadcomment extends AsyncTask<String,String,String>
+	{
+		@Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(FbActivity.this);
+            pDialog.setMessage("Loading products. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+		
+		@Override
+		protected String doInBackground(String... arg0) {
+			// TODO Auto-generated method stub
+			UserFunctions user=new UserFunctions();
+			JSONObject json=user.getcomment("www.com");
+			try{
+				//get item
+				int success =json.getInt("success");
+				
+				if(success==1)
+				{
+					JSONArray comments=json.getJSONArray("comments");
+					for(int i=0;i<comments.length();i++)
+					{
+						JSONObject c=comments.getJSONObject(i);
+						String id=c.getString("email");
+						String comment=c.getString("comment");
+						txtlist=txtlist+comment+"\n\t\t"+id+"\n";
+					}
+				}
+				else
+				{}
+			}
+			catch(JSONException e)
+			{e.printStackTrace();}
+			
+			return null;
+		}
+		
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog after getting all products
+            pDialog.dismiss();
+            // updating UI from Background Thread
+            runOnUiThread(new Runnable() {
+                public void run() {
+                	TextView txtbox=(TextView)findViewById(R.id.txtbox);
+                	txtbox.setText(txtlist);
+                }
+            });
+ 
+        }
+	}
+	
+	*/
+	
+	
 	
 	//fb login func
     public void loginToFacebook() {

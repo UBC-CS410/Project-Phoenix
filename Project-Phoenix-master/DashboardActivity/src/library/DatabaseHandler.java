@@ -69,12 +69,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
       //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         //comment table here
-        String CREATE_COMMENT_TABLE="CREATE TABLE "+TABLE_COMMENT+"("
+        /*String CREATE_COMMENT_TABLE="CREATE TABLE "+TABLE_COMMENT+"("
         		+CID+" INTEGER PRIMARY KEY,"
         		+IMAGE_URL+" TEXT,"
         		+USER_ID+" TEXT,"
         		+COMMENTS+" TEXT,"+")";
         db.execSQL(CREATE_COMMENT_TABLE);
+        */
     }
  
     // Upgrading database

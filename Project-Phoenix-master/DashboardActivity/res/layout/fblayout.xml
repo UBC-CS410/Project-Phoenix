@@ -37,4 +37,10 @@
         android:layout_height="wrap_content"
         android:text="FB" />
 
+    <TextView
+        android:id="@+id/txtbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
 </LinearLayout>

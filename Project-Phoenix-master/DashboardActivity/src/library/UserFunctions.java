@@ -19,6 +19,8 @@ public class UserFunctions {
     private static String registerURL = "http://70.79.75.130:3721/";
     private static String imageURL = "http://70.79.75.130:3721/storePhoto.php";
     private static String commentURL="http://70.79.75.130:3721/comment.php";
+    private static String getcommentURL="http://70.79.75.130:3721/getcomment.php";
+    
  
     private static String login_tag = "login";
     private static String register_tag = "register";
@@ -46,6 +48,15 @@ public class UserFunctions {
         return json;
     }
  
+    public JSONObject getcomment(String photoref)
+    {
+    	List<NameValuePair>params=new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("photoref",photoref));
+    	JSONObject json=jsonParser.getJSONFromUrl(getcommentURL,params);
+		return json;
+    	
+    }
+    
     /**
      * function make Login Request
      * @param name
