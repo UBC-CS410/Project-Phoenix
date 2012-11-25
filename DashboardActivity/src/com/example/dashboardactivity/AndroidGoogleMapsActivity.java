@@ -13,6 +13,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -26,9 +28,9 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		LocationListener {
 	private MapView map;
 	private MapController controller;
-	private Location lastKnowLocation;
+	private Location currentLocation;
 	private GeoPoint point;
-
+	Button btnFindme;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -39,8 +41,8 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 500.0f,
 				this);
 
-		String locationProvider = LocationManager.GPS_PROVIDER;
-		lastKnowLocation = lm.getLastKnownLocation(locationProvider);
+//		String locationProvider = LocationManager.GPS_PROVIDER;
+//		lastKnowLocation = lm.getLastKnownLocation(locationProvider);
 
 
 		setContentView(R.layout.map_view);
@@ -50,6 +52,17 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 
 		GeoPoint p = new GeoPoint(-122,37);
 		placeMarker(map, p);
+		
+		
+		String locationProvider = LocationManager.GPS_PROVIDER;
+		currentLocation = lm.getLastKnownLocation(locationProvider);
+		btnFindme = (Button) findViewById(R.id.btnFindMe);
+		btnFindme.setOnClickListener(new View.OnClickListener() {
+			 
+            public void onClick(View view) {
+            	locationChanged(currentLocation);
+            }
+        });
 		
 	}
 
@@ -92,7 +105,7 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			public void run() {
 				controller.setZoom(15);
 				controller.animateTo(myOverlay.getMyLocation());
-				lastKnowLocation = myOverlay.getLastFix();
+//				lastKnowLocation = myOverlay.getLastFix();
 			}
 		});
 		map.getOverlays().add(myOverlay);
@@ -115,17 +128,31 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
+//		if (location != null) {
+//			double lat = location.getLatitude();
+//			double lng = location.getLongitude();
+//			MapView mapView = (MapView) findViewById(R.id.mapView);
+//			GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
+//					(int) (lng * 1E6));
+//			MapController mc = mapView.getController();
+//			mc.animateTo(geoPoint);
+//			mc.setZoom(15);
+//			mapView.invalidate();
+//		} 
+
+	}
+	
+	public void locationChanged(Location location) {
 		if (location != null) {
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
-			MapView mapView = (MapView) findViewById(R.id.mapView);
+//			MapView mapView = (MapView) findViewById(R.id.mapView);
 			GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
 					(int) (lng * 1E6));
-			MapController mc = mapView.getController();
-			mc.animateTo(geoPoint);
-			mc.setZoom(15);
-			mapView.invalidate();
+			
+			controller.animateTo(geoPoint);
+			controller.setZoom(15);
+			map.invalidate();
 		} 
 
 	}
