@@ -129,6 +129,7 @@ public class FbActivity extends Activity  {
     	
     	submit.setOnClickListener(new View.OnClickListener() {
 			
+    		//////////////////////////////////////////////////comment
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -136,8 +137,11 @@ public class FbActivity extends Activity  {
 				String email="email";
 				String url="www.com";
 				
+				long twid=2223;
+				long twuserid=3434;
+				
 				UserFunctions user=new UserFunctions();
-				JSONObject json=user.comment_Image(url, email, comment);
+				JSONObject json=user.tcomment(twid,twuserid,comment);
 				try {
 					input.setText(json.get("message").toString());
 				} catch (JSONException e) {
