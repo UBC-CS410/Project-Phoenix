@@ -19,9 +19,10 @@ public final class R {
         public static final int ic_launcher=0x7f020002;
         public static final int image_for_empty_url=0x7f020003;
         public static final int mark_red=0x7f020004;
-        public static final int search_medium=0x7f020005;
-        public static final int stub_image=0x7f020006;
-        public static final int success=0x7f020007;
+        public static final int marker=0x7f020005;
+        public static final int search_medium=0x7f020006;
+        public static final int stub_image=0x7f020007;
+        public static final int success=0x7f020008;
     }
     public static final class id {
         public static final int btnConnectTwitter=0x7f080015;
