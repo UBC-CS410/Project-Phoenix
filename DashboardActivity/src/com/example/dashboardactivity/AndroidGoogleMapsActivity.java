@@ -1,5 +1,10 @@
 package com.example.dashboardactivity;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -8,6 +13,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,7 +23,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridView;
 
+import com.example.dashboardactivity.MainActivity.ImageAdapter;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -23,59 +33,67 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 public class AndroidGoogleMapsActivity extends MapActivity implements
 		LocationListener {
 	private MapView map;
 	private MapController controller;
 	private Location currentLocation;
-	private GeoPoint point;
+	// private GeoPoint point;
 	Button btnFindme;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER))
-			showDialog();
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 500.0f,
 				this);
-
-//		String locationProvider = LocationManager.GPS_PROVIDER;
-//		lastKnowLocation = lm.getLastKnownLocation(locationProvider);
-
 
 		setContentView(R.layout.map_view);
 		initMapView();
 		initMyLocation();
-			
 
-		GeoPoint p = new GeoPoint(-122,37);
-		placeMarker(map, p);
-		
-		
+		//place marker
+		GeoPoint p = getGeoPoint(37, -123);
+		Bitmap pic = null;
+		try {
+			pic = drawFromUrl("http://bks6.books.google.com/books?id=aH7BPTrwNXUC&printsec=frontcover&img=1&zoom=5&edge=curl&sig=ACfU3U2aQRnAX2o2ny2xFC1GmVn22almpg");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Drawable drawable = new BitmapDrawable(pic);
+		placeMarker(map, p, drawable);
+
+		//get current location
 		String locationProvider = LocationManager.GPS_PROVIDER;
 		currentLocation = lm.getLastKnownLocation(locationProvider);
+		
+		//findme button
 		btnFindme = (Button) findViewById(R.id.btnFindMe);
 		btnFindme.setOnClickListener(new View.OnClickListener() {
-			 
-            public void onClick(View view) {
-            	locationChanged(currentLocation);
-            }
-        });
-		
+			public void onClick(View view) {
+				locationChanged(currentLocation);
+			}
+		});
+
 	}
 
-	/** Find and initialize the map view. */
+	//initialize map
 	private void initMapView() {
 		map = (MapView) findViewById(R.id.mapView);
 		controller = map.getController();
 		map.setBuiltInZoomControls(true);
-		
+
 	}
-	
-	//if gps is show setting dialog
-	private void showDialog(){
+
+	// if gps is off, show setting dialog
+	private void showDialog() {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		alertDialog.setTitle("Error");
 		alertDialog.setMessage("Do you want go to turn on GPS");
@@ -87,7 +105,7 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 						android.provider.Settings.ACTION_WIRELESS_SETTINGS));
 			}
 		});
-		alertDialog.setNegativeButton("cancle", new OnClickListener(){
+		alertDialog.setNegativeButton("cancle", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
@@ -105,17 +123,18 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			public void run() {
 				controller.setZoom(15);
 				controller.animateTo(myOverlay.getMyLocation());
-//				lastKnowLocation = myOverlay.getLastFix();
+				// lastKnowLocation = myOverlay.getLastFix();
 			}
 		});
 		map.getOverlays().add(myOverlay);
 	}
 
 	// place marker
-	public void placeMarker(MapView mapView, GeoPoint geoPoint) {
+	public void placeMarker(MapView mapView, GeoPoint geoPoint,
+			Drawable drawable) {
 		List<Overlay> mapOverlays = map.getOverlays();
-		Drawable drawable = this.getResources().getDrawable(R.drawable.marker);
-		customMarkerOverlay itemizedoverlay = new customMarkerOverlay(drawable, this);
+		customMarkerOverlay itemizedoverlay = new customMarkerOverlay(drawable,
+				this);
 		OverlayItem overlayitem = new OverlayItem(geoPoint, "leo", "chen");
 		itemizedoverlay.addOverlay(overlayitem);
 		mapOverlays.add(itemizedoverlay);
@@ -128,38 +147,50 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-//		if (location != null) {
-//			double lat = location.getLatitude();
-//			double lng = location.getLongitude();
-//			MapView mapView = (MapView) findViewById(R.id.mapView);
-//			GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
-//					(int) (lng * 1E6));
-//			MapController mc = mapView.getController();
-//			mc.animateTo(geoPoint);
-//			mc.setZoom(15);
-//			mapView.invalidate();
-//		} 
-
+		currentLocation = location;
 	}
-	
+
+	// use to find me
 	public void locationChanged(Location location) {
 		if (location != null) {
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
-//			MapView mapView = (MapView) findViewById(R.id.mapView);
 			GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
 					(int) (lng * 1E6));
-			
+
 			controller.animateTo(geoPoint);
 			controller.setZoom(15);
 			map.invalidate();
-		} 
+		}
+	}
+	
+	//int to geopoint
+	public GeoPoint getGeoPoint(int lat, int log){
+		GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
+				(int) (log * 1E6));
+		return geoPoint;
+	}
 
+	// convert url to bitmap
+	Bitmap drawFromUrl(String url) throws java.net.MalformedURLException,
+			java.io.IOException {
+		Bitmap x;
+		HttpURLConnection connection = (HttpURLConnection) new URL(url)
+				.openConnection();
+		connection.setRequestProperty("User-agent", "Mozilla/4.0");
+		connection.connect();
+		InputStream input = connection.getInputStream();
+		x = BitmapFactory.decodeStream(input);
+		return x;
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		showDialog();
+		if (provider == "gps") {
+			showDialog();
+		} else {
+			showDialog();
+		}
 	}
 
 	@Override
@@ -173,4 +204,5 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		// TODO Auto-generated method stub
 
 	}
+
 }
