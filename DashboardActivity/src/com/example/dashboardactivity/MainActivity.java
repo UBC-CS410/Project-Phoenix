@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -109,6 +110,7 @@ public class MainActivity extends Activity {
 	
     private ArrayList<String> imageList = new ArrayList<String>();
     private ArrayList<String> tweetList = new ArrayList<String>();
+    private ArrayList<Long> tweetIdList = new ArrayList<Long>();
     private ArrayList<String> peopleList = new ArrayList<String>();
     private ArrayList<Long> peopleIdList = new ArrayList<Long>();
     
@@ -396,7 +398,7 @@ public class MainActivity extends Activity {
 				
 				// Check for blank text
 				if (name.trim().length() > 0) {
-					// update status
+					// search people by user name
 					searchPeople(name);
 				} else {
 					// EditText is empty
@@ -652,10 +654,52 @@ public class MainActivity extends Activity {
 	/*
 	 * Send Comment on a tweet
 	 */
-	private void sendComment(String comment){
+	private void sendComment(String comment, long userId, long tweetId){
 		// TODO
-		System.out.println("The comment is: " + comment);
+		//System.out.println("The comment is: " + comment);
+		//System.out.println("The userId is: " + userId);
+		//System.out.println("send comment tweetId is: " + tweetId);
+		//System.out.println("long to string is: " + Long.toString(tweetId)); // same as long
+		
+		UserFunctions user = new UserFunctions();
+		JSONObject json = user.tcomment(tweetId, userId, comment);
+		
+		getComment(tweetId); 
 	}
+	
+	private void getComment(long tweetId){
+		//String txtlist="";
+		UserFunctions user=new UserFunctions();
+		JSONObject json=user.tgetcomment(tweetId);
+		try{
+			//get item
+			int success =json.getInt("success");
+
+			if(success==1)
+			{
+				
+				JSONArray comments=json.getJSONArray("comments");
+				System.out.println("comments has size : " + comments.length());
+				for(int i=0;i<comments.length();i++)
+				{
+					JSONObject c = comments.getJSONObject(i);
+					long twuserid=Long.valueOf( c.get("twuserid").toString() );
+					String comment=c.get("comment").toString();
+					
+					//txtlist=txtlist+comment+"\n\t\t"+id+"\n";
+					
+					System.out.println(twuserid+ " " + comment );
+				}
+			}
+			else
+			{}
+		}
+		catch(JSONException e)
+		{e.printStackTrace();}
+		
+		//txtTweetComment.setText(txtlist);
+	}
+	
 	
 	/**
 	 * search other twitter user by user name
@@ -697,16 +741,27 @@ public class MainActivity extends Activity {
 		try {			
 			// clear tweet array list every time before use
 			tweetList.clear();//@@@@
+			tweetIdList.clear(); //$$$$
 			
 			//User user = twitter.verifyCredentials();
 			
 			User user = twitter.showUser(twitter.getId());
-			List<Status> statuses = twitter.getHomeTimeline();
+			//List<Status> statuses = twitter.getHomeTimeline();
+			List<Status> statuses = twitter.getUserTimeline();
             System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
             
             // add these recent status to corresponding arraylist for future use
             for (Status status : statuses) {            	
             	tweetList.add(status.getText());
+            	tweetIdList.add(status.getId());
+            	//System.out.println("pre");
+            	if(status.getGeoLocation()!= null){
+            		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
+            	}else{
+            		//System.out.println("No geo info");
+            	}
+            	
+            	//System.out.println("post");
                 //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
             }			
             
@@ -742,17 +797,24 @@ public class MainActivity extends Activity {
 					//System.out.println("This menu item has this order " + id);					
 					switch(id)
 					{
-						case 2131230760: // follow
+						case R.id.menu0: // show name
+							String name = twitter.showUser(peopleIdList.get(position)).getName();
+							Toast.makeText(MainActivity.this,"Name is <" + name+">" ,Toast.LENGTH_LONG).show();
+							break;
+						case R.id.menu1: // follow
 							twitter.createFriendship(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have followed " + peopleList.get(position) ,Toast.LENGTH_LONG).show();
 							break;
-						case 2131230761: // unfollow
+						case R.id.menu2: // unfollow
 							twitter.destroyFriendship(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have unfollowed " + peopleList.get(position),Toast.LENGTH_LONG).show();
 							break;
-						case 2131230762: // block
+						case R.id.menu3: // block
 							twitter.createBlock(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have blocked " + peopleList.get(position),Toast.LENGTH_LONG).show();
+							break;
+						case R.id.menu4: // add as friend
+							Toast.makeText(MainActivity.this,"Add as friend",Toast.LENGTH_LONG).show();
 							break;
 						default:
 							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
@@ -784,26 +846,37 @@ public class MainActivity extends Activity {
 				
 				switch(id)
 				{
-					case 2131230763: // Comment
-						//showCommentWindow(); //!!
-						System.out.println("Comment is clicked");	
+					case R.id.tweetmenu1: // Comment
+						//showCommentWindow(); //!!						
+						try {
+							System.out.println("Comment is clicked");								
+							String comment = txtTweetComment.getText().toString();
+							long tweetId = tweetIdList.get(position);
+							long userId = twitter.getId();
+							
+							if (comment.trim().length() > 0) {
+								sendComment(comment, userId, tweetId);
+								Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
+								txtTweetComment.setText("");
+							} else {
+								// EditText is empty
+								Toast.makeText(getApplicationContext(),
+										"Your comment can not be empty", Toast.LENGTH_SHORT).show();
+							}
+							
+						} catch (IllegalStateException e) {
+							e.printStackTrace();
+						} catch (TwitterException e) {
+							e.printStackTrace();
+						}
 						
-						String comment = txtTweetComment.getText().toString();
-						
-						if (comment.trim().length() > 0) {
-							sendComment(comment);
-							Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
-						} else {
-							// EditText is empty
-							Toast.makeText(getApplicationContext(),
-									"Your comment can not be empty", Toast.LENGTH_SHORT).show();
-						}	
+							
 						break;
-					case 2131230764: // Item 2
+					case R.id.tweetmenu2: // Item 2
 						System.out.println("Item 2 is clicked");		
 						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
 						break;
-					case 2131230765: // Item 3
+					case R.id.tweetmenu3: // Item 3
 						System.out.println("Item 3 is clicked");
 						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
 						break;

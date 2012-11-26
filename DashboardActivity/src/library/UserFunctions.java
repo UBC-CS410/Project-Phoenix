@@ -19,6 +19,10 @@ public class UserFunctions {
     private static String registerURL = "http://70.79.75.130:3721/";
     private static String imageURL = "http://70.79.75.130:3721/"; //http://70.79.75.130:3721/storePhoto.php
  
+    //twitter comment function
+    private static String tcommentURL="http://70.79.75.130:3721/tcomment.php";
+    private static String tgetcommentURL="http://70.79.75.130:3721/tgetcomment.php";
+    
     private static String login_tag = "login";
     private static String register_tag = "register";
     private static String image_tag = "storeImage";
@@ -64,6 +68,30 @@ public class UserFunctions {
         // return json
         return json;
     }
+    
+    //########################################
+    //comment on tweet
+    public JSONObject tcomment(long twid,long twuserid,String comment)
+    {
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("twid", ""+twid));
+        params.add(new BasicNameValuePair("twuserid", ""+twuserid));
+        params.add(new BasicNameValuePair("comment", comment));
+        
+    	JSONObject json = jsonParser.getJSONFromUrl(tcommentURL, params);
+    	return json;
+    }
+    
+    // get comment on tweet
+    public JSONObject tgetcomment(long twid)
+    {
+    	List<NameValuePair>params=new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("twid",""+twid));
+    	JSONObject json=jsonParser.getJSONFromUrl(tgetcommentURL,params);
+		return json;
+    	
+    }
+    
     
     //*************************************************************************************
     public JSONObject getImageUrl(String email, String url){
