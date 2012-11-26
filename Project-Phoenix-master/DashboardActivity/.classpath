@@ -8,7 +8,13 @@
 	<classpathentry kind="lib" path="libs/signpost-commonshttp4-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/twitter4j-core-android-2.2.6.jar"/>
 	<classpathentry kind="lib" path="libs/universal-image-loader-1.6.3.jar"/>
+	<classpathentry kind="lib" path="libs/robotium-solo-3.5.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/DashboardActivity/libs/robotium-solo-3.6-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="C:/Users/steve/Desktop/Project-Phoenix-Steve-Shen/DashboardActivity/libs/gcm.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -1,8 +1,5 @@
 package com.example.dashboardactivity;
 
-
-import java.util.HashMap;
-
 import org.json.JSONException;
 import org.json.JSONObject;
  
@@ -94,10 +91,11 @@ public class LoginActivity extends Activity {
         btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
  
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(),
-                        RegisterActivity.class);
-                startActivity(i);
-                finish();
+            	
+            	startActivity(new Intent(getApplicationContext(),RegisterActivity.class));
+                //Intent i = new Intent(getApplicationContext(),RegisterActivity.class);
+                //startActivity(i);
+                //finish(); // don't finish this activity
             }
         });
     }

@@ -17,14 +17,14 @@ public class UserFunctions {
     // use http://10.0.2.2/ to connect to your localhost ie http://localhost/
     private static String loginURL = "http://70.79.75.130:3721/";
     private static String registerURL = "http://70.79.75.130:3721/";
-    private static String imageURL = "http://70.79.75.130:3721/storePhoto.php";
-    private static String commentURL="http://70.79.75.130:3721/comment.php";
-    private static String getcommentURL="http://70.79.75.130:3721/getcomment.php";
-    
+    private static String imageURL = "http://70.79.75.130:3721/"; //http://70.79.75.130:3721/storePhoto.php
+ 
     //twitter comment function
     private static String tcommentURL="http://70.79.75.130:3721/tcomment.php";
     private static String tgetcommentURL="http://70.79.75.130:3721/tgetcomment.php";
- 
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    private static String get_all_friends = "http://70.79.75.130:3721/test/get_all_products.php";
+    
     private static String login_tag = "login";
     private static String register_tag = "register";
     private static String image_tag = "storeImage";
@@ -51,8 +51,6 @@ public class UserFunctions {
         return json;
     }
  
-    
-    
     /**
      * function make Login Request
      * @param name
@@ -73,6 +71,39 @@ public class UserFunctions {
         return json;
     }
     
+    //########################################
+    //comment on tweet
+    public JSONObject tcomment(long twid,long twuserid,String comment)
+    {
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("twid", ""+twid));
+        params.add(new BasicNameValuePair("twuserid", ""+twuserid));
+        params.add(new BasicNameValuePair("comment", comment));
+        
+    	JSONObject json = jsonParser.getJSONFromUrl(tcommentURL, params);
+    	return json;
+    }
+    
+    // get comment on tweet
+    public JSONObject tgetcomment(long twid)
+    {
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("twid",""+twid));
+    	JSONObject json=jsonParser.getJSONFromUrl(tgetcommentURL,params);
+		return json;
+    	
+    }
+    
+    
+    // get friend in our DB
+    public JSONObject getAllFriends(long currUID){
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("twitterID",""+currUID));
+    	JSONObject json = jsonParser.getJSONFromUrl(get_all_friends,params);
+		return json;   	
+    }
+    
+    
     //*************************************************************************************
     public JSONObject getImageUrl(String email, String url){
     	
@@ -84,48 +115,6 @@ public class UserFunctions {
     	
     	JSONObject json = jsonParser.getJSONFromUrl(imageURL, params);
     	return json;
-    }
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
-    //comment   photo
-    public JSONObject comment_Image(String url,String email,String comment)
-    {
-    	List<NameValuePair> params = new ArrayList<NameValuePair>();
-    	params.add(new BasicNameValuePair("photoref", url));
-        params.add(new BasicNameValuePair("email", email));
-        params.add(new BasicNameValuePair("comment", comment));
-        
-    	JSONObject json = jsonParser.getJSONFromUrl(commentURL, params);
-    	return json;
-    }
-    public JSONObject getcomment(String photoref)
-    {
-    	List<NameValuePair>params=new ArrayList<NameValuePair>();
-    	params.add(new BasicNameValuePair("photoref",photoref));
-    	JSONObject json=jsonParser.getJSONFromUrl(getcommentURL,params);
-		return json;
-    	
-    }
-    
-    
-    //########################################
-    //comment twitter
-    public JSONObject tcomment(long twid,long twuserid,String comment)
-    {
-    	List<NameValuePair> params = new ArrayList<NameValuePair>();
-    	params.add(new BasicNameValuePair("twid", ""+twid));
-        params.add(new BasicNameValuePair("twuserid", ""+twuserid));
-        params.add(new BasicNameValuePair("comment", comment));
-        
-    	JSONObject json = jsonParser.getJSONFromUrl(tcommentURL, params);
-    	return json;
-    }
-    public JSONObject tgetcomment(long twid)
-    {
-    	List<NameValuePair>params=new ArrayList<NameValuePair>();
-    	params.add(new BasicNameValuePair("twid",""+twid));
-    	JSONObject json=jsonParser.getJSONFromUrl(tgetcommentURL,params);
-		return json;
-    	
     }
  
     /**

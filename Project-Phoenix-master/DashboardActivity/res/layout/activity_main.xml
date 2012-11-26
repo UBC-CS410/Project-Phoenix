@@ -88,6 +88,17 @@
         android:layout_marginTop="50dip"
         android:layout_marginRight="10dip"
         android:visibility="gone"/>
+    
+    <GridView android:id="@+id/gridview_test"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:columnWidth="100dip"
+    android:gravity="center"
+    android:horizontalSpacing="4dip"
+    android:numColumns="auto_fit"
+    android:stretchMode="columnWidth"
+    android:verticalSpacing="4dip" />
+    
  </LinearLayout>
  
 <LinearLayout android:id="@+id/tab3_Tweets"
@@ -104,7 +115,15 @@
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
         android:layout_marginTop="50dip"
-        android:visibility="gone"/>  
+        android:visibility="gone"/>
+    
+    <!-- Comment EditText -->
+    <EditText android:id="@+id/txtComment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Compose new Comment..."
+        android:visibility="gone"/>
+    
         
     <ListView android:id="@+id/mylist"
     	android:layout_width="fill_parent"
@@ -113,35 +132,36 @@
     
  </LinearLayout>
  
- <LinearLayout android:id="@+id/tab4_Pepple"
+ <RelativeLayout android:id="@+id/tab4_Pepple"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:paddingTop="50dp">
     
     <!-- Search People EditText -->
     <EditText android:id="@+id/txtSearchPeople"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dip"
-        android:layout_margin="10dip"        
-        android:hint="Search"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"   
+        android:layout_alignParentLeft="true"    
+        android:hint="Search People"
         android:visibility="gone"/>
 
     <!-- Search People Button -->
-    <Button android:id="@+id/btnSearchPeople"
-        android:layout_width="fill_parent"
+    <ImageButton android:id="@+id/btnSearchPeople"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
-        android:text="Search People"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
+        android:src="@drawable/search_medium"
+        android:background="@android:color/white"
+        android:layout_alignParentRight="true" 
         android:visibility="gone"/>
     
     <ListView android:id="@+id/mylist2"
     	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/txtSearchPeople"
         />
     
- </LinearLayout>
+ </RelativeLayout>
  
 </FrameLayout>
 
