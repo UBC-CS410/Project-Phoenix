@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -67,21 +68,50 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Drawable drawable = new BitmapDrawable(pic);
-		placeMarker(map, p, drawable);
+		
+
 
 		//get current location
 		String locationProvider = LocationManager.GPS_PROVIDER;
 		currentLocation = lm.getLastKnownLocation(locationProvider);
 		
-		//findme button
+		//find me button
 		btnFindme = (Button) findViewById(R.id.btnFindMe);
 		btnFindme.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				locationChanged(currentLocation);
 			}
 		});
+		
+		
 
+		GeoPoint p1 = new GeoPoint((int) (56.27058500725475 * 1E6), (int) (-2.6984095573425293 * 1E6));
+
+		
+		List<GeoPoint> geoPoint = new ArrayList<GeoPoint>();
+		List<Bitmap> bitMap	= new ArrayList<Bitmap>();
+		List<String> string = new ArrayList<String>();
+		
+		
+		string.add("1");
+		string.add("2");
+		string.add("3");
+		geoPoint.add(p);
+		geoPoint.add(p1);
+		GeoPoint p2 = new GeoPoint((int) (60.00 * 1E6), (int) (-21.69 * 1E6));
+		geoPoint.add(p2);
+		bitMap.add(pic);
+		bitMap.add(pic);
+		bitMap.add(pic);
+		
+		
+		
+		customMapOverlay demoOverlay = new customMapOverlay(geoPoint, bitMap, string);
+		map.getOverlays().add(demoOverlay);
+		
+		
+		
+		
 	}
 
 	//initialize map
@@ -123,22 +153,11 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			public void run() {
 				controller.setZoom(15);
 				controller.animateTo(myOverlay.getMyLocation());
-				// lastKnowLocation = myOverlay.getLastFix();
 			}
 		});
 		map.getOverlays().add(myOverlay);
 	}
 
-	// place marker
-	public void placeMarker(MapView mapView, GeoPoint geoPoint,
-			Drawable drawable) {
-		List<Overlay> mapOverlays = map.getOverlays();
-		customMarkerOverlay itemizedoverlay = new customMarkerOverlay(drawable,
-				this);
-		OverlayItem overlayitem = new OverlayItem(geoPoint, "leo", "chen");
-		itemizedoverlay.addOverlay(overlayitem);
-		mapOverlays.add(itemizedoverlay);
-	}
 
 	@Override
 	protected boolean isRouteDisplayed() {
