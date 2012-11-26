@@ -184,7 +184,7 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 	}
 	
 	//int to geopoint
-	public GeoPoint getGeoPoint(int lat, int log){
+	public GeoPoint getGeoPoint(double lat, double log){
 		GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
 				(int) (log * 1E6));
 		return geoPoint;
