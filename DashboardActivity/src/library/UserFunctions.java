@@ -22,6 +22,8 @@ public class UserFunctions {
     //twitter comment function
     private static String tcommentURL="http://70.79.75.130:3721/tcomment.php";
     private static String tgetcommentURL="http://70.79.75.130:3721/tgetcomment.php";
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    private static String get_all_friends = "http://70.79.75.130:3721/test/get_all_products.php";
     
     private static String login_tag = "login";
     private static String register_tag = "register";
@@ -85,11 +87,20 @@ public class UserFunctions {
     // get comment on tweet
     public JSONObject tgetcomment(long twid)
     {
-    	List<NameValuePair>params=new ArrayList<NameValuePair>();
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
     	params.add(new BasicNameValuePair("twid",""+twid));
     	JSONObject json=jsonParser.getJSONFromUrl(tgetcommentURL,params);
 		return json;
     	
+    }
+    
+    
+    // get friend in our DB
+    public JSONObject getAllFriends(long currUID){
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	params.add(new BasicNameValuePair("twitterID",""+currUID));
+    	JSONObject json = jsonParser.getJSONFromUrl(get_all_friends,params);
+		return json;   	
     }
     
     

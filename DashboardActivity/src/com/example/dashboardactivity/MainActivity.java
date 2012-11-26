@@ -60,6 +60,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -356,13 +357,28 @@ public class MainActivity extends Activity {
 			
 		});
 		
+//		imageGridView.setOnItemClickListener(new ListView.OnItemClickListener() {
+//
+//			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+//				showFriendMenu(view,position);
+//				//showTweetMenu(view, position);	
+//			}
+//			
+//		});
+		
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
 				//showProfileImage();				
 				//startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
 				
 				//Bundle bundle = getIntent().getExtras();
-				imageUrls = showProfileImage();
+				try {
+					imageUrls = getAllFriend(twitter.getId());
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
+				} catch (TwitterException e) {
+					e.printStackTrace();
+				}
 
 				options = new DisplayImageOptions.Builder()
 					.showStubImage(R.drawable.stub_image)
@@ -374,12 +390,13 @@ public class MainActivity extends Activity {
 				//GridView gridView = (GridView) findViewById(R.id.gridview_test);
 				//imageGridView = (GridView) findViewById(R.id.gridview_test);
 				imageGridView.setAdapter(new ImageAdapter());
-//				gridView.setOnItemClickListener(new OnItemClickListener() {
-//					@Override
-//					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//						startImageGalleryActivity(position);
-//					}
-//				});
+				imageGridView.setOnItemClickListener(new OnItemClickListener() {
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						//startImageGalleryActivity(position);
+						//TODO
+						showFriendMenu(view, position);
+					}
+				});
 				
 				//Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
 			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -670,7 +687,43 @@ public class MainActivity extends Activity {
 		UserFunctions user = new UserFunctions();
 		JSONObject json = user.tcomment(tweetId, userId, comment);
 		
+		//getAllFriend(userId);
 		//getComment(tweetId); 
+	}
+	
+	private String[] getAllFriend(long currUid){
+		imageList.clear();
+		
+		UserFunctions user = new UserFunctions();
+		JSONObject json = user.getAllFriends(currUid);
+		
+		int success;
+		try {
+			success = json.getInt("success");
+			if(success==1){
+				JSONArray friends = json.getJSONArray("friends");
+				System.out.println("friends has size : " + friends.length());
+				
+				for(int i=0; i< friends.length(); i++)
+				{
+					JSONObject c = friends.getJSONObject(i);
+					
+					long friendId = Long.valueOf( c.get("twitterFriend").toString() );					
+					String friendImgUrl = c.get("twitterFriendImg").toString();
+					imageList.add(friendImgUrl);
+					
+					System.out.println(friendId+ " " + friendImgUrl );
+					
+				}
+			
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		String[] urls = new String[imageList.size()];
+		
+		return imageList.toArray(urls);
 	}
 	
 	private boolean getComment(long tweetId){
@@ -865,6 +918,35 @@ public class MainActivity extends Activity {
 	}
 	
 
+	private void showFriendMenu(View v, final int position){
+		PopupMenu friendMenu = new PopupMenu(MainActivity.this, v);
+		friendMenu.getMenuInflater().inflate(R.menu.friendimagemenu , friendMenu.getMenu());
+		
+		friendMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+			public boolean onMenuItemClick(MenuItem item) {
+				//TODO
+				int id = item.getItemId();
+				switch(id){
+					case R.id.friendmenu1:  // delete friend from DB
+						Toast.makeText(MainActivity.this,"Delete friend",Toast.LENGTH_LONG).show();
+						break;
+					case R.id.friendmenu2:  // item 2
+						Toast.makeText(MainActivity.this,"Item 2",Toast.LENGTH_LONG).show();
+						break;
+					case R.id.friendmenu3:  // item 3
+						Toast.makeText(MainActivity.this,"Item 3",Toast.LENGTH_LONG).show();
+						break;	
+					default:
+						Toast.makeText(MainActivity.this,"Nothing",Toast.LENGTH_LONG).show();
+						
+				}				
+				return true;
+			}
+			
+		});
+		friendMenu.show();			
+	}
 	
 	/**
 	 * Show a popup menu when click on a recent tweet
@@ -955,30 +1037,7 @@ public class MainActivity extends Activity {
             	
                 //System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
                 //System.out.println(url.toString());  
-             }
-			
-			
-			//UserFunctions userFunction = new UserFunctions();
-			//JSONObject json = userFunction.getImageUrl("s@s.com", url.toString());
-		/*	
-			System.out.println("11111");
-			try{
-				if (json.getString(IMAGE_SUCCESS) != null) {
-					System.out.println("22222");
-					String res = json.getString(IMAGE_SUCCESS);
-					if(Integer.parseInt(res) == 1){
-						// add image successful
-						// Store image details in SQLite Database
-                        //DatabaseHandler db = new DatabaseHandler(getApplicationContext());
-                        //JSONObject json_user = json.getJSONObject("user");
-					}
-					
-				}
-			}catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-			*/
+             }			
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (TwitterException e) {
