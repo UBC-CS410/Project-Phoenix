@@ -3,6 +3,7 @@ package com.example.dashboardactivity;
 import library.AlertDialogManager;
 import library.ConnectionDetector;
 import library.DatabaseHandler;
+import library.JSONParserFriend;
 import library.UserFunctions;
 import library.ExtendedImageDownloader;
 
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,6 +124,13 @@ public class MainActivity extends Activity {
     private ArrayList<Long> commentAuthorIdList = new ArrayList<Long>();
     private ArrayList<String> comboCommentList = new ArrayList<String>();
     
+    private long yourID;
+    private long friendID;
+    private String friendPicUrl;
+    
+    private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
+    private static String url_create_friend = "http://70.79.75.130:3721/test/create_product.php";
+    private static final String TAG_SUCCESS = "success";
     
     private TabHost tabHost;
     
@@ -704,16 +714,24 @@ public class MainActivity extends Activity {
 				JSONArray friends = json.getJSONArray("friends");
 				System.out.println("friends has size : " + friends.length());
 				
-				for(int i=0; i< friends.length(); i++)
-				{
+				for(int i=0; i< friends.length(); i++){
+					
 					JSONObject c = friends.getJSONObject(i);
 					
-					long friendId = Long.valueOf( c.get("twitterFriend").toString() );					
-					String friendImgUrl = c.get("twitterFriendImg").toString();
-					imageList.add(friendImgUrl);
-					
-					System.out.println(friendId+ " " + friendImgUrl );
-					
+					try {
+						if (twitter.getId() == Long.valueOf( c.get("twitterID").toString() )){							
+							//long friendId = Long.valueOf( c.get("twitterFriend").toString() );					
+							String friendImgUrl = c.get("twitterFriendImg").toString();
+							imageList.add(friendImgUrl);							
+							//System.out.println(friendId+ " " + friendImgUrl );
+						}
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (IllegalStateException e) {
+						e.printStackTrace();
+					} catch (TwitterException e) {
+						e.printStackTrace();
+					}					
 				}
 			
 			}
@@ -879,6 +897,7 @@ public class MainActivity extends Activity {
 	    
 	    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 	    	public boolean onMenuItemClick(MenuItem item) {
+	    		
 				try {
 					int id = item.getItemId();
 					//System.out.println("This menu item has this order " + id);					
@@ -901,6 +920,13 @@ public class MainActivity extends Activity {
 							Toast.makeText(MainActivity.this,"You have blocked " + peopleList.get(position),Toast.LENGTH_LONG).show();
 							break;
 						case R.id.menu4: // add as friend
+							
+							
+							yourID = twitter.getId();
+						    friendID = peopleIdList.get(position);
+						    friendPicUrl = twitter.showUser(friendID).getProfileImageURL().toString();
+						    new CreateNewFriend().execute();
+							
 							Toast.makeText(MainActivity.this,"Add as friend",Toast.LENGTH_LONG).show();
 							break;
 						default:
@@ -1048,6 +1074,81 @@ public class MainActivity extends Activity {
 	    return imageList.toArray(url_arr);
 	}
 	
+	
+	// TODO
+	class CreateNewFriend extends AsyncTask<String, String, String> {
+
+		/**
+		 * Before starting background thread Show Progress Dialog
+		 * */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(MainActivity.this);
+			pDialog.setMessage("Adding as friend..");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		/**
+		 * Creating friend
+		 * */
+		protected String doInBackground(String... args) {
+			String twitterID = String.valueOf(yourID);
+			String twitterFriend = String.valueOf(friendID);
+			String twitterFriendImg = friendPicUrl;
+
+			// Building Parameters
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("twitterID", twitterID));
+			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
+			params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
+			
+			System.out.println(params.toString());
+
+			// getting JSON Object
+			// Note that create product url accepts POST method
+			JSONObject json = jasonParsonFriend.makeHttpRequest(url_create_friend,
+					"POST", params);
+			
+			// check log cat fro response
+			Log.d("Create Response", json.toString());
+
+			// check for success tag
+			try {
+				int success = json.getInt(TAG_SUCCESS);
+
+				if (success == 1) {
+//					// successfully created product
+//					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
+//					startActivity(i);
+//					
+//					// closing this screen
+//					finish();
+					
+				} else {
+					// failed to create product
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		/**
+		 * After completing background task Dismiss the progress dialog
+		 * **/
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog once done
+			pDialog.dismiss();
+			Toast.makeText(MainActivity.this,"Friend added",Toast.LENGTH_LONG).show();
+		}
+
+	}
+	
+	
 	private void setTwitterForTesting(Twitter tw){
 		twitterForTesting = tw;
 	}
@@ -1064,6 +1165,9 @@ public class MainActivity extends Activity {
 	public ArrayList<Long> getPeopleIdList(){
 		return peopleIdList;
 	}
+	
+	
+	
 	
 	
 	public class ImageAdapter extends BaseAdapter {
