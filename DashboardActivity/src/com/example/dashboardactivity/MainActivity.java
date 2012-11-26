@@ -111,8 +111,14 @@ public class MainActivity extends Activity {
     private ArrayList<String> imageList = new ArrayList<String>();
     private ArrayList<String> tweetList = new ArrayList<String>();
     private ArrayList<Long> tweetIdList = new ArrayList<Long>();
+    private ArrayList<String> comboTweetList = new ArrayList<String>();
+    
     private ArrayList<String> peopleList = new ArrayList<String>();
     private ArrayList<Long> peopleIdList = new ArrayList<Long>();
+    
+    private ArrayList<String> commentList = new ArrayList<String>();
+    private ArrayList<Long> commentAuthorIdList = new ArrayList<Long>();
+    private ArrayList<String> comboCommentList = new ArrayList<String>();
     
     
     private TabHost tabHost;
@@ -664,40 +670,66 @@ public class MainActivity extends Activity {
 		UserFunctions user = new UserFunctions();
 		JSONObject json = user.tcomment(tweetId, userId, comment);
 		
-		getComment(tweetId); 
+		//getComment(tweetId); 
 	}
 	
-	private void getComment(long tweetId){
-		//String txtlist="";
+	private boolean getComment(long tweetId){
+		// TODO
+		commentList.clear();
+		commentAuthorIdList.clear();
+		comboCommentList.clear();
+		
 		UserFunctions user=new UserFunctions();
 		JSONObject json=user.tgetcomment(tweetId);
 		try{
 			//get item
 			int success =json.getInt("success");
-
 			if(success==1)
-			{
-				
+			{				
 				JSONArray comments=json.getJSONArray("comments");
 				System.out.println("comments has size : " + comments.length());
-				for(int i=0;i<comments.length();i++)
+				
+				if(comments.length()==0){
+					return false;
+				}
+				
+				for(int i=0; i< comments.length(); i++)
 				{
 					JSONObject c = comments.getJSONObject(i);
-					long twuserid=Long.valueOf( c.get("twuserid").toString() );
+					
+					long twuserid = Long.valueOf( c.get("twuserid").toString() );
 					String comment=c.get("comment").toString();
-					
-					//txtlist=txtlist+comment+"\n\t\t"+id+"\n";
-					
 					System.out.println(twuserid+ " " + comment );
+					
+					try {
+						String comboComment = twitter.showUser(twuserid).getName()
+								               + ": " +comment;
+						
+						commentList.add(comment);// add comment to comment list
+						commentAuthorIdList.add(twuserid); // add userId to comment author list
+						comboCommentList.add(comboComment);
+					} catch (TwitterException e) {
+						e.printStackTrace();
+					}
+					
+					
 				}
+				
+				// convert an arraylist to an string array
+	            String[] simpleArray = new String[comboCommentList.size()];
+	            comboCommentList.toArray(simpleArray);
+	            
+	            // set array adapter and display in list view
+	            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+	            tweetListView.setAdapter(arrayAdapter2);
+			
 			}
-			else
-			{}
+			else{
+				return false;
+			}
 		}
-		catch(JSONException e)
-		{e.printStackTrace();}
-		
-		//txtTweetComment.setText(txtlist);
+		catch(JSONException e) { e.printStackTrace(); }
+		return true;		
 	}
 	
 	
@@ -736,24 +768,26 @@ public class MainActivity extends Activity {
 	/**
 	 * Get the most recent 20 tweets from other real twitter user
 	 */
-	private void getRecentTweets(){
-		System.out.println("Get Tweets button is clicked");		
+	private void getRecentTweets(){	
 		try {			
 			// clear tweet array list every time before use
 			tweetList.clear();//@@@@
 			tweetIdList.clear(); //$$$$
+			comboTweetList.clear();
 			
 			//User user = twitter.verifyCredentials();
 			
 			User user = twitter.showUser(twitter.getId());
-			//List<Status> statuses = twitter.getHomeTimeline();
-			List<Status> statuses = twitter.getUserTimeline();
+			List<Status> statuses = twitter.getHomeTimeline();
+			//List<Status> statuses = twitter.getUserTimeline();
             System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
             
             // add these recent status to corresponding arraylist for future use
             for (Status status : statuses) {            	
             	tweetList.add(status.getText());
             	tweetIdList.add(status.getId());
+             
+            	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
             	//System.out.println("pre");
             	if(status.getGeoLocation()!= null){
             		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
@@ -766,8 +800,8 @@ public class MainActivity extends Activity {
             }			
             
             // convert an arraylist to an string array
-            String[] simpleArray = new String[tweetList.size()];
-            tweetList.toArray(simpleArray);
+            String[] simpleArray = new String[comboTweetList.size()];
+            comboTweetList.toArray(simpleArray);
             
             // set array adapter and display in list view
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
@@ -841,18 +875,17 @@ public class MainActivity extends Activity {
 		
 		tweetMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			public boolean onMenuItemClick(MenuItem item) {
-				int id = item.getItemId();
-				System.out.println("This menu item has this order " + id);					
-				
+				int id = item.getItemId();					
+				long tweetId = tweetIdList.get(position);
+				long userId;
 				switch(id)
 				{
-					case R.id.tweetmenu1: // Comment
+					case R.id.tweetmenu1: // Write a Comment
 						//showCommentWindow(); //!!						
 						try {
-							System.out.println("Comment is clicked");								
 							String comment = txtTweetComment.getText().toString();
-							long tweetId = tweetIdList.get(position);
-							long userId = twitter.getId();
+							//tweetId = tweetIdList.get(position);
+							userId = twitter.getId();
 							
 							if (comment.trim().length() > 0) {
 								sendComment(comment, userId, tweetId);
@@ -868,13 +901,14 @@ public class MainActivity extends Activity {
 							e.printStackTrace();
 						} catch (TwitterException e) {
 							e.printStackTrace();
-						}
-						
-							
+						}							
 						break;
-					case R.id.tweetmenu2: // Item 2
-						System.out.println("Item 2 is clicked");		
-						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+					case R.id.tweetmenu2: // Show all Comments
+						//TODO
+						if (getComment(tweetId) == true)
+							Toast.makeText(MainActivity.this,"Comments all shown",Toast.LENGTH_LONG).show();
+						else
+							Toast.makeText(MainActivity.this,"No Comments to show",Toast.LENGTH_LONG).show();
 						break;
 					case R.id.tweetmenu3: // Item 3
 						System.out.println("Item 3 is clicked");
