@@ -31,11 +31,5 @@
         android:id="@+id/btnLogout"
         android:layout_marginTop="80dip"
         android:background="@null"/>
-
-    <TextView
-        android:id="@+id/DISPLAY"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
  
 </LinearLayout>

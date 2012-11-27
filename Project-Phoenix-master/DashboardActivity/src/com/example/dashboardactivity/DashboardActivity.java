@@ -2,32 +2,28 @@ package com.example.dashboardactivity;
 
 
 
-import com.google.android.gcm.GCMRegistrar;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
  
 import library.UserFunctions;
 import static library.CommonUT.SENDER_ID;
 
+import com.google.android.gcm.GCMRegistrar;
+
+
 public class DashboardActivity extends Activity {
+	private String TAG = "** pushAndroidActivity **";
+	
     UserFunctions userFunctions;
-    private String TAG = "** pushAndroidActivity **";
-    private TextView display;
-    
     Button btnLogout;
     Button btnConnectTwitter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.dashboard);
-        
-        
         
         /**
          * Dashboard Screen for the application
@@ -38,24 +34,22 @@ public class DashboardActivity extends Activity {
        // user already logged in show databoard
             setContentView(R.layout.dashboard);
             
+            //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            //GCM
             GCMRegistrar.checkDevice(this);
             GCMRegistrar.checkManifest(this);
-            
-            display=(TextView)findViewById(R.id.DISPLAY);
-            
-            
+
+            //mDisplay = (TextView) findViewById(R.id.display);
+
             final String regId = GCMRegistrar.getRegistrationId(this);
-            //Log.i(TAG, "registration id =====  "+regId);
+            Log.i(TAG, "registration id =====  "+regId);
 
             if (regId.equals("")) {
             GCMRegistrar.register(this, SENDER_ID);
-            display.setText("hi"+regId);
+            Log.v(TAG, "Register");
             } else {
-            //Log.v(TAG, "Already registered");
-            display.setText("Already registered"+ regId);
+            Log.v(TAG, "Already registered");
             }
-
-            
             
             
             
@@ -97,9 +91,12 @@ public class DashboardActivity extends Activity {
             finish();
         }
     }
+    
     @Override
     protected void onPause() {
     super.onPause();
     GCMRegistrar.unregister(this);
-    } 
+    }
+    
+    
 }
