@@ -124,7 +124,16 @@ public class MainActivity extends Activity {
     
     private ArrayList<String> commentList = new ArrayList<String>();
     private ArrayList<Long> commentAuthorIdList = new ArrayList<Long>();
-    private ArrayList<String> comboCommentList = new ArrayList<String>();
+    private ArrayList<String> comboCommentList = new ArrayList<String>();    
+    
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ for map 
+    private ArrayList<String> statList = new ArrayList<String>();
+    private ArrayList<Double> latList = new ArrayList<Double>();
+    private ArrayList<Double> lonList = new ArrayList<Double>();
+    private ArrayList<String> imgurlList = new ArrayList<String>();
+    
+    
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ for map
     
     private long yourID;
     private long createFriendID;
@@ -384,7 +393,54 @@ public class MainActivity extends Activity {
 		
 		btnShowMap.setOnClickListener(new View.OnClickListener(){
 		      public void onClick(View arg0) {
-		        startActivity(new Intent(getApplicationContext(), AndroidGoogleMapsActivity.class));
+		    	  // TODO
+		    	  UserFunctions user = new UserFunctions();
+		    	  JSONObject json = user.getNewestStatus();
+		    	  
+		    	  int success;
+		  		try {
+		  			success = json.getInt("success");
+		  			if(success==1){
+		  				JSONArray newestStatuses = json.getJSONArray("status");
+		  				System.out.println("newestStatuses has size : " + newestStatuses.length());
+		  				
+		  				// reverse the order, display the most recent tweet first
+		  				for(int i=newestStatuses.length()-1; i>= 0; i--){
+		  					
+		  					JSONObject c = newestStatuses.getJSONObject(i);
+		  						
+		  						double lat = Double.valueOf( c.get("lat").toString() );	
+		  						double lon = Double.valueOf( c.get("lon").toString() );	
+		  						String stat = c.get("stat").toString();
+		  						String url = c.get("imgurl").toString();
+		  						
+		  						statList.add(stat);			  						
+		  						latList.add(lat);
+		  						lonList.add(lon);
+		  						imgurlList.add(url);
+		  				}
+		  			
+		  			}
+		  		} catch (JSONException e) {
+		  			e.printStackTrace();
+		  		}
+		  		
+		  		String[] statArr = new String[statList.size()]; 
+		  		double[] latArr = new double[latList.size()]; 
+		  		double[] lonArr = new double[lonList.size()]; 
+		  		String[] urlArr = new String[imgurlList.size()]; 
+		    	 
+		    	Intent intent = new Intent(getApplicationContext(), AndroidGoogleMapsActivity.class);
+		    	intent.putExtra("stat", statList.toArray(statArr));
+		    	//intent.putExtra("lat", latArr);
+		    	intent.putExtra("lat", latList);
+		    	intent.putExtra("lon", lonList);
+		    	//intent.putExtra("lon", lonArr);
+		    	intent.putExtra("imgurl", imgurlList.toArray(urlArr));
+		    	
+		    	System.out.print("error??");
+		    	startActivity(intent);		    	
+		        //startActivity(new Intent(getApplicationContext(), AndroidGoogleMapsActivity.class));
 		      }
 		});
 		
@@ -636,8 +692,8 @@ public class MainActivity extends Activity {
 			        UserFunctions userFunction = new UserFunctions();
 			        System.out.println(status+" "+tuser+" "+tid);
 			        JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
-			        JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon);
-			        System.out.println("!!!!" + res1);
+			        JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
+//			        System.out.println("!!!!" + res1);
 //			        System.out.println("current location"+ lat+"  "+lon);
 				
 				Log.d("Status", "> " + response.getText());
@@ -1404,6 +1460,18 @@ public class MainActivity extends Activity {
 		//Button btnSendComment = (Button)popupView.findViewById(R.id.btnSendComment);
 		//txtComment.setFocusable(true);
 	}*/
+	
+	public ArrayList<Double> getLatList(){
+		
+		//Double[] latArr = new Double[latList.size()];
+		//latList.toa
+		return latList;
+	}
+
+	public ArrayList<Double> getLonList(){
+		
+		return lonList;
+	}
 
 	protected void onResume() {
 		super.onResume();

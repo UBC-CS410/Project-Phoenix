@@ -32,9 +32,17 @@ public class customMapOverlay extends Overlay {
 		bitMapList = b;
 		stringList = s;
 	}
+	
+	
+	public void print(){
+		for(int i=0; i<geoPointList.size(); i++){
+			System.out.println("dsfdsaf"+geoPointList.get(i));
+		}
+	}
 
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
+		print();// test
 
 		super.draw(canvas, mapView, shadow);
 		GeoPoint geoPoint;
