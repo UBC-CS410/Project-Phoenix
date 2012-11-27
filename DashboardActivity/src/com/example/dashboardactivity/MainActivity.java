@@ -163,6 +163,7 @@ public class MainActivity extends Activity {
 	ImageButton btnSearchPeople;
 	
 	Button btnSendComment; // !!
+	Button btnShowMap; // map button
 	
 	ListView tweetListView;  // @#@#
 	ListView peopleListView;
@@ -248,12 +249,17 @@ public class MainActivity extends Activity {
 		
 		TabSpec spec4=tabHost.newTabSpec("Tab 4");
 		spec4.setContent(R.id.tab4_Pepple);
-		spec4.setIndicator("People");		
+		spec4.setIndicator("People");
+		
+		TabSpec spec5=tabHost.newTabSpec("Tab 5");
+		spec5.setContent(R.id.tab5_Maps);
+		spec5.setIndicator("Map");
 		
 		tabHost.addTab(spec1);
 		tabHost.addTab(spec2);
 		tabHost.addTab(spec3);
 		tabHost.addTab(spec4);
+		tabHost.addTab(spec5);
 		
 		//****************************************************************************************************
 		
@@ -266,6 +272,8 @@ public class MainActivity extends Activity {
 		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);//!! no use for now
 		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
 		btnSearchPeople = (ImageButton) findViewById(R.id.btnSearchPeople);
+		
+		btnShowMap = (Button) findViewById(R.id.btnShowMap);
 		
 		tweetListView = (ListView) findViewById(R.id.mylist);  // @#@#
 		peopleListView = (ListView) findViewById(R.id.mylist2);
@@ -370,6 +378,13 @@ public class MainActivity extends Activity {
 			}
 			
 		});
+		
+		btnShowMap.setOnClickListener(new View.OnClickListener(){
+		      public void onClick(View arg0) {
+		        startActivity(new Intent(getApplicationContext(), AndroidGoogleMapsActivity.class));
+		      }
+		});
+		
 		
 //		imageGridView.setOnItemClickListener(new ListView.OnItemClickListener() {//!! no use for now, becuause we have a local listener already
 //

@@ -2,6 +2,10 @@ package com.example.dashboardactivity.test;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import twitter4j.IDs;
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -12,6 +16,7 @@ import twitter4j.User;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import junit.framework.Assert;
+import library.UserFunctions;
 
 import com.example.dashboardactivity.DashboardActivity;
 import com.example.dashboardactivity.MainActivity;
@@ -41,6 +46,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 	private int num_of_status;
 	private IDs ids;
 	private long gonna_unfollow_this_friend_id;
+	private long userID;
 	
 	public MainActivityTest(){
 		super(MainActivity.class);
@@ -112,6 +118,69 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 	}
 	
 
+	public void testSearchAndAddToDB(){
+		solo.clickOnButton("Login with Twitter");
+		solo.sleep(10000);
+		twitter = activityWeTest.getTwitterForTesting();
+		
+		try {
+			userID = twitter.getId();
+			
+			user = twitter.showUser(userID);
+		} catch (IllegalStateException e) {		
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+		
+		solo.clickOnText("People");
+		
+		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 	
+		solo.clickOnImageButton(0);
+		solo.sleep(7000);
+		Assert.assertNotNull(peopleListView);
+		
+		solo.clickOnScreen(100, 250);
+		solo.clickOnText("Add to DB");
+		solo.sleep(4000);
+		
+		UserFunctions user = new UserFunctions();
+		JSONObject json = user.getAllFriends(userID);
+		
+		int success;
+		try {
+			success = json.getInt("success");
+			if(success==1){
+				JSONArray friends = json.getJSONArray("friends");
+				System.out.println("friends has size : " + friends.length());
+				
+				for(int i=0; i< friends.length(); i++){
+					
+					JSONObject c = friends.getJSONObject(i);
+					
+					try {
+						if (twitter.getId() == Long.valueOf( c.get("twitterID").toString() )){							
+							long thisfriendId = Long.valueOf( c.get("twitterFriend").toString() );					
+							String friendImgUrl = c.get("twitterFriendImg").toString();
+							
+							//imageList.add(friendImgUrl);						
+							//friendList.add(thisfriendId);
+						}
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (IllegalStateException e) {
+						e.printStackTrace();
+					} catch (TwitterException e) {
+						e.printStackTrace();
+					}					
+				}
+			
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+	}
 
 	// passed
 	public void testSearchAndFollowPeople(){

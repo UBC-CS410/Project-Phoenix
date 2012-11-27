@@ -163,6 +163,21 @@
     
  </RelativeLayout>
  
+ 
+<LinearLayout android:id="@+id/tab5_Maps"
+  android:orientation="vertical"
+  android:layout_width="fill_parent"
+    android:layout_height="fill_parent">   
+    
+     <Button android:id="@+id/btnShowMap"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Map"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="50dip"/>  
+</LinearLayout>
+ 
 </FrameLayout>
 
 </TabHost>
