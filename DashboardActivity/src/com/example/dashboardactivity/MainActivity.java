@@ -728,7 +728,8 @@ public class MainActivity extends Activity {
 				JSONArray statuses = json.getJSONArray("status");
 				System.out.println("friends has size : " + statuses.length());
 				
-				for(int i=0; i< statuses.length(); i++){
+				// reverse the order, display the most recent tweet first
+				for(int i=statuses.length()-1; i>= 0; i--){
 					
 					JSONObject c = statuses.getJSONObject(i);
 					
