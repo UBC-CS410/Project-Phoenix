@@ -425,7 +425,11 @@ public class MainActivity extends Activity {
 		
 		btnGetTweets.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
-				getRecentTweets();				
+				//TODO // 
+				//getRecentTweets(); // get the most recent 20 tweets ( from real twitter user)
+				
+				// get tweets from our db
+				getRecentTweetFromOurDB();
 			}
 			
 		});
@@ -687,11 +691,68 @@ public class MainActivity extends Activity {
 		return mSharedPreferences.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
 	}
 	
-	/*
+	
+	/**
+	 * Get the most recent 20 tweets from our DB user
+	 */
+	private void getRecentTweetFromOurDB(){
+		
+		// clear tweet array list every time before use
+		tweetList.clear();//@@@@
+		tweetIdList.clear(); //$$$$
+		comboTweetList.clear();
+		
+		// get the most recent 20 tweets from our db user
+		UserFunctions user = new UserFunctions();
+		JSONObject json = user.getAllStatus();
+		
+		int success;
+		try {
+			success = json.getInt("success");
+			if(success==1){
+				JSONArray statuses = json.getJSONArray("status");
+				System.out.println("friends has size : " + statuses.length());
+				
+				for(int i=0; i< statuses.length(); i++){
+					
+					JSONObject c = statuses.getJSONObject(i);
+					
+					
+					//if (twitter.getId() == Long.valueOf( c.get("twitterID").toString() )){
+						
+						long tid = Long.valueOf( c.get("tid").toString() );					
+						String stat = c.get("stat").toString();
+						
+						tweetList.add(stat);						
+						tweetIdList.add(tid);
+						try {
+							comboTweetList.add(twitter.showStatus(tid).getUser().getName() + ": " + stat);
+						} catch (TwitterException e) {
+							e.printStackTrace();
+						}
+										
+				}
+			
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		// convert an arraylist to an string array
+        String[] simpleArray = new String[comboTweetList.size()];
+        comboTweetList.toArray(simpleArray);
+        
+        // set array adapter and display in list view
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+        tweetListView.setAdapter(arrayAdapter);
+	}
+	
+	
+	/**
 	 * Send Comment on a tweet
 	 */
 	private void sendComment(String comment, long userId, long tweetId){
-		// TODO
+		//
 		//System.out.println("The comment is: " + comment);
 		//System.out.println("The userId is: " + userId);
 		//System.out.println("send comment tweetId is: " + tweetId);
@@ -711,7 +772,6 @@ public class MainActivity extends Activity {
 	private String[] getAllFriend(long currUid){
 		imageList.clear();
 		friendList.clear();
-		//TODO
 		
 		UserFunctions user = new UserFunctions();
 		JSONObject json = user.getAllFriends(currUid);
@@ -760,7 +820,7 @@ public class MainActivity extends Activity {
 	 * Return false if there is no comment for this status(tweet)
 	 */
 	private boolean getComment(long tweetId){
-		// TODO
+		// 
 		commentList.clear();
 		commentAuthorIdList.clear();
 		comboCommentList.clear();
@@ -1026,7 +1086,6 @@ public class MainActivity extends Activity {
 						}							
 						break;
 					case R.id.tweetmenu2: // Show all Comments
-						//TODO
 						if (getComment(tweetId) == true)
 							Toast.makeText(MainActivity.this,"Comments all shown",Toast.LENGTH_LONG).show();
 						else
@@ -1091,8 +1150,6 @@ public class MainActivity extends Activity {
 	 * Create a new friend and store a new friend entry into our own db 
 	 */
 	class CreateNewFriend extends AsyncTask<String, String, String> {
-		// TODO
-		
 		/**
 		 * Show progress dialog before adding a new friend
 		 * */

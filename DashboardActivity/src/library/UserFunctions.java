@@ -25,6 +25,10 @@ public class UserFunctions {
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     private static String get_all_friends = "http://70.79.75.130:3721/test/get_all_products.php";
     
+    //@#@#@#@#@#@
+    private static String storeTweets = "http://70.79.75.130:3721/tstat.php";
+    private static String getStoredTweets = "http://70.79.75.130:3721/getTweets.php";
+    
     private static String login_tag = "login";
     private static String register_tag = "register";
     private static String image_tag = "storeImage";
@@ -94,6 +98,31 @@ public class UserFunctions {
     	
     }
     
+    //########################
+    //store tweets to database
+    public JSONObject storeTweets(String status, long tuser, long tid, float lat, float lon){
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	System.out.print(status);
+    	System.out.print(tuser);
+    	System.out.print(tid);
+    	System.out.print(lat + " "+ lon);
+    	
+    	params.add(new BasicNameValuePair("stat", status));
+        params.add(new BasicNameValuePair("tuser", ""+tuser));
+        params.add(new BasicNameValuePair("tid", ""+tid));
+        params.add(new BasicNameValuePair("lat", ""+lat));
+        params.add(new BasicNameValuePair("lon", ""+lon));
+    	JSONObject json = jsonParser.getJSONFromUrl(storeTweets, params);
+    	return json;
+    }
+    
+    //get all status form database
+    public JSONObject getAllStatus(){
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	JSONObject json = jsonParser.getJSONFromUrl(getStoredTweets,params);
+    	System.out.println(json);
+		return json;   	
+    }
     
     // get friend in our DB
     public JSONObject getAllFriends(long currUID){
@@ -102,6 +131,8 @@ public class UserFunctions {
     	JSONObject json = jsonParser.getJSONFromUrl(get_all_friends,params);
 		return json;   	
     }
+    
+    
     
     
     //*************************************************************************************

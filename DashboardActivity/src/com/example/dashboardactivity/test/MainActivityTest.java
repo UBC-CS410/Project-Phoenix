@@ -115,6 +115,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
 	// passed
 	public void testSearchAndFollowPeople(){
+		long new_friend_id;
 		
 		solo.clickOnButton("Login with Twitter");
 		solo.sleep(10000);
@@ -148,7 +149,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 			
 			ids = twitter.getFriendsIDs(-1);
 			//String new_friend_screenName = twitter.showUser(ids.getIDs()[0]).getScreenName();
-			long new_friend_id = ids.getIDs()[0];						
+			new_friend_id = ids.getIDs()[0];						
 			//System.out.println("ids[0] is: " + ids.getIDs()[0]);
 			//System.out.println("ids[0]'s screen name is: " +  twitter.showUser(ids.getIDs()[0]).getScreenName());				
 			Assert.assertTrue(twitter.showFriendship(twitter.getId(), new_friend_id).isSourceFollowingTarget());
