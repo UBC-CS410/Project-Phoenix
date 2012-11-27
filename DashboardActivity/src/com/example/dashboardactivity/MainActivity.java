@@ -200,6 +200,7 @@ public class MainActivity extends Activity {
 	
 	// Alert Dialog Manager
 	AlertDialogManager alert = new AlertDialogManager();
+	gpsTracker gps ;  // gps
 
 
 	@Override
@@ -324,6 +325,8 @@ public class MainActivity extends Activity {
 
 				// Check for blank text
 				if (status.trim().length() > 0) {
+					// set up gps
+					gps = new gpsTracker(MainActivity.this);
 					// update status
 					new updateTwitterStatus().execute(status);
 				} else {
@@ -623,6 +626,19 @@ public class MainActivity extends Activity {
 				
 				// Update status
 				twitter4j.Status response = twitter.updateStatus(status);
+				
+				//store to database
+
+				long tuser = twitter.getId();
+			        long tid = response.getId();
+			        double lat = gps.getLatitude();
+			        double lon = gps.getLongitude();
+			        UserFunctions userFunction = new UserFunctions();
+			        System.out.println(status+" "+tuser+" "+tid);
+			        JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
+			        JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon);
+			        System.out.println("!!!!" + res1);
+//			        System.out.println("current location"+ lat+"  "+lon);
 				
 				Log.d("Status", "> " + response.getText());
 			} catch (TwitterException e) {
