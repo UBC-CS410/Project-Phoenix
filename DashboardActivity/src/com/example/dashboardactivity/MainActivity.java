@@ -113,6 +113,8 @@ public class MainActivity extends Activity {
     //private static String KEY_CREATED_AT = "created_at";
 	
     private ArrayList<String> imageList = new ArrayList<String>();
+    private ArrayList<Long> friendList = new ArrayList<Long>();
+    
     private ArrayList<String> tweetList = new ArrayList<String>();
     private ArrayList<Long> tweetIdList = new ArrayList<Long>();
     private ArrayList<String> comboTweetList = new ArrayList<String>();
@@ -125,12 +127,15 @@ public class MainActivity extends Activity {
     private ArrayList<String> comboCommentList = new ArrayList<String>();
     
     private long yourID;
-    private long friendID;
+    private long createFriendID;
+    private long deleteFriendID;
     private String friendPicUrl;
     
     private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
     private static String url_create_friend = "http://70.79.75.130:3721/test/create_product.php";
     private static final String TAG_SUCCESS = "success";
+    
+    private static String url_delete_friend = "http://70.79.75.130:3721/test/delete_product.php";
     
     private TabHost tabHost;
     
@@ -139,9 +144,9 @@ public class MainActivity extends Activity {
 	private String[] imageUrls = {};
 	private DisplayImageOptions options;
    /* 
-    LayoutInflater layoutInflater; //!!!	// popupwindow 
-	View popupView;  //!!!
-	PopupWindow commentPopupWindow; // !!!
+    LayoutInflater layoutInflater; //!! no use for now
+	View popupView;  //!! no use for now
+	PopupWindow commentPopupWindow; //!! no use for now
 	*/
 
 	// Login button
@@ -258,7 +263,7 @@ public class MainActivity extends Activity {
 		btnUpdateStatus = (Button) findViewById(R.id.btnUpdateStatus);
 		
 		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // @#@#
-		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
+		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);//!! no use for now
 		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
 		btnSearchPeople = (ImageButton) findViewById(R.id.btnSearchPeople);
 		
@@ -274,12 +279,11 @@ public class MainActivity extends Activity {
 		lblUserName = (TextView) findViewById(R.id.lblUserName);		
 		
 		
-		//layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);//!!
-		
-		//popupView = layoutInflater.inflate(R.layout.comment_popup, null);//!!
+		//layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);//!! no use for now		
+		//popupView = layoutInflater.inflate(R.layout.comment_popup, null);//!! no use for now
 		
 		txtTweetComment = (EditText) findViewById(R.id.txtComment); //!!
-		//btnSendComment = (Button) popupView.findViewById(R.id.btnSendComment); // !!
+		//btnSendComment = (Button) popupView.findViewById(R.id.btnSendComment); //!! no use for now
 
 		// Shared Preferences
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
@@ -349,7 +353,7 @@ public class MainActivity extends Activity {
 		ImageLoader.getInstance().init(config);
 	  
 	  
-		//@#@#@
+		//@#@#@ List view listeners
 		
 		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
 
@@ -367,7 +371,7 @@ public class MainActivity extends Activity {
 			
 		});
 		
-//		imageGridView.setOnItemClickListener(new ListView.OnItemClickListener() {
+//		imageGridView.setOnItemClickListener(new ListView.OnItemClickListener() {//!! no use for now, becuause we have a local listener already
 //
 //			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 //				showFriendMenu(view,position);
@@ -379,9 +383,10 @@ public class MainActivity extends Activity {
 		btnProfileImage.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
 				//showProfileImage();				
-				//startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
-				
+				//startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));				
 				//Bundle bundle = getIntent().getExtras();
+				//TODO
+				
 				try {
 					imageUrls = getAllFriend(twitter.getId());
 				} catch (IllegalStateException e) {
@@ -442,7 +447,7 @@ public class MainActivity extends Activity {
 			
 		});
 		
-		/*	
+		/*	//!! no use for now
 		btnSendComment.setOnClickListener(new View.OnClickListener(){  //!!!
 			public void onClick(View arg0) {
 				commentPopupWindow.dismiss(); // for now, just close the window
@@ -450,7 +455,7 @@ public class MainActivity extends Activity {
 		});*/
 		
 		
-	/*	
+	/*	//!! no use for now
 		btnBackToCenter.setOnClickListener(new View.OnClickListener(){
 
 			public void onClick(View arg0) {
@@ -463,7 +468,6 @@ public class MainActivity extends Activity {
 		});*/
 		
 		
-		//@#@#
 
 		/** This if conditions is tested once is
 		 * redirected from twitter page. Parse the uri to get oAuth
@@ -480,10 +484,7 @@ public class MainActivity extends Activity {
 					// Get the access token
 					AccessToken accessToken = twitter.getOAuthAccessToken(
 							requestToken, verifier);
-					//*************************************************
 					
-					
-					//*************************************************
 					// Shared Preferences
 					Editor e = mSharedPreferences.edit();
 
@@ -505,8 +506,8 @@ public class MainActivity extends Activity {
 					// Show Update Twitter
 					lblUpdate.setVisibility(View.VISIBLE);
 					txtUpdate.setVisibility(View.VISIBLE);
-					txtTweetComment.setVisibility(View.VISIBLE); //!!!
-					txtSearchPeople.setVisibility(View.VISIBLE);// @#@#
+					txtTweetComment.setVisibility(View.VISIBLE); //text field for enter comment for a tweet
+					txtSearchPeople.setVisibility(View.VISIBLE);
 					btnUpdateStatus.setVisibility(View.VISIBLE);
 					
 					btnProfileImage.setVisibility(View.VISIBLE);
@@ -520,6 +521,8 @@ public class MainActivity extends Activity {
 					long userID = accessToken.getUserId();
 					User user = twitter.showUser(userID);
 					String username = user.getName();
+					
+					yourID = twitter.getId(); // @@@@@@@@@@@@
 					
 					// Displaying in xml ui
 					lblUserName.setText(Html.fromHtml("<b>Welcome " + username + "</b>"));
@@ -547,7 +550,7 @@ public class MainActivity extends Activity {
 			twitter = factory.getInstance();
 			
 			// nextline is for testing 
-			setTwitterForTesting(twitter);
+			setTwitterForTesting(twitter);// THIS METHOD IS FOR UNIT TESTING PURPOSE!
 
 			try {
 				requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
@@ -643,7 +646,7 @@ public class MainActivity extends Activity {
 		e.remove(PREF_KEY_TWITTER_LOGIN);
 		e.commit();
 		
-		//@#@#
+		//@#@#//!! no use for now
 		/*Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
 		twitterPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(twitterPage);
@@ -701,8 +704,14 @@ public class MainActivity extends Activity {
 		//getComment(tweetId); 
 	}
 	
+	/**
+	 * Get the profile image of all our db friend for the current user
+	 * Return a list of profile image urls
+	 */
 	private String[] getAllFriend(long currUid){
 		imageList.clear();
+		friendList.clear();
+		//TODO
 		
 		UserFunctions user = new UserFunctions();
 		JSONObject json = user.getAllFriends(currUid);
@@ -720,10 +729,11 @@ public class MainActivity extends Activity {
 					
 					try {
 						if (twitter.getId() == Long.valueOf( c.get("twitterID").toString() )){							
-							//long friendId = Long.valueOf( c.get("twitterFriend").toString() );					
+							long thisfriendId = Long.valueOf( c.get("twitterFriend").toString() );					
 							String friendImgUrl = c.get("twitterFriendImg").toString();
-							imageList.add(friendImgUrl);							
-							//System.out.println(friendId+ " " + friendImgUrl );
+							
+							imageList.add(friendImgUrl);						
+							friendList.add(thisfriendId);
 						}
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
@@ -744,6 +754,11 @@ public class MainActivity extends Activity {
 		return imageList.toArray(urls);
 	}
 	
+	
+	/**
+	 * Fetch all comments in our db for a status(tweet)
+	 * Return false if there is no comment for this status(tweet)
+	 */
 	private boolean getComment(long tweetId){
 		// TODO
 		commentList.clear();
@@ -806,7 +821,6 @@ public class MainActivity extends Activity {
 	
 	/**
 	 * search other twitter user by user name
-	 * collects a list of 
 	 */
 	private void searchPeople(String name){
 		try {
@@ -919,16 +933,12 @@ public class MainActivity extends Activity {
 							twitter.createBlock(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have blocked " + peopleList.get(position),Toast.LENGTH_LONG).show();
 							break;
-						case R.id.menu4: // add as friend
-							
-							
-							yourID = twitter.getId();
-						    friendID = peopleIdList.get(position);
-						    friendPicUrl = twitter.showUser(friendID).getProfileImageURL().toString();
+						case R.id.menu4: // add as friend							
+							yourID = twitter.getId(); //may not be needed 
+							createFriendID = peopleIdList.get(position);
+						    friendPicUrl = twitter.showUser(createFriendID).getProfileImageURL().toString();
 						    new CreateNewFriend().execute();
-							
-							Toast.makeText(MainActivity.this,"Add as friend",Toast.LENGTH_LONG).show();
-							break;
+						    break;
 						default:
 							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
 					
@@ -943,7 +953,9 @@ public class MainActivity extends Activity {
 	    popupMenu.show();
 	}
 	
-
+	/**
+	 * Show a popup menu when click on a profile image
+	 */
 	private void showFriendMenu(View v, final int position){
 		PopupMenu friendMenu = new PopupMenu(MainActivity.this, v);
 		friendMenu.getMenuInflater().inflate(R.menu.friendimagemenu , friendMenu.getMenu());
@@ -955,7 +967,9 @@ public class MainActivity extends Activity {
 				int id = item.getItemId();
 				switch(id){
 					case R.id.friendmenu1:  // delete friend from DB
-						Toast.makeText(MainActivity.this,"Delete friend",Toast.LENGTH_LONG).show();
+						deleteFriendID = friendList.get(position);
+						System.out.println("id will be deleted is: "+ deleteFriendID);
+						new DeleteFriend().execute();
 						break;
 					case R.id.friendmenu2:  // item 2
 						Toast.makeText(MainActivity.this,"Item 2",Toast.LENGTH_LONG).show();
@@ -1023,8 +1037,7 @@ public class MainActivity extends Activity {
 						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
 						break;
 					default:
-						System.out.println("Noting is clicked");
-						//Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+						Toast.makeText(MainActivity.this,"Nothing is clicked",Toast.LENGTH_LONG).show();
 				}				
 				return true;
 			}
@@ -1074,12 +1087,14 @@ public class MainActivity extends Activity {
 	    return imageList.toArray(url_arr);
 	}
 	
-	
-	// TODO
+	/**
+	 * Create a new friend and store a new friend entry into our own db 
+	 */
 	class CreateNewFriend extends AsyncTask<String, String, String> {
-
+		// TODO
+		
 		/**
-		 * Before starting background thread Show Progress Dialog
+		 * Show progress dialog before adding a new friend
 		 * */
 		@Override
 		protected void onPreExecute() {
@@ -1096,7 +1111,7 @@ public class MainActivity extends Activity {
 		 * */
 		protected String doInBackground(String... args) {
 			String twitterID = String.valueOf(yourID);
-			String twitterFriend = String.valueOf(friendID);
+			String twitterFriend = String.valueOf(createFriendID);
 			String twitterFriendImg = friendPicUrl;
 
 			// Building Parameters
@@ -1108,19 +1123,18 @@ public class MainActivity extends Activity {
 			System.out.println(params.toString());
 
 			// getting JSON Object
-			// Note that create product url accepts POST method
 			JSONObject json = jasonParsonFriend.makeHttpRequest(url_create_friend,
 					"POST", params);
 			
-			// check log cat fro response
-			Log.d("Create Response", json.toString());
+			// check log cat for response
+			Log.d("Create Friend Response", json.toString());
 
 			// check for success tag
 			try {
 				int success = json.getInt(TAG_SUCCESS);
 
 				if (success == 1) {
-//					// successfully created product
+//					// successfully create friend
 //					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
 //					startActivity(i);
 //					
@@ -1128,7 +1142,7 @@ public class MainActivity extends Activity {
 //					finish();
 					
 				} else {
-					// failed to create product
+					// failed to create friend
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -1136,17 +1150,93 @@ public class MainActivity extends Activity {
 
 			return null;
 		}
-
+		
 		/**
 		 * After completing background task Dismiss the progress dialog
 		 * **/
 		protected void onPostExecute(String file_url) {
 			// dismiss the dialog once done
 			pDialog.dismiss();
-			Toast.makeText(MainActivity.this,"Friend added",Toast.LENGTH_LONG).show();
+			Toast.makeText(MainActivity.this,"Friend Added!",Toast.LENGTH_LONG).show();
+		}
+		
+	}
+		
+		
+	/**
+	 * Delete a friend  from our own data base
+	 */
+	class DeleteFriend extends AsyncTask<String, String, String> {
+		// TODO
+		/**
+		 * Show progress dialog before deleting a friend from our db
+		 */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(MainActivity.this);
+			pDialog.setMessage("Delete friend..");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
 		}
 
-	}
+		/**
+		 * Delete friend from our db
+		 */
+		protected String doInBackground(String... args) {
+			System.out.println("in doingbackground..");
+			String twitterID = String.valueOf(yourID);
+			String twitterFriend = String.valueOf(deleteFriendID);
+			//String twitterFriendImg = friendPicUrl;
+
+			// Building Parameters
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("twitterID", twitterID));
+			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
+			//params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
+			
+			System.out.println("..."+params.toString());
+
+			// getting JSON Object
+			JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,
+						"POST", params);
+			System.out.println("Error here?");// get printed
+				
+			// check log cat for response
+			//Log.d("Delete Friend Response", json.toString());
+
+//			// check for success tag
+//			try {
+//				int success = json.getInt(TAG_SUCCESS);
+//				if (success == 1) {
+//					System.out.println("or here?");
+////					// successfully delete friend
+////					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
+////					startActivity(i);
+////					
+////					// closing this screen
+////					finish();
+//						
+//				} else {
+//					// failed to delete friend
+//				}
+//			} catch (JSONException e) {
+//				e.printStackTrace();
+//			}
+
+			return null;
+		}
+
+		/**
+		 * Dismiss the progress dialog after deleting a friend from our db
+		 */
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog
+			pDialog.dismiss();
+			Toast.makeText(MainActivity.this,"Friend Deleted!",Toast.LENGTH_LONG).show();
+		}
+	 }
 	
 	
 	private void setTwitterForTesting(Twitter tw){
@@ -1169,7 +1259,9 @@ public class MainActivity extends Activity {
 	
 	
 	
-	
+	/**
+	 * This is a class handling displaying profile image as grid view
+	 */
 	public class ImageAdapter extends BaseAdapter {
 		public int getCount() {
 			return imageUrls.length;
