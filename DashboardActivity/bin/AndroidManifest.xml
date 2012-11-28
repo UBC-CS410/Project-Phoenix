@@ -52,7 +52,7 @@
         <!--  Twitter Activity -->
          <activity
             android:name=".MainActivity"
-            android:label="Twitter Activity" >
+            android:label="Home" >
             
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -62,15 +62,9 @@
             </intent-filter>
         </activity>
         
-        <!--  Show Map Activity -->
+        <!--  Show Map Activity -->        
         <activity
             android:label="Map"
-            android:name=".ShowMapActivity">
-            <category android:name="android.intent.category.DEFAULT" />
-        </activity>        
-        
-        <activity
-            android:label="MapAct"
             android:name=".AndroidGoogleMapsActivity" >
             <category android:name="android.intent.category.DEFAULT" />
         </activity>

@@ -64,6 +64,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -119,6 +120,8 @@ public class MainActivity extends Activity {
     private long deleteFriendID;
     private String friendPicUrl;
     private long currentTweetID; // ????
+    
+    private String notification;
     
     private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
     private static String url_create_friend = "http://70.79.75.130:3721/test/create_product.php";
@@ -191,6 +194,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		notification="";
 		
 		cd = new ConnectionDetector(getApplicationContext());
 
@@ -220,19 +224,19 @@ public class MainActivity extends Activity {
 		// Add  tabs
 		TabSpec spec1=tabHost.newTabSpec("Tab 1");
 		spec1.setContent(R.id.tab1_Main);
-		spec1.setIndicator("Main");
+		spec1.setIndicator("Update");
 		
 		TabSpec spec2=tabHost.newTabSpec("Tab 2");
 		spec2.setContent(R.id.tab2_Image);
-		spec2.setIndicator("Image");
+		spec2.setIndicator("Friend");
 		
 		TabSpec spec3=tabHost.newTabSpec("Tab 3");
 		spec3.setContent(R.id.tab3_Tweets);
-		spec3.setIndicator("Tweets");
+		spec3.setIndicator("Status");
 		
 		TabSpec spec4=tabHost.newTabSpec("Tab 4");
 		spec4.setContent(R.id.tab4_Pepple);
-		spec4.setIndicator("People");
+		spec4.setIndicator("Search");
 		
 //		TabSpec spec5=tabHost.newTabSpec("Tab 5");
 //		spec5.setContent(R.id.tab5_Maps);
@@ -275,6 +279,34 @@ public class MainActivity extends Activity {
 		// Shared Preferences
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
 				"MyPref", 0);
+		
+		
+		
+		tabHost.setOnTabChangedListener(new OnTabChangeListener(){
+
+			public void onTabChanged(String tabID) {				
+				
+				if(tabID.equals("Tab 2")){
+					imageUrls = getAllFriend(yourID);	
+					options = new DisplayImageOptions.Builder()
+						.showStubImage(R.drawable.stub_image)
+						.showImageForEmptyUri(R.drawable.image_for_empty_url)
+						.cacheInMemory()
+						.cacheOnDisc()
+						.build();
+
+					imageGridView.setAdapter(new ImageAdapter());
+					imageGridView.setOnItemClickListener(new OnItemClickListener() {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							showFriendMenu(view, position);
+						}
+					});
+				}else if (tabID.equals("Tab 3")){
+					getRecentTweetFromOurDB();
+				}				
+			}
+			
+		});
 		
 
 		/**
@@ -695,6 +727,7 @@ public class MainActivity extends Activity {
 	 * Get the most recent 20 tweets from our DB user
 	 */
 	private void getRecentTweetFromOurDB(){
+		String compare="";
 		
 		// clear tweet array list every time before use
 		tweetList.clear();
@@ -710,6 +743,8 @@ public class MainActivity extends Activity {
 			success = json.getInt("success");
 			if(success==1){
 				JSONArray statuses = json.getJSONArray("status");
+				
+				
 				System.out.println("friends has size : " + statuses.length());
 				int count=0;
 				
@@ -724,6 +759,7 @@ public class MainActivity extends Activity {
 					long tid = Long.valueOf( c.get("tid").toString() );					
 					String stat = c.get("stat").toString();
 					
+					
 					tweetList.add(stat);						
 					tweetIdList.add(tid);
 					
@@ -735,6 +771,23 @@ public class MainActivity extends Activity {
 					
 					count++;		
 				}
+				
+				if(notification == ""){
+					notification = statuses.
+							getJSONObject(statuses.length()-1).get("stat").toString();
+					compare = statuses.
+							getJSONObject(statuses.length()-1).get("stat").toString();
+				}else{
+					compare = statuses.
+							getJSONObject(statuses.length()-1).get("stat").toString();
+				}
+				
+				if(notification.equals(compare) == false ){
+					Toast.makeText(MainActivity.this,
+							"You have a new update!" ,Toast.LENGTH_LONG).show();
+					notification = compare;
+				}
+
 			
 			}
 		} catch (JSONException e) {
