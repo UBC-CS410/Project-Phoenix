@@ -1,23 +1,15 @@
 package com.example.dashboardactivity;
 
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
  
 import library.UserFunctions;
-import static library.CommonUT.SENDER_ID;
-
-import com.google.android.gcm.GCMRegistrar;
-
-
+ 
 public class DashboardActivity extends Activity {
-	private String TAG = "** pushAndroidActivity **";
-	
     UserFunctions userFunctions;
     Button btnLogout;
     Button btnConnectTwitter;
@@ -33,26 +25,6 @@ public class DashboardActivity extends Activity {
         if(userFunctions.isUserLoggedIn(getApplicationContext())){
        // user already logged in show databoard
             setContentView(R.layout.dashboard);
-            
-            //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            //GCM
-            GCMRegistrar.checkDevice(this);
-            GCMRegistrar.checkManifest(this);
-
-            //mDisplay = (TextView) findViewById(R.id.display);
-
-            final String regId = GCMRegistrar.getRegistrationId(this);
-            Log.i(TAG, "registration id =====  "+regId);
-
-            if (regId.equals("")) {
-            GCMRegistrar.register(this, SENDER_ID);
-            Log.v(TAG, "Register");
-            } else {
-            Log.v(TAG, "Already registered");
-            }
-            
-            
-            
             btnLogout = (Button) findViewById(R.id.btnLogout);
             btnConnectTwitter = (Button) findViewById(R.id.btnConnectTwitter);  //@#@#
             
@@ -91,12 +63,4 @@ public class DashboardActivity extends Activity {
             finish();
         }
     }
-    
-    @Override
-    protected void onPause() {
-    super.onPause();
-    GCMRegistrar.unregister(this);
-    }
-    
-    
 }

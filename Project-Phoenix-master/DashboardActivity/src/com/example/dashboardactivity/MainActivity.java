@@ -2,14 +2,11 @@ package com.example.dashboardactivity;
 
 import library.AlertDialogManager;
 import library.ConnectionDetector;
-import library.DatabaseHandler;
 import library.JSONParserFriend;
 import library.UserFunctions;
 import library.ExtendedImageDownloader;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -18,16 +15,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.dashboardactivity.ImageGridActivity;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.example.dashboardactivity.ImageGridActivity.ImageAdapter;
-import com.example.dashboardactivity.ImageSource.Extra;
-
 
 import twitter4j.IDs;
 import twitter4j.Status;
@@ -50,16 +43,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore.Images;
 import android.text.Html;
-import android.text.style.ImageSpan;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -67,14 +57,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,16 +93,10 @@ public class MainActivity extends Activity {
 	static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
 	
-	//*****************************************************
-	// JSON Response node names
-    private static String IMAGE_SUCCESS = "success";
-    private static String IMAGE_ERROR = "error";
-    private static String IMAGE_ERROR_MSG = "error_msg";
-    private static String IMAGE_URL = "photo_ref";
-    private static String IMAGE_EMAIL = "email";
-    //private static String KEY_CREATED_AT = "created_at";
-	
+	// ArrayLists
     private ArrayList<String> imageList = new ArrayList<String>();
+    private ArrayList<Long> friendList = new ArrayList<Long>();
+    
     private ArrayList<String> tweetList = new ArrayList<String>();
     private ArrayList<Long> tweetIdList = new ArrayList<Long>();
     private ArrayList<String> comboTweetList = new ArrayList<String>();
@@ -122,55 +106,64 @@ public class MainActivity extends Activity {
     
     private ArrayList<String> commentList = new ArrayList<String>();
     private ArrayList<Long> commentAuthorIdList = new ArrayList<Long>();
-    private ArrayList<String> comboCommentList = new ArrayList<String>();
+    private ArrayList<String> comboCommentList = new ArrayList<String>();    
+    
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ for map 
+    private ArrayList<String> statList = new ArrayList<String>();
+    private ArrayList<Double> latList = new ArrayList<Double>();
+    private ArrayList<Double> lonList = new ArrayList<Double>();
+    private ArrayList<String> imgurlList = new ArrayList<String>();
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ for map
     
     private long yourID;
-    private long friendID;
+    private long createFriendID;
+    private long deleteFriendID;
     private String friendPicUrl;
+    private long currentTweetID; // ????
+    
+    private String notification;
     
     private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
     private static String url_create_friend = "http://70.79.75.130:3721/test/create_product.php";
-    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_SUCCESS = "success";    
+    private static String url_delete_friend = "http://70.79.75.130:3721/test/delete_product.php";
     
-    private TabHost tabHost;
-    
+    private TabHost tabHost;    
     protected ImageLoader imageLoader = ImageLoader.getInstance();
-
 	private String[] imageUrls = {};
 	private DisplayImageOptions options;
-   /* 
-    LayoutInflater layoutInflater; //!!!	// popupwindow 
-	View popupView;  //!!!
-	PopupWindow commentPopupWindow; // !!!
-	*/
 
-	// Login button
 	Button btnLoginTwitter;
-	// Update status button
 	Button btnUpdateStatus;
-	// Logout button
-	Button btnLogoutTwitter;
+	Button btnLogoutTwitter; // no use
 	
-	// Show profile image button   @#@#
-	Button btnProfileImage;
-	//Button btnBackToCenter;
-	Button btnGetTweets;
-	ImageButton btnSearchPeople;
+	// Show profile image button 
+	Button btnProfileImage;  // no use
+	Button btnGetTweets;     // no use
+	Button btnShowMap; // map button // no use
+	Button btnSendComment; // no use
 	
-	Button btnSendComment; // !!
+	ImageButton btnSearchPeople;		
 	
-	ListView tweetListView;  // @#@#
+	// List Views
+	ListView tweetListView;
 	ListView peopleListView;
+	ListView commentListView;
+	
+	// Image Grid view
 	GridView imageGridView;
 	
 	// EditText for update
 	EditText txtUpdate;
 	EditText txtSearchPeople;
-	EditText txtTweetComment; //!!
+	EditText txtTweetComment;
 	
 	// lbl update
 	TextView lblUpdate;
 	TextView lblUserName;
+	
+	// location check box
+	CheckBox checkboxLocation;
 
 	// Progress dialog
 	ProgressDialog pDialog;
@@ -178,8 +171,7 @@ public class MainActivity extends Activity {
 	// Twitter
 	private static Twitter twitter;
 	private static Twitter twitterForTesting;
-	private static RequestToken requestToken;
-	
+	private static RequestToken requestToken;	
 	
 	//@#@#
 	IDs ids;
@@ -194,6 +186,7 @@ public class MainActivity extends Activity {
 	
 	// Alert Dialog Manager
 	AlertDialogManager alert = new AlertDialogManager();
+	gpsTracker gps ;  // gps
 
 
 	@Override
@@ -201,6 +194,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		notification="";
 		
 		cd = new ConnectionDetector(getApplicationContext());
 
@@ -223,67 +217,96 @@ public class MainActivity extends Activity {
 
 		// All UI elements
 		//****************************************************************************************************
-		// Create steve shen's tabs
+		// Create tabs
 		tabHost=(TabHost)findViewById(R.id.tabHost);
 		tabHost.setup();
-		//LayoutInflater.from(this).inflate(R.layout.activity_main, tabHost.getTabContentView(), true);
 		
-		// Add steve shen's tabs
+		// Add  tabs
 		TabSpec spec1=tabHost.newTabSpec("Tab 1");
 		spec1.setContent(R.id.tab1_Main);
-		spec1.setIndicator("Main");
+		spec1.setIndicator("Update");
 		
 		TabSpec spec2=tabHost.newTabSpec("Tab 2");
 		spec2.setContent(R.id.tab2_Image);
-		spec2.setIndicator("Image");
+		spec2.setIndicator("Friend");
 		
 		TabSpec spec3=tabHost.newTabSpec("Tab 3");
 		spec3.setContent(R.id.tab3_Tweets);
-		spec3.setIndicator("Tweets");
+		spec3.setIndicator("Status");
 		
 		TabSpec spec4=tabHost.newTabSpec("Tab 4");
 		spec4.setContent(R.id.tab4_Pepple);
-		spec4.setIndicator("People");		
+		spec4.setIndicator("Search");
+		
+//		TabSpec spec5=tabHost.newTabSpec("Tab 5");
+//		spec5.setContent(R.id.tab5_Maps);
+//		spec5.setIndicator("Map");
 		
 		tabHost.addTab(spec1);
 		tabHost.addTab(spec2);
 		tabHost.addTab(spec3);
 		tabHost.addTab(spec4);
+		//tabHost.addTab(spec5);
 		
 		//****************************************************************************************************
-		
-		
 		
 		btnLoginTwitter = (Button) findViewById(R.id.btnLoginTwitter);
 		btnUpdateStatus = (Button) findViewById(R.id.btnUpdateStatus);
 		
-		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // @#@#
-		//btnBackToCenter = (Button) findViewById(R.id.btnBackToCenter);
-		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);
+		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // no use
+		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);  // no use
 		btnSearchPeople = (ImageButton) findViewById(R.id.btnSearchPeople);
 		
-		tweetListView = (ListView) findViewById(R.id.mylist);  // @#@#
-		peopleListView = (ListView) findViewById(R.id.mylist2);
-		imageGridView = (GridView) findViewById(R.id.gridview_test);// @#@#
+		btnShowMap = (Button) findViewById(R.id.btnShowMap); // no use
 		
-		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);
+		tweetListView = (ListView) findViewById(R.id.mylist);
+		commentListView = (ListView) findViewById(R.id.mylist3);
+		peopleListView = (ListView) findViewById(R.id.mylist2);
+		imageGridView = (GridView) findViewById(R.id.gridview_test);
+		
+		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);// no use
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
-		txtSearchPeople = (EditText) findViewById(R.id.txtSearchPeople); //@#@#
+		txtSearchPeople = (EditText) findViewById(R.id.txtSearchPeople);
 		
 		lblUpdate = (TextView) findViewById(R.id.lblUpdate);
 		lblUserName = (TextView) findViewById(R.id.lblUserName);		
 		
 		
-		//layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);//!!
-		
-		//popupView = layoutInflater.inflate(R.layout.comment_popup, null);//!!
-		
 		txtTweetComment = (EditText) findViewById(R.id.txtComment); //!!
-		//btnSendComment = (Button) popupView.findViewById(R.id.btnSendComment); // !!
+		
+		checkboxLocation = (CheckBox) findViewById(R.id.checkboxlocation);
 
 		// Shared Preferences
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
 				"MyPref", 0);
+		
+		
+		
+		tabHost.setOnTabChangedListener(new OnTabChangeListener(){
+
+			public void onTabChanged(String tabID) {				
+				
+				if(tabID.equals("Tab 2")){
+					imageUrls = getAllFriend(yourID);	
+					options = new DisplayImageOptions.Builder()
+						.showStubImage(R.drawable.stub_image)
+						.showImageForEmptyUri(R.drawable.image_for_empty_url)
+						.cacheInMemory()
+						.cacheOnDisc()
+						.build();
+
+					imageGridView.setAdapter(new ImageAdapter());
+					imageGridView.setOnItemClickListener(new OnItemClickListener() {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							showFriendMenu(view, position);
+						}
+					});
+				}else if (tabID.equals("Tab 3")){
+					getRecentTweetFromOurDB();
+				}				
+			}
+			
+		});
 		
 
 		/**
@@ -293,7 +316,7 @@ public class MainActivity extends Activity {
 
 			//@Override
 			public void onClick(View arg0) {
-				// Call login twitter function
+				// call this function to log in twitter
 				loginToTwitter();
 			}
 		});
@@ -307,124 +330,24 @@ public class MainActivity extends Activity {
 			//@Override
 			public void onClick(View v) {
 				// Call update status function
-				// Get the status from EditText
 				String status = txtUpdate.getText().toString();
 
 				// Check for blank text
 				if (status.trim().length() > 0) {
+					// set up gps
+					gps = new gpsTracker(MainActivity.this);
 					// update status
 					new updateTwitterStatus().execute(status);
 				} else {
 					// EditText is empty
-					Toast.makeText(getApplicationContext(),
-							"Please enter status message", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),"Please enter status message", Toast.LENGTH_SHORT).show();
 				}
 			}
-		});		
+		});	
 		
-
 		/**
-		 * Button click event for logout from twitter
+		 * Button click event to search other twitter user
 		 */
-		btnLogoutTwitter.setOnClickListener(new View.OnClickListener() {
-
-			//@Override
-			public void onClick(View arg0) {
-				// Call logout twitter function
-				logoutFromTwitter();
-			}
-		});
-		
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-	    .threadPriority(Thread.NORM_PRIORITY - 2)
-	    .memoryCacheSize(2 * 1024 * 1024) // 2 Mb
-	    .denyCacheImageMultipleSizesInMemory()
-	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
-	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
-	    .tasksProcessingOrder(QueueProcessingType.LIFO)
-	    .enableLogging() // Not necessary in common
-	    .build();
-    
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config);
-	  
-	  
-		//@#@#@
-		
-		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-				showPopupMenu(view, position);	
-			}
-			
-		});
-		
-		tweetListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-				showTweetMenu(view, position);	
-			}
-			
-		});
-		
-//		imageGridView.setOnItemClickListener(new ListView.OnItemClickListener() {
-//
-//			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-//				showFriendMenu(view,position);
-//				//showTweetMenu(view, position);	
-//			}
-//			
-//		});
-		
-		btnProfileImage.setOnClickListener(new View.OnClickListener(){
-			public void onClick(View arg0) {
-				//showProfileImage();				
-				//startActivity(new Intent(getApplicationContext(), ImageGridActivity.class).putExtra(Extra.IMAGES, showProfileImage()));
-				
-				//Bundle bundle = getIntent().getExtras();
-				try {
-					imageUrls = getAllFriend(twitter.getId());
-				} catch (IllegalStateException e) {
-					e.printStackTrace();
-				} catch (TwitterException e) {
-					e.printStackTrace();
-				}
-
-				options = new DisplayImageOptions.Builder()
-					.showStubImage(R.drawable.stub_image)
-					.showImageForEmptyUri(R.drawable.image_for_empty_url)
-					.cacheInMemory()
-					.cacheOnDisc()
-					.build();
-
-				//GridView gridView = (GridView) findViewById(R.id.gridview_test);
-				//imageGridView = (GridView) findViewById(R.id.gridview_test);
-				imageGridView.setAdapter(new ImageAdapter());
-				imageGridView.setOnItemClickListener(new OnItemClickListener() {
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						//startImageGalleryActivity(position);
-						//TODO
-						showFriendMenu(view, position);
-					}
-				});
-				
-				//Intent intent = new Intent(getApplicationContext(), ImageGridActivity.class);
-			    //dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			    //intent.putExtra(Extra.IMAGES, showProfileImage());
-			    //startActivity(intent);
-			    //finish();				
-			}
-			
-		});
-		
-		
-		btnGetTweets.setOnClickListener(new View.OnClickListener(){
-			public void onClick(View arg0) {
-				getRecentTweets();				
-			}
-			
-		});
-		
 		btnSearchPeople.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
 				String name = txtSearchPeople.getText().toString();
@@ -435,35 +358,68 @@ public class MainActivity extends Activity {
 					searchPeople(name);
 				} else {
 					// EditText is empty
-					Toast.makeText(getApplicationContext(),
-							"Please enter a name", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),"Please enter a name", Toast.LENGTH_SHORT).show();
 				}				
+			}
+			
+		});	
+		
+		/**
+		 *  set up image loader
+		 */
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+	    .threadPriority(Thread.NORM_PRIORITY - 2)
+	    .memoryCacheSize(2 * 1024 * 1024) 
+	    .denyCacheImageMultipleSizesInMemory()
+	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
+	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
+	    .tasksProcessingOrder(QueueProcessingType.LIFO)
+	    .enableLogging()
+	    .build();
+    
+		// Initialize ImageLoader with configuration.
+		ImageLoader.getInstance().init(config);
+	  
+	  
+		//List view listeners
+		
+		/**
+		 * This triggers a popup menu, this enables user to
+		 * "Show Name", "Follow", "Unfollow", "Block", and "Add to DB"
+		 */
+		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showPopupMenu(view, position);	
 			}
 			
 		});
 		
-		/*	
-		btnSendComment.setOnClickListener(new View.OnClickListener(){  //!!!
-			public void onClick(View arg0) {
-				commentPopupWindow.dismiss(); // for now, just close the window
-			}
-		});*/
-		
-		
-	/*	
-		btnBackToCenter.setOnClickListener(new View.OnClickListener(){
+		/**
+		 * This triggers a popup menu, this enables user to
+		 * "Send Comment to a tweet",  and "show all comments of a tweet"
+		 */
+		tweetListView.setOnItemClickListener(new ListView.OnItemClickListener() {
 
-			public void onClick(View arg0) {
-				Intent dashboardPage = new Intent(getApplicationContext(), DashboardActivity.class);
-				dashboardPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(dashboardPage);
-				finish();
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showTweetMenu(view, position);	
 			}
 			
-		});*/
+		});
 		
-		
-		//@#@#
+		/**
+		 * This triggers a popup menu, this enables user to
+		 * "Reply a comment of a tweet"
+		 */
+		commentListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showCommentMenu(view, position);
+			}
+			
+		});
+	    //##########################################################################################
+		// functions
 
 		/** This if conditions is tested once is
 		 * redirected from twitter page. Parse the uri to get oAuth
@@ -480,10 +436,7 @@ public class MainActivity extends Activity {
 					// Get the access token
 					AccessToken accessToken = twitter.getOAuthAccessToken(
 							requestToken, verifier);
-					//*************************************************
 					
-					
-					//*************************************************
 					// Shared Preferences
 					Editor e = mSharedPreferences.edit();
 
@@ -500,37 +453,137 @@ public class MainActivity extends Activity {
 
 					// Hide login button
 					btnLoginTwitter.setVisibility(View.GONE);
-					//btnBackToCenter.setVisibility(View.GONE);  //@#@#
 
 					// Show Update Twitter
 					lblUpdate.setVisibility(View.VISIBLE);
 					txtUpdate.setVisibility(View.VISIBLE);
-					txtTweetComment.setVisibility(View.VISIBLE); //!!!
-					txtSearchPeople.setVisibility(View.VISIBLE);// @#@#
+					txtTweetComment.setVisibility(View.VISIBLE); //text field for enter comment for a tweet
+					txtSearchPeople.setVisibility(View.VISIBLE);
 					btnUpdateStatus.setVisibility(View.VISIBLE);
 					
-					btnProfileImage.setVisibility(View.VISIBLE);
-					btnLogoutTwitter.setVisibility(View.VISIBLE);
-					btnGetTweets.setVisibility(View.VISIBLE);
+					//btnProfileImage.setVisibility(View.VISIBLE);
+					//btnLogoutTwitter.setVisibility(View.VISIBLE);
+					//btnGetTweets.setVisibility(View.VISIBLE);
+					//btnShowMap.setVisibility(View.VISIBLE);
 					btnSearchPeople.setVisibility(View.VISIBLE);
+					checkboxLocation.setVisibility(View.VISIBLE);
 					
 					
-					// Getting user details from twitter
-					// For now i am getting his name only
+					// get user ID and user name
 					long userID = accessToken.getUserId();
 					User user = twitter.showUser(userID);
 					String username = user.getName();
 					
-					// Displaying in xml ui
+					// Important!! set up your twitter id for future use
+					yourID = twitter.getId(); 
+					
+					// Displaying user name in the welcome label
 					lblUserName.setText(Html.fromHtml("<b>Welcome " + username + "</b>"));
 				} catch (Exception e) {
-					// Check log for login errors
 					Log.e("Twitter Login Error", "> " + e.getMessage());
 				}
 			}
 		}
 
 	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+		if(isTwitterLoggedInAlready()==true){
+			 MenuInflater menuInflater = getMenuInflater();
+		        menuInflater.inflate(R.menu.tweetmenu, menu);
+		        return true;
+		}else{
+			return false;
+		}
+    }
+	
+	
+	/**
+     * Event Handling for Individual menu item selected
+     * Identify single menu item by it's id
+     * */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {// TODO
+        switch (item.getItemId())
+        {
+        case R.id.menu_showprofileimage:
+        
+			imageUrls = getAllFriend(yourID);	
+			options = new DisplayImageOptions.Builder()
+				.showStubImage(R.drawable.stub_image)
+				.showImageForEmptyUri(R.drawable.image_for_empty_url)
+				.cacheInMemory()
+				.cacheOnDisc()
+				.build();
+
+			imageGridView.setAdapter(new ImageAdapter());
+			imageGridView.setOnItemClickListener(new OnItemClickListener() {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					showFriendMenu(view, position);
+				}
+			});
+            return true;
+ 
+        case R.id.menu_gettweet:
+        	getRecentTweetFromOurDB();
+            return true;
+ 
+        case R.id.menu_showmap:
+        	 UserFunctions user = new UserFunctions();
+	    	 JSONObject json = user.getNewestStatus();
+	    	  
+	    	  int success;
+	  		try {
+	  			success = json.getInt("success");
+	  			if(success==1){
+	  				JSONArray newestStatuses = json.getJSONArray("status");
+	  				System.out.println("newestStatuses has size : " + newestStatuses.length());
+	  				
+	  				for(int i=newestStatuses.length()-1; i>= 0; i--){
+	  					
+	  					JSONObject c = newestStatuses.getJSONObject(i);
+	  						
+	  						double lat = Double.valueOf( c.get("lat").toString() );	
+	  						double lon = Double.valueOf( c.get("lon").toString() );	
+	  						String stat = c.get("stat").toString();
+	  						String url = c.get("imgurl").toString();
+	  						
+	  						statList.add(stat);			  						
+	  						latList.add(lat);
+	  						lonList.add(lon);
+	  						imgurlList.add(url);
+	  				}
+	  			
+	  			}
+	  		} catch (JSONException e) {
+	  			e.printStackTrace();
+	  		}
+	  		
+	  		String[] statArr = new String[statList.size()]; 
+	  		String[] urlArr = new String[imgurlList.size()]; 
+	    	 
+	    	Intent intent = new Intent(getApplicationContext(), AndroidGoogleMapsActivity.class);
+	    	intent.putExtra("stat", statList.toArray(statArr));
+	    	intent.putExtra("lat", latList);
+	    	intent.putExtra("lon", lonList);
+	    	intent.putExtra("imgurl", imgurlList.toArray(urlArr));
+	    	
+	    	startActivity(intent);
+            return true; 
+ 
+        case R.id.menu_logout:
+            logoutFromTwitter();
+            return true;
+ 
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }    
+ 
+
 
 	/**
 	 * Function to login twitter
@@ -547,7 +600,7 @@ public class MainActivity extends Activity {
 			twitter = factory.getInstance();
 			
 			// nextline is for testing 
-			setTwitterForTesting(twitter);
+			setTwitterForTesting(twitter);// THIS METHOD IS FOR UNIT TESTING PURPOSE!
 
 			try {
 				requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
@@ -602,7 +655,20 @@ public class MainActivity extends Activity {
 				// Update status
 				twitter4j.Status response = twitter.updateStatus(status);
 				
-				Log.d("Status", "> " + response.getText());
+				if(checkboxLocation.isChecked()==true){
+					//store to database
+					long tuser = yourID;
+				    long tid = response.getId();
+				    double lat = gps.getLatitude();
+				    double lon = gps.getLongitude();
+				    UserFunctions userFunction = new UserFunctions();
+				    //System.out.println(status+" "+tuser+" "+tid);
+				    JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
+				    JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
+					
+					Log.d("Status", "> " + response.getText());
+				}
+				
 			} catch (TwitterException e) {
 				// Error in updating status
 				Log.d("Twitter Update Error", e.getMessage());
@@ -643,36 +709,8 @@ public class MainActivity extends Activity {
 		e.remove(PREF_KEY_TWITTER_LOGIN);
 		e.commit();
 		
-		//@#@#
-		/*Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
-		twitterPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(twitterPage);
-		finish();*/
-		//@#@#@
-		
-
-		// After this take the appropriate action
-		// I am showing the hiding/showing buttons again
-		// You might not needed this code
-		
-		/*// not used for now
-		btnLogoutTwitter.setVisibility(View.GONE);
-		btnUpdateStatus.setVisibility(View.GONE);
-		txtUpdate.setVisibility(View.GONE);
-		txtSearchPeople.setVisibility(View.GONE);
-		lblUpdate.setVisibility(View.GONE);
-		lblUserName.setText("");
-		lblUserName.setVisibility(View.GONE);
-		
-		btnProfileImage.setVisibility(View.GONE);
-		btnGetTweets.setVisibility(View.GONE);
-		btnSearchPeople.setVisibility(View.GONE);
-
-		btnLoginTwitter.setVisibility(View.VISIBLE); */
-		//btnBackToCenter.setVisibility(View.VISIBLE);
-		
 		// this line is very important!!, it ends this current activity
-		finish();//@#@#
+		finish();
 	}
 
 	/**
@@ -684,25 +722,108 @@ public class MainActivity extends Activity {
 		return mSharedPreferences.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
 	}
 	
-	/*
-	 * Send Comment on a tweet
+	
+	/**
+	 * Get the most recent 20 tweets from our DB user
 	 */
-	private void sendComment(String comment, long userId, long tweetId){
-		// TODO
-		//System.out.println("The comment is: " + comment);
-		//System.out.println("The userId is: " + userId);
-		//System.out.println("send comment tweetId is: " + tweetId);
-		//System.out.println("long to string is: " + Long.toString(tweetId)); // same as long
+	private void getRecentTweetFromOurDB(){
+		String compare="";
 		
+		// clear tweet array list every time before use
+		tweetList.clear();
+		tweetIdList.clear();
+		comboTweetList.clear();
+		
+		// get the most recent 20 tweets from our db user
 		UserFunctions user = new UserFunctions();
-		JSONObject json = user.tcomment(tweetId, userId, comment);
+		JSONObject json = user.getAllStatus();
 		
-		//getAllFriend(userId);
-		//getComment(tweetId); 
+		int success;
+		try {
+			success = json.getInt("success");
+			if(success==1){
+				JSONArray statuses = json.getJSONArray("status");
+				
+				
+				System.out.println("friends has size : " + statuses.length());
+				int count=0;
+				
+				// reverse the order, display the most recent tweet first
+				for(int i=statuses.length()-1; i>= 0; i--){
+					if (count==20){
+						break;
+					}
+					
+					JSONObject c = statuses.getJSONObject(i);
+						
+					long tid = Long.valueOf( c.get("tid").toString() );					
+					String stat = c.get("stat").toString();
+					
+					
+					tweetList.add(stat);						
+					tweetIdList.add(tid);
+					
+					try {
+						comboTweetList.add(twitter.showStatus(tid).getUser().getName() + ": " + stat);
+					} catch (TwitterException e) {
+						e.printStackTrace();
+					}
+					
+					count++;		
+				}
+				
+				if(notification == ""){
+					notification = statuses.
+							getJSONObject(statuses.length()-1).get("stat").toString();
+					compare = statuses.
+							getJSONObject(statuses.length()-1).get("stat").toString();
+				}else{
+					compare = statuses.
+							getJSONObject(statuses.length()-1).get("stat").toString();
+				}
+				
+				if(notification.equals(compare) == false ){
+					Toast.makeText(MainActivity.this,
+							"You have a new update!" ,Toast.LENGTH_LONG).show();
+					notification = compare;
+				}
+
+			
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		// clear the comment list view
+		String[] emptyArray = {};
+		ArrayAdapter<String> emptyAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,emptyArray);
+		commentListView.setAdapter(emptyAdapter);		
+		
+		// convert an arraylist to an string array
+        String[] simpleArray = new String[comboTweetList.size()];
+        comboTweetList.toArray(simpleArray);
+        
+        // set array adapter and display in list view
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+        tweetListView.setAdapter(arrayAdapter);
 	}
 	
+	
+	/**
+	 * Send Comment on a tweet
+	 */
+	private void sendComment(String comment, long userId, long tweetId){		
+		UserFunctions user = new UserFunctions();
+		JSONObject json = user.tcomment(tweetId, userId, comment);
+	}
+	
+	/**
+	 * Get the profile image of all our db friend for the current user
+	 * Return a list of profile image urls
+	 */
 	private String[] getAllFriend(long currUid){
 		imageList.clear();
+		friendList.clear();
 		
 		UserFunctions user = new UserFunctions();
 		JSONObject json = user.getAllFriends(currUid);
@@ -714,38 +835,32 @@ public class MainActivity extends Activity {
 				JSONArray friends = json.getJSONArray("friends");
 				System.out.println("friends has size : " + friends.length());
 				
-				for(int i=0; i< friends.length(); i++){
-					
-					JSONObject c = friends.getJSONObject(i);
-					
-					try {
-						if (twitter.getId() == Long.valueOf( c.get("twitterID").toString() )){							
-							//long friendId = Long.valueOf( c.get("twitterFriend").toString() );					
+				for(int i=0; i< friends.length(); i++){					
+					JSONObject c = friends.getJSONObject(i);			
+						if ( yourID == Long.valueOf( c.get("twitterID").toString() )){							
+							long thisfriendId = Long.valueOf( c.get("twitterFriend").toString() );					
 							String friendImgUrl = c.get("twitterFriendImg").toString();
-							imageList.add(friendImgUrl);							
-							//System.out.println(friendId+ " " + friendImgUrl );
-						}
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					} catch (IllegalStateException e) {
-						e.printStackTrace();
-					} catch (TwitterException e) {
-						e.printStackTrace();
-					}					
-				}
-			
+							
+							imageList.add(friendImgUrl);						
+							friendList.add(thisfriendId);
+						}					
+				}			
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		
-		String[] urls = new String[imageList.size()];
-		
+		String[] urls = new String[imageList.size()];		
 		return imageList.toArray(urls);
 	}
 	
+	
+	/**
+	 * Fetch all comments in our db for a status(tweet)
+	 * Return false if there is no comment for this status(tweet)
+	 */
 	private boolean getComment(long tweetId){
-		// TODO
+		// 
 		commentList.clear();
 		commentAuthorIdList.clear();
 		comboCommentList.clear();
@@ -786,14 +901,19 @@ public class MainActivity extends Activity {
 					
 				}
 				
+				// clear the tweet list view
+				String[] emptyArray = {};
+				ArrayAdapter<String> emptyAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,emptyArray);
+				tweetListView.setAdapter(emptyAdapter);
+				
 				// convert an arraylist to an string array
 	            String[] simpleArray = new String[comboCommentList.size()];
 	            comboCommentList.toArray(simpleArray);
 	            
 	            // set array adapter and display in list view
 	            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
-	            tweetListView.setAdapter(arrayAdapter2);
-			
+	            commentListView.setAdapter(arrayAdapter2);// was tweetlistview	            
+	            
 			}
 			else{
 				return false;
@@ -806,7 +926,6 @@ public class MainActivity extends Activity {
 	
 	/**
 	 * search other twitter user by user name
-	 * collects a list of 
 	 */
 	private void searchPeople(String name){
 		try {
@@ -814,8 +933,8 @@ public class MainActivity extends Activity {
 			List<User> listOfUsers = twitter.searchUsers(name, 10);
 			
 			// clear user_name arraylist and user_id arraylist every time before use
-			peopleList.clear(); // @@@@
-			peopleIdList.clear(); // @@@@
+			peopleList.clear();
+			peopleIdList.clear();
 			
 			// add user name and user id to corresponding arraylist for future use
 			for (User user : listOfUsers){
@@ -836,55 +955,6 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	/**
-	 * Get the most recent 20 tweets from other real twitter user
-	 */
-	private void getRecentTweets(){	
-		try {			
-			// clear tweet array list every time before use
-			tweetList.clear();//@@@@
-			tweetIdList.clear(); //$$$$
-			comboTweetList.clear();
-			
-			//User user = twitter.verifyCredentials();
-			
-			User user = twitter.showUser(twitter.getId());
-			List<Status> statuses = twitter.getHomeTimeline();
-			//List<Status> statuses = twitter.getUserTimeline();
-            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
-            
-            // add these recent status to corresponding arraylist for future use
-            for (Status status : statuses) {            	
-            	tweetList.add(status.getText());
-            	tweetIdList.add(status.getId());
-             
-            	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
-            	//System.out.println("pre");
-            	if(status.getGeoLocation()!= null){
-            		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
-            	}else{
-            		//System.out.println("No geo info");
-            	}
-            	
-            	//System.out.println("post");
-                //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
-            }			
-            
-            // convert an arraylist to an string array
-            String[] simpleArray = new String[comboTweetList.size()];
-            comboTweetList.toArray(simpleArray);
-            
-            // set array adapter and display in list view
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
-            tweetListView.setAdapter(arrayAdapter);
-			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-	}
 	
 	
 	/**
@@ -919,16 +989,15 @@ public class MainActivity extends Activity {
 							twitter.createBlock(peopleIdList.get(position));
 							Toast.makeText(MainActivity.this,"You have blocked " + peopleList.get(position),Toast.LENGTH_LONG).show();
 							break;
-						case R.id.menu4: // add as friend
-							
-							
-							yourID = twitter.getId();
-						    friendID = peopleIdList.get(position);
-						    friendPicUrl = twitter.showUser(friendID).getProfileImageURL().toString();
+						case R.id.menu4: // add as friend							
+							yourID = twitter.getId(); //may not be needed 
+							createFriendID = peopleIdList.get(position);							
+							twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.BIGGER;							
+							twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(createFriendID), imageSize);
+							friendPicUrl = image.getURL();
+						    //friendPicUrl = twitter.showUser(createFriendID).getProfileImageURL().toString();
 						    new CreateNewFriend().execute();
-							
-							Toast.makeText(MainActivity.this,"Add as friend",Toast.LENGTH_LONG).show();
-							break;
+						    break;
 						default:
 							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
 					
@@ -943,7 +1012,9 @@ public class MainActivity extends Activity {
 	    popupMenu.show();
 	}
 	
-
+	/**
+	 * Show a popup menu when click on a profile image
+	 */
 	private void showFriendMenu(View v, final int position){
 		PopupMenu friendMenu = new PopupMenu(MainActivity.this, v);
 		friendMenu.getMenuInflater().inflate(R.menu.friendimagemenu , friendMenu.getMenu());
@@ -955,7 +1026,9 @@ public class MainActivity extends Activity {
 				int id = item.getItemId();
 				switch(id){
 					case R.id.friendmenu1:  // delete friend from DB
-						Toast.makeText(MainActivity.this,"Delete friend",Toast.LENGTH_LONG).show();
+						deleteFriendID = friendList.get(position);
+						//System.out.println("id will be deleted is: "+ deleteFriendID);
+						new DeleteFriend().execute();
 						break;
 					case R.id.friendmenu2:  // item 2
 						Toast.makeText(MainActivity.this,"Item 2",Toast.LENGTH_LONG).show();
@@ -975,6 +1048,43 @@ public class MainActivity extends Activity {
 	}
 	
 	/**
+	 * Show a popup menu when click on a comment
+	 */
+	private void showCommentMenu(View v, final int position){
+		PopupMenu commentMenu = new PopupMenu(MainActivity.this, v);
+		commentMenu.getMenuInflater().inflate(R.menu.commentlistmenu, commentMenu.getMenu());
+		
+		commentMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+			public boolean onMenuItemClick(MenuItem item) {
+				int id = item.getItemId();
+				switch(id){
+				case R.id.commentmenu1:	// reply a comment						
+					String aReply = txtTweetComment.getText().toString();					
+						
+						if (aReply.trim().length() > 0) {
+							sendComment(aReply, yourID, currentTweetID);
+							// refresh the comment list
+							getComment(currentTweetID);
+							Toast.makeText(MainActivity.this,"Reply Sent",Toast.LENGTH_LONG).show();
+							txtTweetComment.setText("");
+						} else {
+							// EditText is empty
+							Toast.makeText(getApplicationContext(),"Your reply can not be empty", Toast.LENGTH_SHORT).show();
+						}
+					break;
+				default:
+					Toast.makeText(MainActivity.this,"Nothing is clicked",Toast.LENGTH_LONG).show();
+				}
+				return true;
+			}
+			
+		});
+		
+		commentMenu.show();
+	}
+	
+	/**
 	 * Show a popup menu when click on a recent tweet
 	 */
 	private void showTweetMenu(View v, final int position){
@@ -984,47 +1094,29 @@ public class MainActivity extends Activity {
 		tweetMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			public boolean onMenuItemClick(MenuItem item) {
 				int id = item.getItemId();					
-				long tweetId = tweetIdList.get(position);
-				long userId;
+				currentTweetID = tweetIdList.get(position);
 				switch(id)
 				{
 					case R.id.tweetmenu1: // Write a Comment
-						//showCommentWindow(); //!!						
-						try {
-							String comment = txtTweetComment.getText().toString();
-							//tweetId = tweetIdList.get(position);
-							userId = twitter.getId();
-							
-							if (comment.trim().length() > 0) {
-								sendComment(comment, userId, tweetId);
-								Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
-								txtTweetComment.setText("");
-							} else {
-								// EditText is empty
-								Toast.makeText(getApplicationContext(),
-										"Your comment can not be empty", Toast.LENGTH_SHORT).show();
-							}
-							
-						} catch (IllegalStateException e) {
-							e.printStackTrace();
-						} catch (TwitterException e) {
-							e.printStackTrace();
-						}							
+						String comment = txtTweetComment.getText().toString();							
+						if (comment.trim().length() > 0) {
+							sendComment(comment, yourID, currentTweetID);
+							Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
+							txtTweetComment.setText("");
+						} else {
+							// EditText is empty
+							Toast.makeText(getApplicationContext(),
+									"Your comment can not be empty", Toast.LENGTH_SHORT).show();
+						}
 						break;
 					case R.id.tweetmenu2: // Show all Comments
-						//TODO
-						if (getComment(tweetId) == true)
+						if (getComment(currentTweetID) == true)
 							Toast.makeText(MainActivity.this,"Comments all shown",Toast.LENGTH_LONG).show();
 						else
 							Toast.makeText(MainActivity.this,"No Comments to show",Toast.LENGTH_LONG).show();
 						break;
-					case R.id.tweetmenu3: // Item 3
-						System.out.println("Item 3 is clicked");
-						Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
-						break;
 					default:
-						System.out.println("Noting is clicked");
-						//Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+						Toast.makeText(MainActivity.this,"Nothing is clicked",Toast.LENGTH_LONG).show();
 				}				
 				return true;
 			}
@@ -1034,7 +1126,253 @@ public class MainActivity extends Activity {
 
 	
 	/**
+	 * Create a new friend and store a new friend entry into our own db 
+	 */
+	class CreateNewFriend extends AsyncTask<String, String, String> {
+		/**
+		 * Show progress dialog before adding a new friend
+		 * */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(MainActivity.this);
+			pDialog.setMessage("Adding as friend..");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		/**
+		 * Creating friend
+		 * */
+		protected String doInBackground(String... args) {
+			String twitterID = String.valueOf(yourID);
+			String twitterFriend = String.valueOf(createFriendID);
+			String twitterFriendImg = friendPicUrl;
+
+			// Building Parameters
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("twitterID", twitterID));
+			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
+			params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
+			
+			System.out.println(params.toString());
+
+			// getting JSON Object
+			JSONObject json = jasonParsonFriend.makeHttpRequest(url_create_friend,
+					"POST", params);
+			
+			// check log cat for response
+			Log.d("Create Friend Response", json.toString());
+
+			// check for success tag
+			try {
+				int success = json.getInt(TAG_SUCCESS);
+
+				if (success == 1) {
+//					// successfully create friend
+//					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
+//					startActivity(i);
+//					
+//					// closing this screen
+//					finish();
+					
+				} else {
+					// failed to create friend
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+		
+		/**
+		 * After completing background task Dismiss the progress dialog
+		 * **/
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog once done
+			pDialog.dismiss();
+			Toast.makeText(MainActivity.this,"Friend Added!",Toast.LENGTH_LONG).show();
+		}
+		
+	}
+		
+		
+	/**
+	 * Delete a friend  from our own data base
+	 */
+	class DeleteFriend extends AsyncTask<String, String, String> {
+		// TODO
+		/**
+		 * Show progress dialog before deleting a friend from our db
+		 */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(MainActivity.this);
+			pDialog.setMessage("Delete friend..");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		/**
+		 * Delete friend from our db
+		 */
+		protected String doInBackground(String... args) {
+			System.out.println("in doingbackground..");
+			String twitterID = String.valueOf(yourID);
+			String twitterFriend = String.valueOf(deleteFriendID);
+			//String twitterFriendImg = friendPicUrl;
+
+			// Building Parameters
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("twitterID", twitterID));
+			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
+			//params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
+			
+			System.out.println("..."+params.toString());
+
+			// getting JSON Object
+			JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,
+						"POST", params);
+			//System.out.println("Error here?");// get printed
+			
+			
+				
+			// check log cat for response
+			//Log.d("Delete Friend Response", json.toString());
+
+//			// check for success tag
+//			try {
+//				int success = json.getInt(TAG_SUCCESS);
+//				if (success == 1) {
+//					System.out.println("or here?");
+////					// successfully delete friend
+////					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
+////					startActivity(i);
+////					
+////					// closing this screen
+////					finish();
+//						
+//				} else {
+//					// failed to delete friend
+//				}
+//			} catch (JSONException e) {
+//				e.printStackTrace();
+//			}
+
+			return null;
+		}
+
+		/**
+		 * Dismiss the progress dialog after deleting a friend from our db
+		 */
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog
+			pDialog.dismiss();
+			Toast.makeText(MainActivity.this,"Friend Deleted!",Toast.LENGTH_LONG).show();
+		}
+	 }
+	
+	
+	/**
+	 * This is a class handling displaying profile image as grid view
+	 */
+	public class ImageAdapter extends BaseAdapter {
+		public int getCount() {
+			return imageUrls.length;
+		}
+
+		public Object getItem(int position) {
+			return null;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final ImageView imageView;
+			if (convertView == null) {
+				imageView = (ImageView) getLayoutInflater().inflate(R.layout.item_grid_image, parent, false);
+			} else {
+				imageView = (ImageView) convertView;
+			}
+
+			imageLoader.displayImage(imageUrls[position], imageView, options, new SimpleImageLoadingListener() {
+				@Override
+				public void onLoadingComplete(Bitmap loadedImage) {
+					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in);
+					imageView.setAnimation(anim);
+					anim.start();
+				}
+			});
+
+			return imageView;
+		}
+	}
+	
+	private void setTwitterForTesting(Twitter tw){
+		twitterForTesting = tw;
+	}
+	
+	public Twitter getTwitterForTesting(){
+		return twitterForTesting;
+	}	
+	
+	/**
+	 * Get the most recent 20 tweets from other real twitter user
+	 * This method is not used for now
+	 */
+	private void getRecentTweets(){	
+		try {			
+			// clear tweet array list every time before use
+			tweetList.clear();
+			tweetIdList.clear(); 
+			comboTweetList.clear();
+			
+			//User user = twitter.verifyCredentials();
+			
+			User user = twitter.showUser(twitter.getId());
+			List<Status> statuses = twitter.getHomeTimeline();
+			//List<Status> statuses = twitter.getUserTimeline();
+            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
+            
+            // add these recent status to corresponding arraylist for future use
+            for (Status status : statuses) {            	
+            	tweetList.add(status.getText());
+            	tweetIdList.add(status.getId());
+             
+            	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
+            	//System.out.println("pre");
+            	if(status.getGeoLocation()!= null){
+            		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
+            	}else{
+            		//System.out.println("No geo info");
+            	}
+            }			
+            
+            // convert an arraylist to an string array
+            String[] simpleArray = new String[comboTweetList.size()];
+            comboTweetList.toArray(simpleArray);
+            
+            // set array adapter and display in list view
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+            tweetListView.setAdapter(arrayAdapter);
+			
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
 	 * collects follower's profile image urls
+	 * This method is not used for now
 	 */
 	private String[] showProfileImage(){
 		System.out.println("Show image button is clicked");
@@ -1074,155 +1412,6 @@ public class MainActivity extends Activity {
 	    return imageList.toArray(url_arr);
 	}
 	
-	
-	// TODO
-	class CreateNewFriend extends AsyncTask<String, String, String> {
-
-		/**
-		 * Before starting background thread Show Progress Dialog
-		 * */
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			pDialog = new ProgressDialog(MainActivity.this);
-			pDialog.setMessage("Adding as friend..");
-			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(true);
-			pDialog.show();
-		}
-
-		/**
-		 * Creating friend
-		 * */
-		protected String doInBackground(String... args) {
-			String twitterID = String.valueOf(yourID);
-			String twitterFriend = String.valueOf(friendID);
-			String twitterFriendImg = friendPicUrl;
-
-			// Building Parameters
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("twitterID", twitterID));
-			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
-			params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
-			
-			System.out.println(params.toString());
-
-			// getting JSON Object
-			// Note that create product url accepts POST method
-			JSONObject json = jasonParsonFriend.makeHttpRequest(url_create_friend,
-					"POST", params);
-			
-			// check log cat fro response
-			Log.d("Create Response", json.toString());
-
-			// check for success tag
-			try {
-				int success = json.getInt(TAG_SUCCESS);
-
-				if (success == 1) {
-//					// successfully created product
-//					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
-//					startActivity(i);
-//					
-//					// closing this screen
-//					finish();
-					
-				} else {
-					// failed to create product
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-			return null;
-		}
-
-		/**
-		 * After completing background task Dismiss the progress dialog
-		 * **/
-		protected void onPostExecute(String file_url) {
-			// dismiss the dialog once done
-			pDialog.dismiss();
-			Toast.makeText(MainActivity.this,"Friend added",Toast.LENGTH_LONG).show();
-		}
-
-	}
-	
-	
-	private void setTwitterForTesting(Twitter tw){
-		twitterForTesting = tw;
-	}
-	
-	public Twitter getTwitterForTesting(){
-		return twitterForTesting;
-	}
-	
-	
-	public ArrayList<String> getPeopleList(){
-		return peopleList;
-	}
-	
-	public ArrayList<Long> getPeopleIdList(){
-		return peopleIdList;
-	}
-	
-	
-	
-	
-	
-	public class ImageAdapter extends BaseAdapter {
-		public int getCount() {
-			return imageUrls.length;
-		}
-
-		public Object getItem(int position) {
-			return null;
-		}
-
-		public long getItemId(int position) {
-			return position;
-		}
-
-		public View getView(int position, View convertView, ViewGroup parent) {
-			final ImageView imageView;
-			if (convertView == null) {
-				imageView = (ImageView) getLayoutInflater().inflate(R.layout.item_grid_image, parent, false);
-			} else {
-				imageView = (ImageView) convertView;
-			}
-
-			imageLoader.displayImage(imageUrls[position], imageView, options, new SimpleImageLoadingListener() {
-				@Override
-				public void onLoadingComplete(Bitmap loadedImage) {
-					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in);
-					imageView.setAnimation(anim);
-					anim.start();
-				}
-			});
-
-			return imageView;
-		}
-	}
-	
-	/*// not used for now
-	private void showCommentWindow(){
-		//LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-		
-		//View popupView = layoutInflater.inflate(R.layout.comment_popup, null);
-		
-		//final PopupWindow commentPopupWindow = new PopupWindow(popupView, 400,300);
-		commentPopupWindow = new PopupWindow(popupView, 400,300);
-		
-		//PopupWindow commentPopupWindow = new PopupWindow(); // old
-		//commentPopupWindow.setContentView(getLayoutInflater().inflate(R.layout.comment_popup, null)); // old
-		
-		commentPopupWindow.showAtLocation(getLayoutInflater().inflate(R.layout.comment_popup, null), Gravity.CENTER, 0, 175);
-		commentPopupWindow.setFocusable(true);
-		
-		//EditText txtComment = (EditText)popupView.findViewById(R.id.txtComment);		
-		//Button btnSendComment = (Button)popupView.findViewById(R.id.btnSendComment);
-		//txtComment.setFocusable(true);
-	}*/
 
 	protected void onResume() {
 		super.onResume();

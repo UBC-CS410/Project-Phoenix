@@ -1,10 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
   <group android:id="@+id/group_tweetlistmenu">
       <item android:id="@+id/tweetmenu1"
-          android:title="Write a Comment"/>
+          android:title="Send Comment"/>
       <item android:id="@+id/tweetmenu2"
-          android:title="Show all Comments "/>
-      <item android:id="@+id/tweetmenu3"
-          android:title="Item 3"/>
+          android:title="Show its Comments"/>
   </group>
 </menu>

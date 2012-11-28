@@ -53,6 +53,15 @@
         android:layout_height="wrap_content"
         android:hint="Compose new Tweet..."
         android:visibility="gone"/>
+    
+    <CheckBox
+        android:id="@+id/checkboxlocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share Location"
+        android:checked="true"
+        android:visibility="gone"/>>
+    
  
     <!-- Tweet Button -->
     <Button android:id="@+id/btnUpdateStatus"
@@ -74,10 +83,11 @@
         android:visibility="gone"/>
 </LinearLayout>
 
-<LinearLayout android:id="@+id/tab2_Image"
+<RelativeLayout android:id="@+id/tab2_Image"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:paddingTop="50dp">
 
     <!-- Show Profile Image Button -->
     <Button android:id="@+id/btnProfileImage"
@@ -99,12 +109,13 @@
     android:stretchMode="columnWidth"
     android:verticalSpacing="4dip" />
     
- </LinearLayout>
+ </RelativeLayout>
  
 <LinearLayout android:id="@+id/tab3_Tweets"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-    android:layout_height="fill_parent">   
+    android:layout_height="fill_parent"
+    android:paddingTop="50dp">   
     
     
     <!-- Get Tweets Button -->
@@ -121,7 +132,7 @@
     <EditText android:id="@+id/txtComment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="Compose new Comment..."
+        android:hint="Write a new Comment..."
         android:visibility="gone"/>
     
         
@@ -129,6 +140,11 @@
     	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         /> 
+     
+    <ListView android:id="@+id/mylist3"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
     
  </LinearLayout>
  
@@ -162,6 +178,22 @@
         />
     
  </RelativeLayout>
+ 
+ 
+<LinearLayout android:id="@+id/tab5_Maps"
+  android:orientation="vertical"
+  android:layout_width="fill_parent"
+    android:layout_height="fill_parent">   
+    
+     <Button android:id="@+id/btnShowMap"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Map"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="50dip"
+        android:visibility="gone"/>  
+</LinearLayout>
  
 </FrameLayout>
 
