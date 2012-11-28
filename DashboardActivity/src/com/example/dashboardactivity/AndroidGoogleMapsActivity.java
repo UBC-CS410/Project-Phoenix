@@ -22,6 +22,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
@@ -42,57 +43,77 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 	private MapController controller;
 	private Location currentLocation;
 	private MainActivity mainActivity;
-	
-	private String[] statArr; 
-	private	double[] latArr; 
-	private	double[] lonArr; 
-	private	String[] urlArr; 
-	
-	
-	
+	customMapOverlay mapOverlay;
+
+	private String[] statArr;
+	private double[] latArr;
+	private double[] lonArr;
+	private String[] urlArr;
+	private boolean isGpsEnabled, isNetworkEnabled;
+	LocationManager lm;
 	// private GeoPoint point;
 	Button btnFindme;
+
+	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+
+	// The minimum time between updates in milliseconds
+	private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//mainActivity = (MainActivity) getApplicationContext();
-		//mainActivity.getLatList()
-		
-		System.out.println("inside map activity");
+		setContentView(R.layout.map_view);
+		initMapView();
+		initMyLocation();
 		List<GeoPoint> geoPointList = new ArrayList<GeoPoint>();
 		List<String> statList = new ArrayList<String>();
 		List<Bitmap> bitMapList = new ArrayList<Bitmap>();
 		List<Double> latList = new ArrayList<Double>();
 		List<Double> lonList = new ArrayList<Double>();
-		
+
 		// get bundle
-		
+
 		Bundle bundle = getIntent().getExtras();
 		statArr = bundle.getStringArray("stat");
-		latList = (ArrayList<Double>) bundle.getSerializable("lat");
-		lonList = (ArrayList<Double>)bundle.getSerializable("lon");
+		 latList = (ArrayList<Double>) bundle.getSerializable("lat");
+		 lonList = (ArrayList<Double>) bundle.getSerializable("lon");
 		urlArr = bundle.getStringArray("imgurl");
-		
-		
-		
-		System.out.println(statArr.length);
-		//System.out.println(latArr.length);
-		//System.out.println(lonArr.length);
-		System.out.println(urlArr.length);
 
-		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 500.0f,
-				this);
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		isGpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		isNetworkEnabled = lm
+				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-		setContentView(R.layout.map_view);
-		initMapView();
-		initMyLocation();
-		
-		
-		for (int i=0; i<statArr.length; i++){
-			geoPointList.add(getGeoPoint(latList.get(i), lonList.get(i)));	
+		if (isNetworkEnabled) {
+			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+					MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+			Log.d("Network", "Network");
+			if (lm != null) {
+				currentLocation = lm
+						.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+			}
+		}
+
+		if (isGpsEnabled) {
+			if (currentLocation == null) {
+				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+						MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
+						this);
+				Log.d("GPS Enabled", "GPS Enabled");
+				if (lm != null) {
+					currentLocation = lm
+							.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				}
+			}
+		}
+
+		if(!isGpsEnabled && !isNetworkEnabled){
+			showDialog();
+		}
+
+		for (int i = 0; i < statArr.length; i++) {
+			geoPointList.add(getGeoPoint(latList.get(i), lonList.get(i)));
 			statList.add(statArr[i]);
 			try {
 				bitMapList.add(drawFromUrl(urlArr[i]));
@@ -101,31 +122,11 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 		System.out.println("herere??");
-
-//		//place marker
-//		GeoPoint p = getGeoPoint(37, -123);
-//		Bitmap pic = null;
-//		try {
-//			pic = drawFromUrl("http://bks6.books.google.com/books?id=aH7BPTrwNXUC&printsec=frontcover&img=1&zoom=5&edge=curl&sig=ACfU3U2aQRnAX2o2ny2xFC1GmVn22almpg");
-//		} catch (MalformedURLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
-
-
-		//get current location
-		String locationProvider = LocationManager.GPS_PROVIDER;
-		currentLocation = lm.getLastKnownLocation(locationProvider);
-
-		//find me button
+		// find me button
 		btnFindme = (Button) findViewById(R.id.btnFindMe);
 		btnFindme.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -133,39 +134,20 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			}
 		});
 
-
-
-//		GeoPoint p1 = new GeoPoint((int) (56.27058500725475 * 1E6), (int) (-2.6984095573425293 * 1E6));
-//
-//
-//		List<GeoPoint> geoPoint = new ArrayList<GeoPoint>();
-//		List<Bitmap> bitMap	= new ArrayList<Bitmap>();
-//		List<String> string = new ArrayList<String>();
-//
-//
-//		string.add("1");
-//		string.add("2");
-//		string.add("3");
-//		geoPoint.add(p);
-//		geoPoint.add(p1);
-//		GeoPoint p2 = new GeoPoint((int) (60.00 * 1E6), (int) (-21.69 * 1E6));
-//		geoPoint.add(p2);
-//		bitMap.add(pic);
-//		bitMap.add(pic);
-//		bitMap.add(pic);
-		
-		for(int i=0; i<geoPointList.size(); i++){
-			System.out.println("geo"+geoPointList.get(i));
+		if (mapOverlay == null) {
+			mapOverlay = new customMapOverlay(geoPointList, bitMapList,
+					statList);
+			map.getOverlays().add(mapOverlay);
+		} else {
+			map.getOverlays().remove(mapOverlay);
+			map.invalidate();
+			mapOverlay = new customMapOverlay(geoPointList, bitMapList,
+					statList);
+			map.getOverlays().add(mapOverlay);
 		}
-		 
-		
-		
-		customMapOverlay demoOverlay = new customMapOverlay(geoPointList, bitMapList, statList);
-		map.getOverlays().add(demoOverlay);
-
 	}
 
-	//initialize map
+	// initialize map
 	private void initMapView() {
 		map = (MapView) findViewById(R.id.mapView);
 		controller = map.getController();
@@ -179,7 +161,7 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		alertDialog.setTitle("Error");
 		alertDialog.setMessage("Do you want go to turn on GPS");
 		alertDialog.setPositiveButton("yes", new OnClickListener() {
-			//@Override
+			// @Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 				startActivity(new Intent(
@@ -187,7 +169,7 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			}
 		});
 		alertDialog.setNegativeButton("cancle", new OnClickListener() {
-			//@Override
+			// @Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 			}
@@ -202,20 +184,17 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		myOverlay.enableCompass();
 		myOverlay.runOnFirstFix(new Runnable() {
 			public void run() {
-				controller.setZoom(15);
-				controller.animateTo(myOverlay.getMyLocation());
 			}
 		});
 		map.getOverlays().add(myOverlay);
 	}
 
-
-	//@Override
+	// @Override
 	protected boolean isRouteDisplayed() {
 		return false;
 	}
 
-	//@Override
+	// @Override
 	public void onLocationChanged(Location location) {
 		currentLocation = location;
 	}
@@ -234,10 +213,9 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		}
 	}
 
-	//int to geopoint
-	public GeoPoint getGeoPoint(double lat, double log){
-		GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6),
-				(int) (log * 1E6));
+	// int to geopoint
+	public GeoPoint getGeoPoint(double lat, double log) {
+		GeoPoint geoPoint = new GeoPoint((int) (lat * 1E6), (int) (log * 1E6));
 		return geoPoint;
 	}
 
@@ -254,22 +232,18 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		return x;
 	}
 
-	//@Override
+	// @Override
 	public void onProviderDisabled(String provider) {
-		if (provider == "gps") {
 			showDialog();
-		} else {
-			showDialog();
-		}
 	}
 
-	//@Override
+	// @Override
 	public void onProviderEnabled(String provider) {
 		// TODO Auto-generated method stub
 
 	}
 
-	//@Override
+	// @Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// TODO Auto-generated method stub
 

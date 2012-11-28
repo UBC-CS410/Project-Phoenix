@@ -57,6 +57,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -157,6 +158,9 @@ public class MainActivity extends Activity {
 	// lbl update
 	TextView lblUpdate;
 	TextView lblUserName;
+	
+	// location check box
+	CheckBox checkboxLocation;
 
 	// Progress dialog
 	ProgressDialog pDialog;
@@ -265,6 +269,8 @@ public class MainActivity extends Activity {
 		
 		
 		txtTweetComment = (EditText) findViewById(R.id.txtComment); //!!
+		
+		checkboxLocation = (CheckBox) findViewById(R.id.checkboxlocation);
 
 		// Shared Preferences
 		mSharedPreferences = getApplicationContext().getSharedPreferences(
@@ -416,6 +422,7 @@ public class MainActivity extends Activity {
 					//btnGetTweets.setVisibility(View.VISIBLE);
 					//btnShowMap.setVisibility(View.VISIBLE);
 					btnSearchPeople.setVisibility(View.VISIBLE);
+					checkboxLocation.setVisibility(View.VISIBLE);
 					
 					
 					// Getting user details from twitter
@@ -611,18 +618,20 @@ public class MainActivity extends Activity {
 				// Update status
 				twitter4j.Status response = twitter.updateStatus(status);
 				
-				//store to database
-
-				long tuser = twitter.getId();
-			        long tid = response.getId();
-			        double lat = gps.getLatitude();
-			        double lon = gps.getLongitude();
-			        UserFunctions userFunction = new UserFunctions();
-			        System.out.println(status+" "+tuser+" "+tid);
-			        JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
-			        JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
+				if(checkboxLocation.isChecked()==true){
+					//store to database
+					long tuser = twitter.getId();
+				    long tid = response.getId();
+				    double lat = gps.getLatitude();
+				    double lon = gps.getLongitude();
+				    UserFunctions userFunction = new UserFunctions();
+				    //System.out.println(status+" "+tuser+" "+tid);
+				    JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
+				    JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
+					
+					Log.d("Status", "> " + response.getText());
+				}
 				
-				Log.d("Status", "> " + response.getText());
 			} catch (TwitterException e) {
 				// Error in updating status
 				Log.d("Twitter Update Error", e.getMessage());

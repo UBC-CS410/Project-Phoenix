@@ -23,26 +23,20 @@ public class customMapOverlay extends Overlay {
 
 	private ArrayList<GeoPoint> _displayedMarkers;
 	private LinearLayout _bubbleLayout;
-	List<GeoPoint> geoPointList;
-	List<Bitmap> bitMapList;
-	List<String> stringList;
+	private List<GeoPoint> geoPointList;
+	private List<Bitmap> bitMapList;
+	private List<String> stringList;
 
 	public customMapOverlay(List<GeoPoint> g, List<Bitmap> b, List<String> s) {
 		geoPointList = g;
 		bitMapList = b;
 		stringList = s;
 	}
-	
-	
-//	public void print(){
-//		for(int i=0; i<geoPointList.size(); i++){
-//			System.out.println("dsfdsaf"+geoPointList.get(i));
-//		}
-//	}
 
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
-		// print();
+		// print();// test
+
 		super.draw(canvas, mapView, shadow);
 		GeoPoint geoPoint;
 		Bitmap marker;
@@ -95,27 +89,32 @@ public class customMapOverlay extends Overlay {
 			_bubbleLayout = (LinearLayout) inflater.inflate(R.layout.bubble,
 					mapView, false);
 
-			// .. configure its layout parameters
-			MapView.LayoutParams params = new MapView.LayoutParams(
-					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, p,
-					MapView.LayoutParams.BOTTOM_CENTER);
-
-			_bubbleLayout.setLayoutParams(params);
-
 			// Locate the TextView
 			TextView locationNameText = (TextView) _bubbleLayout
 					.findViewById(R.id.status);
 
+			GeoPoint newP = null;
 			// Set the Text
 			for (int i = 0; i < geoPointList.size(); i++) {
-				if (hitTest(mapView, p, geoPointList.get(i)))
+				if (hitTest(mapView, p, geoPointList.get(i))) {
 					locationNameText.setText(stringList.get(i));
+					newP = geoPointList.get(i);
+				}
 			}
+
+			// .. configure its layout parameters
+			MapView.LayoutParams params = new MapView.LayoutParams(
+					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, newP,
+					MapView.LayoutParams.BOTTOM_CENTER);
+
+			_bubbleLayout.setLayoutParams(params);
+
 			// Add the view to the Map
 			mapView.addView(_bubbleLayout);
 
 			// Animate the map to center on the location
-			mapView.getController().animateTo(p);
+			mapView.getController().animateTo(newP);
+			mapView.getController().setZoom(10);
 		}
 
 		return true;
@@ -128,15 +127,10 @@ public class customMapOverlay extends Overlay {
 		RectF hitTestRecr = new RectF();
 		Point tappedCoordinates = new Point();
 		Point locationCoordinates = new Point();
-
-		// Instantiate a projection instance to convert Lat/Long map coordinates
-		// to x/y screen coordinates.
 		Projection projection = mapView.getProjection();
 		projection.toPixels(geo, tappedCoordinates);
 
-		// Configure our hit box - 50px x 50px
 		hitTestRecr.set(-25, -25, 25, 25);
-		// ... and offset it to center on the tapped location
 		hitTestRecr.offset(tappedCoordinates.x, tappedCoordinates.y);
 
 		for (int i = 0; i < geoPointList.size(); i++) {
@@ -158,14 +152,10 @@ public class customMapOverlay extends Overlay {
 		Point tappedCoordinates = new Point();
 		Point locationCoordinates = new Point();
 
-		// Instantiate a projection instance to convert Lat/Long map coordinates
-		// to x/y screen coordinates.
 		Projection projection = mapView.getProjection();
 		projection.toPixels(geo, tappedCoordinates);
 
-		// Configure our hit box - 50px x 50px
 		hitTestRecr.set(-25, -25, 25, 25);
-		// ... and offset it to center on the tapped location
 		hitTestRecr.offset(tappedCoordinates.x, tappedCoordinates.y);
 
 		projection.toPixels(p, locationCoordinates);

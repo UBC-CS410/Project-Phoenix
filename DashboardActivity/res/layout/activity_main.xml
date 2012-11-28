@@ -53,6 +53,15 @@
         android:layout_height="wrap_content"
         android:hint="Compose new Tweet..."
         android:visibility="gone"/>
+    
+    <CheckBox
+        android:id="@+id/checkboxlocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share Location"
+        android:checked="true"
+        android:visibility="gone"/>>
+    
  
     <!-- Tweet Button -->
     <Button android:id="@+id/btnUpdateStatus"
