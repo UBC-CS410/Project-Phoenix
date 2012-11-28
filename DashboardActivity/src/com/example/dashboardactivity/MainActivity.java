@@ -308,56 +308,14 @@ public class MainActivity extends Activity {
 					new updateTwitterStatus().execute(status);
 				} else {
 					// EditText is empty
-					Toast.makeText(getApplicationContext(),
-							"Please enter status message", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),"Please enter status message", Toast.LENGTH_SHORT).show();
 				}
 			}
-		});		
+		});	
 		
 		/**
-		 *  set up image loader
+		 * Button click event to search other twitter user
 		 */
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-	    .threadPriority(Thread.NORM_PRIORITY - 2)
-	    .memoryCacheSize(2 * 1024 * 1024) // 2 Mb
-	    .denyCacheImageMultipleSizesInMemory()
-	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
-	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
-	    .tasksProcessingOrder(QueueProcessingType.LIFO)
-	    .enableLogging() // Not necessary in common
-	    .build();
-    
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config);
-	  
-	  
-		//@#@#@ List view listeners
-		
-		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-				showPopupMenu(view, position);	
-			}
-			
-		});
-		
-		tweetListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-				showTweetMenu(view, position);	
-			}
-			
-		});
-		
-		commentListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-				showCommentMenu(view, position);
-			}
-			
-		});
-	
-		
 		btnSearchPeople.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View arg0) {
 				String name = txtSearchPeople.getText().toString();
@@ -368,13 +326,68 @@ public class MainActivity extends Activity {
 					searchPeople(name);
 				} else {
 					// EditText is empty
-					Toast.makeText(getApplicationContext(),
-							"Please enter a name", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),"Please enter a name", Toast.LENGTH_SHORT).show();
 				}				
 			}
 			
-		});		
+		});	
 		
+		/**
+		 *  set up image loader
+		 */
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+	    .threadPriority(Thread.NORM_PRIORITY - 2)
+	    .memoryCacheSize(2 * 1024 * 1024) 
+	    .denyCacheImageMultipleSizesInMemory()
+	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
+	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
+	    .tasksProcessingOrder(QueueProcessingType.LIFO)
+	    .enableLogging()
+	    .build();
+    
+		// Initialize ImageLoader with configuration.
+		ImageLoader.getInstance().init(config);
+	  
+	  
+		//List view listeners
+		
+		/**
+		 * This triggers a popup menu, this enables user to
+		 * "Show Name", "Follow", "Unfollow", "Block", and "Add to DB"
+		 */
+		peopleListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showPopupMenu(view, position);	
+			}
+			
+		});
+		
+		/**
+		 * This triggers a popup menu, this enables user to
+		 * "Send Comment to a tweet",  and "show all comments of a tweet"
+		 */
+		tweetListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showTweetMenu(view, position);	
+			}
+			
+		});
+		
+		/**
+		 * This triggers a popup menu, this enables user to
+		 * "Reply a comment of a tweet"
+		 */
+		commentListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+				showCommentMenu(view, position);
+			}
+			
+		});
+	    //##########################################################################################
+		// functions
 
 		/** This if conditions is tested once is
 		 * redirected from twitter page. Parse the uri to get oAuth
@@ -408,7 +421,6 @@ public class MainActivity extends Activity {
 
 					// Hide login button
 					btnLoginTwitter.setVisibility(View.GONE);
-					//btnBackToCenter.setVisibility(View.GONE);  //@#@#
 
 					// Show Update Twitter
 					lblUpdate.setVisibility(View.VISIBLE);
@@ -425,18 +437,17 @@ public class MainActivity extends Activity {
 					checkboxLocation.setVisibility(View.VISIBLE);
 					
 					
-					// Getting user details from twitter
-					// For now i am getting his name only
+					// get user ID and user name
 					long userID = accessToken.getUserId();
 					User user = twitter.showUser(userID);
 					String username = user.getName();
 					
-					yourID = twitter.getId(); // @@@@@@@@@@@@
+					// Important!! set up your twitter id for future use
+					yourID = twitter.getId(); 
 					
-					// Displaying in xml ui
+					// Displaying user name in the welcome label
 					lblUserName.setText(Html.fromHtml("<b>Welcome " + username + "</b>"));
 				} catch (Exception e) {
-					// Check log for login errors
 					Log.e("Twitter Login Error", "> " + e.getMessage());
 				}
 			}
@@ -467,14 +478,8 @@ public class MainActivity extends Activity {
         switch (item.getItemId())
         {
         case R.id.menu_showprofileimage:
-        	try {
-				imageUrls = getAllFriend(twitter.getId());
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			} catch (TwitterException e) {
-				e.printStackTrace();
-			}
-
+        
+			imageUrls = getAllFriend(yourID);	
 			options = new DisplayImageOptions.Builder()
 				.showStubImage(R.drawable.stub_image)
 				.showImageForEmptyUri(R.drawable.image_for_empty_url)
@@ -620,7 +625,7 @@ public class MainActivity extends Activity {
 				
 				if(checkboxLocation.isChecked()==true){
 					//store to database
-					long tuser = twitter.getId();
+					long tuser = yourID;
 				    long tid = response.getId();
 				    double lat = gps.getLatitude();
 				    double lon = gps.getLongitude();
@@ -673,7 +678,7 @@ public class MainActivity extends Activity {
 		e.commit();
 		
 		// this line is very important!!, it ends this current activity
-		finish();//@#@#
+		finish();
 	}
 
 	/**
@@ -692,8 +697,8 @@ public class MainActivity extends Activity {
 	private void getRecentTweetFromOurDB(){
 		
 		// clear tweet array list every time before use
-		tweetList.clear();//@@@@
-		tweetIdList.clear(); //$$$$
+		tweetList.clear();
+		tweetIdList.clear();
 		comboTweetList.clear();
 		
 		// get the most recent 20 tweets from our db user
@@ -777,34 +782,22 @@ public class MainActivity extends Activity {
 				JSONArray friends = json.getJSONArray("friends");
 				System.out.println("friends has size : " + friends.length());
 				
-				for(int i=0; i< friends.length(); i++){
-					
-					JSONObject c = friends.getJSONObject(i);
-					
-					try {
-						if (twitter.getId() == Long.valueOf( c.get("twitterID").toString() )){							
+				for(int i=0; i< friends.length(); i++){					
+					JSONObject c = friends.getJSONObject(i);			
+						if ( yourID == Long.valueOf( c.get("twitterID").toString() )){							
 							long thisfriendId = Long.valueOf( c.get("twitterFriend").toString() );					
 							String friendImgUrl = c.get("twitterFriendImg").toString();
 							
 							imageList.add(friendImgUrl);						
 							friendList.add(thisfriendId);
-						}
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					} catch (IllegalStateException e) {
-						e.printStackTrace();
-					} catch (TwitterException e) {
-						e.printStackTrace();
-					}					
-				}
-			
+						}					
+				}			
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		
-		String[] urls = new String[imageList.size()];
-		
+		String[] urls = new String[imageList.size()];		
 		return imageList.toArray(urls);
 	}
 	
@@ -887,8 +880,8 @@ public class MainActivity extends Activity {
 			List<User> listOfUsers = twitter.searchUsers(name, 10);
 			
 			// clear user_name arraylist and user_id arraylist every time before use
-			peopleList.clear(); // @@@@
-			peopleIdList.clear(); // @@@@
+			peopleList.clear();
+			peopleIdList.clear();
 			
 			// add user name and user id to corresponding arraylist for future use
 			for (User user : listOfUsers){
@@ -908,7 +901,6 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	
 	
@@ -1002,11 +994,13 @@ public class MainActivity extends Activity {
 		friendMenu.show();			
 	}
 	
+	/**
+	 * Show a popup menu when click on a comment
+	 */
 	private void showCommentMenu(View v, final int position){
-		System.out.println("show comment menu?");
 		PopupMenu commentMenu = new PopupMenu(MainActivity.this, v);
 		commentMenu.getMenuInflater().inflate(R.menu.commentlistmenu, commentMenu.getMenu());
-		// TODO !!
+		
 		commentMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(MenuItem item) {
@@ -1023,8 +1017,7 @@ public class MainActivity extends Activity {
 							txtTweetComment.setText("");
 						} else {
 							// EditText is empty
-							Toast.makeText(getApplicationContext(),
-									"Your reply can not be empty", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(),"Your reply can not be empty", Toast.LENGTH_SHORT).show();
 						}
 					break;
 				default:
@@ -1049,30 +1042,19 @@ public class MainActivity extends Activity {
 			public boolean onMenuItemClick(MenuItem item) {
 				int id = item.getItemId();					
 				currentTweetID = tweetIdList.get(position);
-				long userId;
 				switch(id)
 				{
 					case R.id.tweetmenu1: // Write a Comment
-						try {
-							String comment = txtTweetComment.getText().toString();
-							//tweetId = tweetIdList.get(position);
-							userId = twitter.getId();
-							
-							if (comment.trim().length() > 0) {
-								sendComment(comment, userId, currentTweetID);
-								Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
-								txtTweetComment.setText("");
-							} else {
-								// EditText is empty
-								Toast.makeText(getApplicationContext(),
-										"Your comment can not be empty", Toast.LENGTH_SHORT).show();
-							}
-							
-						} catch (IllegalStateException e) {
-							e.printStackTrace();
-						} catch (TwitterException e) {
-							e.printStackTrace();
-						}							
+						String comment = txtTweetComment.getText().toString();							
+						if (comment.trim().length() > 0) {
+							sendComment(comment, yourID, currentTweetID);
+							Toast.makeText(MainActivity.this,"Comment Sent",Toast.LENGTH_LONG).show();
+							txtTweetComment.setText("");
+						} else {
+							// EditText is empty
+							Toast.makeText(getApplicationContext(),
+									"Your comment can not be empty", Toast.LENGTH_SHORT).show();
+						}
 						break;
 					case R.id.tweetmenu2: // Show all Comments
 						if (getComment(currentTweetID) == true)
@@ -1089,93 +1071,6 @@ public class MainActivity extends Activity {
 		tweetMenu.show();
 	}
 
-	/**
-	 * Get the most recent 20 tweets from other real twitter user
-	 */
-	private void getRecentTweets(){	
-		try {			
-			// clear tweet array list every time before use
-			tweetList.clear();//@@@@
-			tweetIdList.clear(); //$$$$
-			comboTweetList.clear();
-			
-			//User user = twitter.verifyCredentials();
-			
-			User user = twitter.showUser(twitter.getId());
-			List<Status> statuses = twitter.getHomeTimeline();
-			//List<Status> statuses = twitter.getUserTimeline();
-            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
-            
-            // add these recent status to corresponding arraylist for future use
-            for (Status status : statuses) {            	
-            	tweetList.add(status.getText());
-            	tweetIdList.add(status.getId());
-             
-            	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
-            	//System.out.println("pre");
-            	if(status.getGeoLocation()!= null){
-            		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
-            	}else{
-            		//System.out.println("No geo info");
-            	}
-            }			
-            
-            // convert an arraylist to an string array
-            String[] simpleArray = new String[comboTweetList.size()];
-            comboTweetList.toArray(simpleArray);
-            
-            // set array adapter and display in list view
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
-            tweetListView.setAdapter(arrayAdapter);
-			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	/**
-	 * collects follower's profile image urls
-	 */
-	private String[] showProfileImage(){
-		System.out.println("Show image button is clicked");
-		try {
-			
-			imageList.clear();
-			//User user = twitter.showUser(twitter.getId());
-			//URL url = user.getProfileImageURL();
-			//System.out.println(url.toString());	
-			
-			// Specify that the image size is original
-			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
-			
-            //ids = twitter.getFollowersIDs(-1);
-            ids2= twitter.getFriendsIDs(-1); // friend = following
-                    
-            for (long id2 : ids2.getIDs()) {                    	
-            	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
-            	//System.out.println(image.getURL());
-            	
-            	// store these follower's profile pic url into an arraylist
-            	imageList.add(image.getURL());
-                    	
-                //user = twitter.showUser(id2);
-                //url = user.getProfileImageURL();
-            	
-                //System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
-                //System.out.println(url.toString());  
-             }			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-	   String[] url_arr = new String[imageList.size()];
-	    return imageList.toArray(url_arr);
-	}
 	
 	/**
 	 * Create a new friend and store a new friend entry into our own db 
@@ -1289,7 +1184,9 @@ public class MainActivity extends Activity {
 			// getting JSON Object
 			JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,
 						"POST", params);
-			System.out.println("Error here?");// get printed
+			//System.out.println("Error here?");// get printed
+			
+			
 				
 			// check log cat for response
 			//Log.d("Delete Friend Response", json.toString());
@@ -1325,16 +1222,6 @@ public class MainActivity extends Activity {
 			Toast.makeText(MainActivity.this,"Friend Deleted!",Toast.LENGTH_LONG).show();
 		}
 	 }
-	
-	
-	private void setTwitterForTesting(Twitter tw){
-		twitterForTesting = tw;
-	}
-	
-	public Twitter getTwitterForTesting(){
-		return twitterForTesting;
-	}	
-	
 	
 	
 	/**
@@ -1373,6 +1260,105 @@ public class MainActivity extends Activity {
 			return imageView;
 		}
 	}
+	
+	private void setTwitterForTesting(Twitter tw){
+		twitterForTesting = tw;
+	}
+	
+	public Twitter getTwitterForTesting(){
+		return twitterForTesting;
+	}	
+	
+	/**
+	 * Get the most recent 20 tweets from other real twitter user
+	 * This method is not used for now
+	 */
+	private void getRecentTweets(){	
+		try {			
+			// clear tweet array list every time before use
+			tweetList.clear();
+			tweetIdList.clear(); 
+			comboTweetList.clear();
+			
+			//User user = twitter.verifyCredentials();
+			
+			User user = twitter.showUser(twitter.getId());
+			List<Status> statuses = twitter.getHomeTimeline();
+			//List<Status> statuses = twitter.getUserTimeline();
+            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
+            
+            // add these recent status to corresponding arraylist for future use
+            for (Status status : statuses) {            	
+            	tweetList.add(status.getText());
+            	tweetIdList.add(status.getId());
+             
+            	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
+            	//System.out.println("pre");
+            	if(status.getGeoLocation()!= null){
+            		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
+            	}else{
+            		//System.out.println("No geo info");
+            	}
+            }			
+            
+            // convert an arraylist to an string array
+            String[] simpleArray = new String[comboTweetList.size()];
+            comboTweetList.toArray(simpleArray);
+            
+            // set array adapter and display in list view
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
+            tweetListView.setAdapter(arrayAdapter);
+			
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * collects follower's profile image urls
+	 * This method is not used for now
+	 */
+	private String[] showProfileImage(){
+		System.out.println("Show image button is clicked");
+		try {
+			
+			imageList.clear();
+			//User user = twitter.showUser(twitter.getId());
+			//URL url = user.getProfileImageURL();
+			//System.out.println(url.toString());	
+			
+			// Specify that the image size is original
+			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
+			
+            //ids = twitter.getFollowersIDs(-1);
+            ids2= twitter.getFriendsIDs(-1); // friend = following
+                    
+            for (long id2 : ids2.getIDs()) {                    	
+            	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
+            	//System.out.println(image.getURL());
+            	
+            	// store these follower's profile pic url into an arraylist
+            	imageList.add(image.getURL());
+                    	
+                //user = twitter.showUser(id2);
+                //url = user.getProfileImageURL();
+            	
+                //System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
+                //System.out.println(url.toString());  
+             }			
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+		
+	   String[] url_arr = new String[imageList.size()];
+	    return imageList.toArray(url_arr);
+	}
+	
 
 	protected void onResume() {
 		super.onResume();
