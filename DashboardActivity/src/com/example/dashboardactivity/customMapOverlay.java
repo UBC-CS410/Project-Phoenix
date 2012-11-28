@@ -34,16 +34,15 @@ public class customMapOverlay extends Overlay {
 	}
 	
 	
-	public void print(){
-		for(int i=0; i<geoPointList.size(); i++){
-			System.out.println("dsfdsaf"+geoPointList.get(i));
-		}
-	}
+//	public void print(){
+//		for(int i=0; i<geoPointList.size(); i++){
+//			System.out.println("dsfdsaf"+geoPointList.get(i));
+//		}
+//	}
 
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
-		print();// test
-
+		// print();
 		super.draw(canvas, mapView, shadow);
 		GeoPoint geoPoint;
 		Bitmap marker;
