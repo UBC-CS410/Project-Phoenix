@@ -2,9 +2,5 @@
   <group android:id="@+id/group_friendImagelistmenu">
       <item android:id="@+id/friendmenu1"
           android:title="Delete Friend"/>
-      <item android:id="@+id/friendmenu2"
-          android:title="Item 2"/>
-      <item android:id="@+id/friendmenu3"
-          android:title="Item 3"/>
   </group>
 </menu>

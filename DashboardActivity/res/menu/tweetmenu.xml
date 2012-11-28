@@ -4,10 +4,10 @@
          Set id, icon and Title for each menu item
     -->
     <item android:id="@+id/menu_showprofileimage"
-          android:title="Show Profile Image" />
+          android:title="Refresh your Friend" />
  
     <item android:id="@+id/menu_gettweet"
-          android:title="Get Tweet" />
+          android:title="Refresh Status" />
  
  
     <item android:id="@+id/menu_showmap"

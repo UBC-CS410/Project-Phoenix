@@ -15,13 +15,15 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
             android:text="REGISTER"
+            android:textColor="#21dbd4"
             android:textSize="25dip"
             android:textStyle="bold" />
         <!--  Name Label -->
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Full Name" />
+            android:text="Full Name" 
+            android:textColor="#21dbd4"/>
         <!--  Name TextField -->
         <EditText
             android:id="@+id/registerName"
@@ -32,7 +34,8 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Email" />
+            android:text="Email" 
+            android:textColor="#21dbd4"/>
         <!--  Email TextField -->
         <EditText
             android:id="@+id/registerEmail"
@@ -44,7 +47,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dip"
-            android:text="Password" />
+            android:text="Password" 
+            android:textColor="#21dbd4"/>
         <!--  Password TextField -->
         <EditText
             android:id="@+id/registerPassword"

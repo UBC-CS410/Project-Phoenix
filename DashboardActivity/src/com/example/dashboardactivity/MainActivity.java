@@ -132,6 +132,8 @@ public class MainActivity extends Activity {
     protected ImageLoader imageLoader = ImageLoader.getInstance();
 	private String[] imageUrls = {};
 	private DisplayImageOptions options;
+	
+	private int tabCount =0;
 
 	Button btnLoginTwitter;
 	Button btnUpdateStatus;
@@ -285,7 +287,7 @@ public class MainActivity extends Activity {
 		tabHost.setOnTabChangedListener(new OnTabChangeListener(){
 
 			public void onTabChanged(String tabID) {				
-				
+
 				if(tabID.equals("Tab 2")){
 					imageUrls = getAllFriend(yourID);	
 					options = new DisplayImageOptions.Builder()
@@ -301,11 +303,12 @@ public class MainActivity extends Activity {
 							showFriendMenu(view, position);
 						}
 					});
-				}else if (tabID.equals("Tab 3")){
-					getRecentTweetFromOurDB();
-				}				
+				}
+//				else if (tabID.equals("Tab 3")){
+//					getRecentTweetFromOurDB();
+//				}				
 			}
-			
+
 		});
 		
 
@@ -750,7 +753,7 @@ public class MainActivity extends Activity {
 				
 				// reverse the order, display the most recent tweet first
 				for(int i=statuses.length()-1; i>= 0; i--){
-					if (count==20){
+					if (count==10){ //was 20
 						break;
 					}
 					
@@ -1029,12 +1032,6 @@ public class MainActivity extends Activity {
 						deleteFriendID = friendList.get(position);
 						//System.out.println("id will be deleted is: "+ deleteFriendID);
 						new DeleteFriend().execute();
-						break;
-					case R.id.friendmenu2:  // item 2
-						Toast.makeText(MainActivity.this,"Item 2",Toast.LENGTH_LONG).show();
-						break;
-					case R.id.friendmenu3:  // item 3
-						Toast.makeText(MainActivity.this,"Item 3",Toast.LENGTH_LONG).show();
 						break;	
 					default:
 						Toast.makeText(MainActivity.this,"Nothing",Toast.LENGTH_LONG).show();
