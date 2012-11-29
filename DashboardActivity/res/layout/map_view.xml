@@ -8,7 +8,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
-            android:apiKey="0tg7inGk0KLJSb8uIHcZQg_S1wh-_a4xxGyrwAg"
+            android:apiKey="0ivcaYRrpfe88bb26fwR6ROmoryjSUq6ZYztMuw"
             android:clickable="true" />
 
         <Button

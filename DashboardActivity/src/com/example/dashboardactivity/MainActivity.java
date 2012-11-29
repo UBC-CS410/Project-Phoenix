@@ -124,9 +124,9 @@ public class MainActivity extends Activity {
     private String notification;
     
     private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
-    private static String url_create_friend = "http://70.79.75.130:3721/test/create_product.php";
+    private static String url_create_friend = "http://70.79.75.130:3721/friend/create_friend.php";
     private static final String TAG_SUCCESS = "success";    
-    private static String url_delete_friend = "http://70.79.75.130:3721/test/delete_product.php";
+    private static String url_delete_friend = "http://70.79.75.130:3721/friend/delete_friend.php";
     
     private TabHost tabHost;    
     protected ImageLoader imageLoader = ImageLoader.getInstance();
@@ -304,9 +304,9 @@ public class MainActivity extends Activity {
 						}
 					});
 				}
-//				else if (tabID.equals("Tab 3")){
-//					getRecentTweetFromOurDB();
-//				}				
+				else if (tabID.equals("Tab 3")){
+					getRecentTweetFromOurDB();
+				}				
 			}
 
 		});
@@ -1269,7 +1269,24 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(String file_url) {
 			// dismiss the dialog
 			pDialog.dismiss();
+			
+			imageUrls = getAllFriend(yourID);	
+			options = new DisplayImageOptions.Builder()
+				.showStubImage(R.drawable.stub_image)
+				.showImageForEmptyUri(R.drawable.image_for_empty_url)
+				.cacheInMemory()
+				.cacheOnDisc()
+				.build();
+
+			imageGridView.setAdapter(new ImageAdapter());
+			imageGridView.setOnItemClickListener(new OnItemClickListener() {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					showFriendMenu(view, position);
+				}
+			});
+		
 			Toast.makeText(MainActivity.this,"Friend Deleted!",Toast.LENGTH_LONG).show();
+			
 		}
 	 }
 	
