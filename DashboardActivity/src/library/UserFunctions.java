@@ -22,16 +22,14 @@ public class UserFunctions {
     //twitter comment function
     private static String tcommentURL="http://70.79.75.130:3721/tcomment.php";
     private static String tgetcommentURL="http://70.79.75.130:3721/tgetcomment.php";
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    private static String get_all_friends = "http://70.79.75.130:3721/test/get_all_products.php";
+    private static String get_all_friends = "http://70.79.75.130:3721/friend/get_all_friends.php";
     
-    //@#@#@#@#@#@
     private static String storeTweets = "http://70.79.75.130:3721/tstat.php";
-    private static String getStoredTweets = "http://70.79.75.130:3721/getTweets.php";
-    
-    private static String updateTweets = "http://70.79.75.130:3721/updateStat.php";
-    
+    private static String getStoredTweets = "http://70.79.75.130:3721/getTweets.php";    
+    private static String updateTweets = "http://70.79.75.130:3721/updateStat.php";    
     private static String getNewestTweets = "http://70.79.75.130:3721/getStatus.php";
+    
+    private static String isEverFriend = "http://70.79.75.130:3721/isEverFriend.php";
     
     private static String login_tag = "login";
     private static String register_tag = "register";
@@ -180,6 +178,19 @@ public class UserFunctions {
     	JSONObject json = jsonParser.getJSONFromUrl(imageURL, params);
     	return json;
     }
+    
+//    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&& for testing
+//    public JSONObject isEverFriend(long sourceID, long targetID){
+//    	
+//    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+//    	params.add(new BasicNameValuePair("twitterID",""+ sourceID));
+//    	params.add(new BasicNameValuePair("twitterFriend",""+ targetID));
+//    	
+//    	JSONObject json = jsonParser.getJSONFromUrl(isEverFriend,params);    	
+//    	return json;
+//    }
+    
+    
  
     /**
      * Function get Login status

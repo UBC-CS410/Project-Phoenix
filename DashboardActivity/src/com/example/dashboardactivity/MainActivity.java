@@ -124,9 +124,9 @@ public class MainActivity extends Activity {
     private String notification;
     
     private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
-    private static String url_create_friend = "http://70.79.75.130:3721/test/create_product.php";
+    private static String url_create_friend = "http://70.79.75.130:3721/friend/create_friend.php";
     private static final String TAG_SUCCESS = "success";    
-    private static String url_delete_friend = "http://70.79.75.130:3721/test/delete_product.php";
+    private static String url_delete_friend = "http://70.79.75.130:3721/friend/delete_friend.php";
     
     private TabHost tabHost;    
     protected ImageLoader imageLoader = ImageLoader.getInstance();
@@ -289,24 +289,11 @@ public class MainActivity extends Activity {
 			public void onTabChanged(String tabID) {				
 
 				if(tabID.equals("Tab 2")){
-					imageUrls = getAllFriend(yourID);	
-					options = new DisplayImageOptions.Builder()
-						.showStubImage(R.drawable.stub_image)
-						.showImageForEmptyUri(R.drawable.image_for_empty_url)
-						.cacheInMemory()
-						.cacheOnDisc()
-						.build();
-
-					imageGridView.setAdapter(new ImageAdapter());
-					imageGridView.setOnItemClickListener(new OnItemClickListener() {
-						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-							showFriendMenu(view, position);
-						}
-					});
+					loadImages();
 				}
-//				else if (tabID.equals("Tab 3")){
-//					getRecentTweetFromOurDB();
-//				}				
+				else if (tabID.equals("Tab 3")){
+					getRecentTweetFromOurDB();
+				}				
 			}
 
 		});
@@ -490,6 +477,24 @@ public class MainActivity extends Activity {
 
 	}
 	
+	
+	public void loadImages(){
+		imageUrls = getAllFriend(yourID);	
+		options = new DisplayImageOptions.Builder()
+			.showStubImage(R.drawable.stub_image)
+			.showImageForEmptyUri(R.drawable.image_for_empty_url)
+			.cacheInMemory()
+			.cacheOnDisc()
+			.build();
+
+		imageGridView.setAdapter(new ImageAdapter());
+		imageGridView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				showFriendMenu(view, position);
+			}
+		});
+	}
+	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -509,27 +514,12 @@ public class MainActivity extends Activity {
      * */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
-    {// TODO
+    {
         switch (item.getItemId())
         {
-        case R.id.menu_showprofileimage:
-        
-			imageUrls = getAllFriend(yourID);	
-			options = new DisplayImageOptions.Builder()
-				.showStubImage(R.drawable.stub_image)
-				.showImageForEmptyUri(R.drawable.image_for_empty_url)
-				.cacheInMemory()
-				.cacheOnDisc()
-				.build();
-
-			imageGridView.setAdapter(new ImageAdapter());
-			imageGridView.setOnItemClickListener(new OnItemClickListener() {
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					showFriendMenu(view, position);
-				}
-			});
-            return true;
- 
+        case R.id.menu_showprofileimage:        	
+			loadImages();
+            return true; 
         case R.id.menu_gettweet:
         	getRecentTweetFromOurDB();
             return true;
@@ -1218,7 +1208,6 @@ public class MainActivity extends Activity {
 		 * Delete friend from our db
 		 */
 		protected String doInBackground(String... args) {
-			System.out.println("in doingbackground..");
 			String twitterID = String.valueOf(yourID);
 			String twitterFriend = String.valueOf(deleteFriendID);
 			//String twitterFriendImg = friendPicUrl;
@@ -1229,7 +1218,7 @@ public class MainActivity extends Activity {
 			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
 			//params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
 			
-			System.out.println("..."+params.toString());
+			//System.out.println("..."+params.toString());
 
 			// getting JSON Object
 			JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,
@@ -1268,7 +1257,8 @@ public class MainActivity extends Activity {
 		 */
 		protected void onPostExecute(String file_url) {
 			// dismiss the dialog
-			pDialog.dismiss();
+			pDialog.dismiss();			
+			loadImages();		
 			Toast.makeText(MainActivity.this,"Friend Deleted!",Toast.LENGTH_LONG).show();
 		}
 	 }
@@ -1311,6 +1301,8 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	
+	
 	private void setTwitterForTesting(Twitter tw){
 		twitterForTesting = tw;
 	}
@@ -1318,6 +1310,26 @@ public class MainActivity extends Activity {
 	public Twitter getTwitterForTesting(){
 		return twitterForTesting;
 	}	
+	
+	/**
+	 * Helper method for testing
+	 */
+	public long getYourID(){
+		return yourID;
+	}
+	
+	/**
+	 * Helper method for testing
+	 */
+	public User getCurrentUser(){
+		User user = null;
+		try {
+			user = twitter.showUser(yourID);
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		};
+		return user;
+	}
 	
 	/**
 	 * Get the most recent 20 tweets from other real twitter user

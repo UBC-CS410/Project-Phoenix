@@ -1,7 +1,10 @@
 package com.example.dashboardactivity.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +19,7 @@ import twitter4j.User;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import junit.framework.Assert;
+import library.JSONParserFriend;
 import library.UserFunctions;
 
 import com.example.dashboardactivity.DashboardActivity;
@@ -26,7 +30,9 @@ import com.jayway.android.robotium.solo.Solo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,8 +43,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 	Button btnLoginTwitter, btnUpdateStatus, btnLogoutTwitter,btnProfileImage,btnGetTweets;
 	ImageButton btnSearchPeople;
 	ListView tweetListView, peopleListView;
+	GridView imageGridView;
 	EditText txtUpdate, txtSearchPeople,txtTweetComment;
 	TextView lblUpdate, lblUserName;	
+	CheckBox checkboxLocation;
 	
 	private Solo solo;
 	private Twitter twitter;
@@ -46,8 +54,17 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 	private int num_of_status;
 	private IDs ids;
 	private long gonna_unfollow_this_friend_id;
-	private long userID;
+	private long userID = 169188831;
 	private JSONArray oldFriendsList,newFriendsList;
+	private JSONParserFriend jasonParsonFriend = new JSONParserFriend();
+	private ArrayList<Long> usersFriendListOld = new ArrayList<Long>();
+	private ArrayList<Long> usersFriendListNew = new ArrayList<Long>();
+	private ArrayList<String> imageList = new ArrayList<String>();
+	private long deleThisfriendId;
+	
+	
+	
+	private static String url_delete_friend = "http://70.79.75.130:3721/friend/delete_friend.php";
 	
 	public MainActivityTest(){
 		super(MainActivity.class);
@@ -63,9 +80,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 		
 		btnLoginTwitter = (Button) activityWeTest.findViewById(R.id.btnLoginTwitter);
 		btnUpdateStatus = (Button) activityWeTest.findViewById(R.id.btnUpdateStatus);
-		btnLogoutTwitter = (Button) activityWeTest.findViewById(R.id.btnLogoutTwitter);
-		btnProfileImage = (Button) activityWeTest.findViewById(R.id.btnProfileImage);
-		btnGetTweets = (Button) activityWeTest.findViewById(R.id.btnGetTweets);
+		
+		//btnLogoutTwitter = (Button) activityWeTest.findViewById(R.id.btnLogoutTwitter);
+		//btnProfileImage = (Button) activityWeTest.findViewById(R.id.btnProfileImage);
+		//btnGetTweets = (Button) activityWeTest.findViewById(R.id.btnGetTweets);
 		btnSearchPeople = (ImageButton) activityWeTest.findViewById(R.id.btnSearchPeople);
 		
 		txtUpdate = (EditText) activityWeTest.findViewById(R.id.txtUpdateStatus);
@@ -73,122 +91,200 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 		txtTweetComment = (EditText) activityWeTest.findViewById(R.id.txtComment);
 		tweetListView = (ListView) activityWeTest.findViewById(R.id.mylist);
 		peopleListView = (ListView) activityWeTest.findViewById(R.id.mylist2);
+		imageGridView = (GridView) activityWeTest.findViewById(R.id.gridview_test);
+		
+		checkboxLocation = (CheckBox) activityWeTest.findViewById(R.id.checkboxlocation);
 		
 	}
 	
-
 	// passed
-//	public void testBlockUser(){
-//		// login
+//	public void testGetFriendProfileImages(){
+//		
 //		solo.clickOnButton("Login with Twitter");
 //		solo.sleep(10000);
-//		//solo.assertCurrentActivity("should launch TwitterActivity", MainActivity.class);
-//		twitter = activityWeTest.getTwitterForTesting();	
-//		
-//		
+//				
 //		try {
-//			user = twitter.showUser(twitter.getId()); // this user is me
+//			twitter = activityWeTest.getTwitterForTesting();	
+//			userID = twitter.getId();
+//		} catch (IllegalStateException e1) {
+//			e1.printStackTrace();
+//		} catch (TwitterException e1) {
+//			e1.printStackTrace();
+//		}
+//		
+//		
+//		// check friend list BEFORE deleting a friend
+//		UserFunctions user = new UserFunctions();
+//		JSONObject jsonOld = user.getAllFriends(userID);
 //			
-//			solo.clickOnText("People");			
-//			solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
-//			solo.clickOnImageButton(0);
-//			solo.sleep(7000);
-//			//Assert.assertNotNull(peopleListView);
-//			//Assert.assertTrue(solo.searchText("steve"));
-//			
-//			solo.clickOnScreen(100, 500);
-//			solo.clickOnText("Block");
-//			solo.sleep(5000);
-//			
-//			
-//			ResponseList<User> blockedUsers = twitter.getBlockingUsers();			
-//			System.out.println("Block[0] is: " +blockedUsers.get(0).getScreenName());// yelvington	
-//			
-//			ids = twitter.getBlockingUsersIDs();
-//			long new_block_id = ids.getIDs()[0];
-//			
-//			Assert.assertTrue(twitter.existsBlock(new_block_id));
-//			
-//			
-//		} catch (IllegalStateException e) {		
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
+//		int success;
+//		try {
+//			success = jsonOld.getInt("success");
+//			if(success==1){
+//				oldFriendsList = jsonOld.getJSONArray("friends");	
+//				System.out.println("This user has friend: " + oldFriendsList.length() );	
+//				
+//			}
+//		} catch (JSONException e) {
 //			e.printStackTrace();
 //		}
 //		
+//		solo.clickOnText("Friend");	
+//		solo.sleep(3000);		
+//		
+//		if(oldFriendsList.length()>0){
+//			Assert.assertNotNull(imageGridView);
+//		}else{
+//			Assert.assertNull(imageGridView);
+//		}
+//		
+//		solo.clickOnMenuItem("Log out");
 //	}
 	
-    // passed
-	public void testSearchAndAddToDB(){
-		solo.clickOnButton("Login with Twitter");
-		solo.sleep(10000);
-		twitter = activityWeTest.getTwitterForTesting();
-		
-		try {
-			userID = twitter.getId();
-			
-			user = twitter.showUser(userID);
-		} catch (IllegalStateException e) {		
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-		solo.clickOnText("People");
-		
-		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "Paul"); 	
-		solo.clickOnImageButton(0);
-		solo.sleep(7000);
-		Assert.assertNotNull(peopleListView);
-		
-		
-		UserFunctions user = new UserFunctions();
-		JSONObject jsonOld = user.getAllFriends(userID);
-		
-		int success;
-		try {
-			success = jsonOld.getInt("success");
-			if(success==1){
-				oldFriendsList = jsonOld.getJSONArray("friends");
-				System.out.println("friends has size : " + oldFriendsList.length());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		solo.clickOnScreen(100, 250);
-		solo.clickOnText("Add to DB");
-		solo.sleep(6000);
-		
-		JSONObject jsonNew = user.getAllFriends(userID);
-		
-		int success1;
-		try {
-			success1 = jsonNew.getInt("success");
-			if(success1==1){
-				newFriendsList = jsonNew.getJSONArray("friends");
-				System.out.println("friends has size : " + newFriendsList.length());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		
-		Assert.assertEquals(newFriendsList.length(), oldFriendsList.length()+1);
-		
-		solo.clickOnText("Main");
-		solo.clickOnButton("Logout from Twitter");
-		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);
-		
-	}
+	
+	
+//    // passed
+//	public void testSearchAndAddToDB(){
+//		solo.clickOnButton("Login with Twitter");
+//		solo.sleep(10000);
+//		
+//		// setting up
+//		twitter = activityWeTest.getTwitterForTesting();		
+//		userID = activityWeTest.getYourID();			
+//		user = activityWeTest.getCurrentUser();
+//		//****************************************
+//		// begin searching friend
+//		solo.clickOnText("Search");		
+//		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "Paul"); 	
+//		solo.clickOnImageButton(0);
+//		solo.sleep(7000);
+//		Assert.assertNotNull(peopleListView);
+//		
+//		// check friend list BEFORE adding a friend
+//		UserFunctions user = new UserFunctions();
+//		JSONObject jsonOld = user.getAllFriends(userID);
+//		
+//		int success;
+//		try {
+//			success = jsonOld.getInt("success");
+//			if(success==1){
+//				oldFriendsList = jsonOld.getJSONArray("friends");
+//				System.out.println("friends has size : " + oldFriendsList.length());
+//			}
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		// adding a friend		
+//		solo.clickOnScreen(100, 250);
+//		solo.clickOnText("Add to Ever Friend");
+//		solo.sleep(6000);
+//		
+//		// check friend list AFTER adding a friend
+//		JSONObject jsonNew = user.getAllFriends(userID);
+//		
+//		int success1;
+//		try {
+//			success1 = jsonNew.getInt("success");
+//			if(success1==1){
+//				newFriendsList = jsonNew.getJSONArray("friends");
+//				System.out.println("friends has size : " + newFriendsList.length());
+//			}
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		
+//		Assert.assertEquals(newFriendsList.length(), oldFriendsList.length()+1);
+//
+//		solo.clickOnText("Main");
+//		solo.clickOnButton("Logout from Twitter");
+//		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);		
+//	}
+	
+	
+//	public void testDeleteDbFriend(){ // passed
+//		
+//		// check friend list BEFORE deleting a friend
+//		UserFunctions user = new UserFunctions();
+//		JSONObject jsonOld = user.getAllFriends(userID);
+//			
+//		int success;
+//		try {
+//			success = jsonOld.getInt("success");
+//			if(success==1){
+//				oldFriendsList = jsonOld.getJSONArray("friends");	
+//				System.out.println("All oldfl is: " + oldFriendsList.length() );
+//				
+//				JSONObject c = oldFriendsList.getJSONObject(0);
+//				deleThisfriendId = Long.valueOf( c.get("twitterFriend").toString() );
+//					
+//				if (oldFriendsList.length()==0){
+//					return;
+//				}
+//				
+//			}
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//		//-----------------------------------------------------------------
+//		long deleteID = deleThisfriendId;
+//						
+//			// delete this first friend of this user			
+//		List<NameValuePair> params = new ArrayList<NameValuePair>();
+//		params.add(new BasicNameValuePair("twitterID", String.valueOf(userID)));
+//		params.add(new BasicNameValuePair("twitterFriend",String.valueOf(deleteID)));			
+//		JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,"POST", params);
+//		
+//		//---------------------------------------------------------------------------------------	
+//			
+//		// check friend list AFTER delete a friend
+//		JSONObject jsonNew = user.getAllFriends(userID);		
+//		int success1;
+//		try {
+//			success1 = jsonNew.getInt("success");
+//			if(success1==1){
+//				newFriendsList = jsonNew.getJSONArray("friends");
+//				System.out.println("All newfl is: " + newFriendsList.length() );	
+//			}
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		if(newFriendsList.length()>0){
+//			Assert.assertEquals(oldFriendsList.length()-1, newFriendsList.length());
+//		}else
+//			return;
+//		
+//		
+////		//----------------------------------------------------------
+////		
+////		JSONObject friendship = user.isEverFriend(userID,deleteID);
+////		int success2;
+////		try {
+////			success2 = friendship.getInt("success");
+////			if (success2==1){
+////				JSONArray friend = friendship.getJSONArray("friends");
+////				System.out.println(friend);
+////				//Assert.assertNull(friend);
+////				System.out.println("Passed isEverFriend method");	
+////			}			
+////			
+////		} catch (JSONException e) {
+////			e.printStackTrace();
+////		}
+//		
+//		
+//		
+//	}
 
-	// passed
+//	 //passed
 //	public void testSearchAndFollowPeople(){
 //		long new_friend_id;
 //		
 //		solo.clickOnButton("Login with Twitter");
 //		solo.sleep(10000);
-//		//solo.assertCurrentActivity("should launch TwitterActivity", MainActivity.class);
+//		
 //		twitter = activityWeTest.getTwitterForTesting();
 //		try {
 //			user = twitter.showUser(twitter.getId());
@@ -200,7 +296,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //		
 //		int num_of_friends =  user.getFriendsCount();
 //		
-//		solo.clickOnText("People");
+//		solo.clickOnText("Search");
 //		
 //		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
 //		solo.clickOnImageButton(0);
@@ -227,16 +323,13 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //			e.printStackTrace();
 //		}
 //		
-//		solo.clickOnText("Main");
-//		solo.clickOnButton("Logout from Twitter");
-//		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);
+//		solo.clickOnMenuItem("Log out");
 //	}
 
-	// passed
+//	 //passed
 //	public void testSearchAndUnfollowPeople(){
 //		solo.clickOnButton("Login with Twitter");
 //		solo.sleep(10000);
-//		//solo.assertCurrentActivity("should launch TwitterActivity", MainActivity.class);
 //		twitter = activityWeTest.getTwitterForTesting();
 //		try {
 //			user = twitter.showUser(twitter.getId());
@@ -250,7 +343,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //		
 //		int num_of_friends =  user.getFriendsCount();
 //		
-//		solo.clickOnText("People");		
+//		solo.clickOnText("Search");		
 //		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
 //		solo.clickOnImageButton(0);
 //		solo.sleep(7000);
@@ -270,17 +363,54 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //			e.printStackTrace();
 //		} catch (TwitterException e) {
 //			e.printStackTrace();
-//		}
-//			
+//		}			
 //		
 //		
-//		solo.clickOnText("Main");
-//		solo.clickOnButton("Logout from Twitter");
-//		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);
+//		solo.clickOnMenuItem("Log out");
 //	}
 	
 	
-	// passed
+//	// passed
+//	public void testBlockUser(){
+//		// login
+//		solo.clickOnButton("Login with Twitter");
+//		solo.sleep(10000);
+//		twitter = activityWeTest.getTwitterForTesting();	
+//		
+//		
+//		try {
+//			user = twitter.showUser(twitter.getId()); // this user is me
+//			
+//			solo.clickOnText("Search");			
+//			solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
+//			solo.clickOnImageButton(0);
+//			solo.sleep(7000);
+//			
+//			solo.clickOnScreen(100, 500);
+//			solo.clickOnText("Block");
+//			solo.sleep(5000);
+//			
+//			
+//			ResponseList<User> blockedUsers = twitter.getBlockingUsers();			
+//			System.out.println("Block[0] is: " +blockedUsers.get(0).getScreenName());// yelvington	
+//			
+//			ids = twitter.getBlockingUsersIDs();
+//			long new_block_id = ids.getIDs()[0];
+//			
+//			Assert.assertTrue(twitter.existsBlock(new_block_id));
+//			
+//			
+//		} catch (IllegalStateException e) {		
+//			e.printStackTrace();
+//		} catch (TwitterException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		solo.clickOnMenuItem("Log out");
+//		
+//	}
+	
+//	// passed
 //	public void testTweetAndTweetEmpty(){
 //		
 //		solo.clickOnButton("Login with Twitter");
@@ -303,7 +433,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //	 
 //		// test sending a not empty tweet
 //		num_of_status = user.getStatusesCount();
-//		String status = "Robotium test tweet 18! Nov 24";
+//		String status = "Robotium test tweet 20! Nov 29";
 //		
 //		solo.enterText( (EditText) solo.getView( R.id.txtUpdateStatus ), status);
 //		solo.clickOnButton("Tweet");	
@@ -321,62 +451,38 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //		} catch (TwitterException e) {
 //			e.printStackTrace();
 //		}
-//		solo.clickOnButton("Logout from Twitter");
-//		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);
-//		Assert.assertEquals(0, btnLoginTwitter.getVisibility());
+//
+//		solo.clickOnMenuItem("Log out");
 //	}
 	
 	
 		
-//	// passed
-//	public void testGetTweets(){
-//		// login
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//		//solo.assertCurrentActivity("should launch TwitterActivity", MainActivity.class);
-//		twitter = activityWeTest.getTwitterForTesting();
-//		try {
-//			user = twitter.showUser(twitter.getId());
-//		} catch (IllegalStateException e) {		
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		// get recent tweets
-//		solo.clickOnText("Tweets");
-//		solo.clickOnButton("Get Tweets");
-//		solo.sleep(6000);
-//		Assert.assertNotNull(tweetListView);
-//		
-//		// log out
-//		solo.clickOnText("Main");
-//		solo.clickOnButton("Logout from Twitter");
-//		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);
-//	}
-
-/*	
-	// passed, merged with tweet test, not used
-	public void testTweetEmptyMsg(){
+	// passed
+	public void testGetStatus(){
+		// login
 		solo.clickOnButton("Login with Twitter");
 		solo.sleep(10000);
-		solo.assertCurrentActivity("should launch TwitterActivity", MainActivity.class);		
+		twitter = activityWeTest.getTwitterForTesting();
+		try {
+			user = twitter.showUser(twitter.getId());
+		} catch (IllegalStateException e) {		
+			e.printStackTrace();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
 		
+		// get recent tweets
+		solo.clickOnText("Status");
+		solo.clickOnMenuItem("Refresh Status");
+		solo.sleep(5000);
+		Assert.assertNotNull(tweetListView);
 		
-		// test tweet an empty message	
-		
-		solo.clickOnButton("Tweet");
-		Assert.assertEquals("",txtUpdate.getText().toString());
-		Assert.assertTrue(solo.waitForText("Please enter status message"));				
-		
-		solo.clickOnButton("Logout from Twitter");
-		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);
-		Assert.assertEquals(0, btnLoginTwitter.getVisibility());
+		// log out
+		solo.clickOnMenuItem("Log out");
 	}
-*/	
 	
-	// previously passed tests	
 	
+	// previously passed tests		
 //	public void testAllGuiComponents(){
 //		
 //		assertNotNull(activityWeTest);
@@ -388,20 +494,20 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //		assertEquals("Tweet", btnUpdateStatus.getText());
 //		Assert.assertEquals(8, btnUpdateStatus.getVisibility());		
 //		
-//		assertNotNull(btnLogoutTwitter);
-//		assertEquals("Logout from Twitter", btnLogoutTwitter.getText());
-//		Assert.assertEquals(8, btnLogoutTwitter.getVisibility());		
-//		
-//		assertNotNull(btnProfileImage);
-//		assertEquals("Show Profile Image", btnProfileImage.getText());
-//		Assert.assertEquals(8, btnProfileImage.getVisibility());		
-//		
-//		assertNotNull(btnGetTweets);
-//		assertEquals("Get Tweets", btnGetTweets.getText());
-//		Assert.assertEquals(8, btnGetTweets.getVisibility());		
-//		
-//		assertNotNull(btnSearchPeople);
-//		Assert.assertEquals(8, btnSearchPeople.getVisibility());
+////		assertNotNull(btnLogoutTwitter);
+////		assertEquals("Logout from Twitter", btnLogoutTwitter.getText());
+////		Assert.assertEquals(8, btnLogoutTwitter.getVisibility());		
+////		
+////		assertNotNull(btnProfileImage);
+////		assertEquals("Show Profile Image", btnProfileImage.getText());
+////		Assert.assertEquals(8, btnProfileImage.getVisibility());		
+////		
+////		assertNotNull(btnGetTweets);
+////		assertEquals("Get Tweets", btnGetTweets.getText());
+////		Assert.assertEquals(8, btnGetTweets.getVisibility());		
+////		
+////		assertNotNull(btnSearchPeople);
+////		Assert.assertEquals(8, btnSearchPeople.getVisibility());
 //		
 //		tweetListView = (ListView) activityWeTest.findViewById(R.id.mylist);
 //		assertNotNull(tweetListView);
@@ -424,6 +530,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //		
 //		lblUserName = (TextView) activityWeTest.findViewById(R.id.lblUserName);
 //		assertNotNull(lblUserName);
+//	
+//		checkboxLocation = (CheckBox) activityWeTest.findViewById(R.id.checkboxlocation);
+//		assertNotNull(checkboxLocation);
+//	
 //	}
 	
 }
