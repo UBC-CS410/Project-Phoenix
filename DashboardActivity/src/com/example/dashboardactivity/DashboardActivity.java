@@ -26,14 +26,13 @@ public class DashboardActivity extends Activity {
        // user already logged in show databoard
             setContentView(R.layout.dashboard);
             btnLogout = (Button) findViewById(R.id.btnLogout);
-            btnConnectTwitter = (Button) findViewById(R.id.btnConnectTwitter);  //@#@#
+            btnConnectTwitter = (Button) findViewById(R.id.btnConnectTwitter);
             
             
-            btnConnectTwitter.setOnClickListener(new View.OnClickListener() { //@#@#
+            btnConnectTwitter.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View v) {
 					startActivity(new Intent(getApplicationContext(), MainActivity.class));
-					
 					//Intent twitterPage = new Intent(getApplicationContext(), MainActivity.class);
 					//twitterPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					//startActivity(twitterPage);

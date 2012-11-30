@@ -13,11 +13,9 @@ public class UserFunctions {
  
     private JSONParser jsonParser;
  
-    // Testing in localhost using wamp or xampp
-    // use http://10.0.2.2/ to connect to your localhost ie http://localhost/
+    // DB urls
     private static String loginURL = "http://70.79.75.130:3721/";
     private static String registerURL = "http://70.79.75.130:3721/";
-    private static String imageURL = "http://70.79.75.130:3721/"; //http://70.79.75.130:3721/storePhoto.php
  
     //twitter comment function
     private static String tcommentURL="http://70.79.75.130:3721/tcomment.php";
@@ -33,7 +31,6 @@ public class UserFunctions {
     
     private static String login_tag = "login";
     private static String register_tag = "register";
-    private static String image_tag = "storeImage";
  
     // constructor
     public UserFunctions(){
@@ -52,16 +49,15 @@ public class UserFunctions {
         params.add(new BasicNameValuePair("email", email));
         params.add(new BasicNameValuePair("password", password));
         JSONObject json = jsonParser.getJSONFromUrl(loginURL, params);
-        // return json
-        // Log.e("JSON", json.toString());
+       
         return json;
     }
  
     /**
      * function make Login Request
-     * @param name
-     * @param email
-     * @param password
+     * @param name user name
+     * @param email email address
+     * @param password password
      * */
     public JSONObject registerUser(String name, String email, String password){
         // Building Parameters
@@ -77,8 +73,12 @@ public class UserFunctions {
         return json;
     }
     
-    //########################################
-    //comment on tweet
+    /**
+     * function comment on tweet
+     * @param twid tweetID
+     * @param twuserid user's twitter ID
+     * @param comment user's written comment
+     * */
     public JSONObject tcomment(long twid,long twuserid,String comment)
     {
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -90,7 +90,10 @@ public class UserFunctions {
     	return json;
     }
     
-    // get comment on tweet
+    /**
+     * function get comment on tweet
+     * @param twid tweetID
+     * */
     public JSONObject tgetcomment(long twid)
     {
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -100,14 +103,20 @@ public class UserFunctions {
     	
     }
     
-    //########################
-    //store tweets to database
+    /**
+     * function store tweet to database
+     * @param status status that user writes
+     * @param tuser user's twitter ID
+     * @param tid tweetID
+     * @param lat latitude
+     * @param lon lontitude
+     * */
     public JSONObject storeTweets(String status, long tuser, long tid, double lat, double lon){
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
-    	System.out.print(status);
-    	System.out.print(tuser);
-    	System.out.print(tid);
-    	System.out.print(lat + " "+ lon);
+//    	System.out.print(status);
+//    	System.out.print(tuser);
+//    	System.out.print(tid);
+//    	System.out.print(lat + " "+ lon);
     	
     	params.add(new BasicNameValuePair("stat", status));
         params.add(new BasicNameValuePair("tuser", ""+tuser));
@@ -118,13 +127,17 @@ public class UserFunctions {
     	return json;
     }
     
-    //%%%%%%%%%%
+    /**
+     * function update the newest tweet for a user in database
+     * @param status status that user writes
+     * @param tuser user's twitter ID
+     * @param tid tweetID
+     * @param lat latitude
+     * @param lon lontitude
+     * @param imageUrl user's profile image url
+     * */
     public JSONObject updateTweets(String status, long tuser, long tid, double lat, double lon, String imageUrl){
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
-//    	System.out.print(status);
-//    	System.out.print(tuser);
-//    	System.out.print(tid);
-//    	System.out.print(lat + " "+ lon);
     	
     	params.add(new BasicNameValuePair("stat", status));
         params.add(new BasicNameValuePair("tuser", ""+tuser));
@@ -137,7 +150,9 @@ public class UserFunctions {
     	return json;
     }
     
-    //$$$$
+    /**
+     * function for every Ever Friend user, get his/her newest status
+     * */
     public JSONObject getNewestStatus(){
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
     	JSONObject json = jsonParser.getJSONFromUrl(getNewestTweets,params);
@@ -146,37 +161,26 @@ public class UserFunctions {
     }
     
     
-    
-    //get all status form database
+    /**
+     * function get all status from database
+     * */
     public JSONObject getAllStatus(){
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
     	JSONObject json = jsonParser.getJSONFromUrl(getStoredTweets,params);
-    	//System.out.println(json);
 		return json;   	
     }
     
     // get friend in our DB
+
+    /**
+     * function for a user, get all his/her friends
+     * @param currUID current user's twitterID
+     * */
     public JSONObject getAllFriends(long currUID){
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
     	params.add(new BasicNameValuePair("twitterID",""+currUID));
     	JSONObject json = jsonParser.getJSONFromUrl(get_all_friends,params);
 		return json;   	
-    }
-    
-    
-    
-    
-    //*************************************************************************************
-    public JSONObject getImageUrl(String email, String url){
-    	
-    	List<NameValuePair> params = new ArrayList<NameValuePair>();
-    	params.add(new BasicNameValuePair("tag", image_tag));
-    	params.add(new BasicNameValuePair("email", email));
-    	params.add(new BasicNameValuePair("photo_ref", url));
-    	
-    	
-    	JSONObject json = jsonParser.getJSONFromUrl(imageURL, params);
-    	return json;
     }
     
 //    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&& for testing

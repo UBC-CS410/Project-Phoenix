@@ -1,6 +1,6 @@
 package library;
 
-import static com.example.dashboardactivity.ImageSource.IMAGES;
+import static library.ImageSource.IMAGES;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;

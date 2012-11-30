@@ -98,443 +98,267 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 	}
 	
 	// passed
-//	public void testGetFriendProfileImages(){
-//		
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//				
-//		try {
-//			twitter = activityWeTest.getTwitterForTesting();	
-//			userID = twitter.getId();
-//		} catch (IllegalStateException e1) {
-//			e1.printStackTrace();
-//		} catch (TwitterException e1) {
-//			e1.printStackTrace();
-//		}
-//		
-//		
-//		// check friend list BEFORE deleting a friend
-//		UserFunctions user = new UserFunctions();
-//		JSONObject jsonOld = user.getAllFriends(userID);
-//			
-//		int success;
-//		try {
-//			success = jsonOld.getInt("success");
-//			if(success==1){
-//				oldFriendsList = jsonOld.getJSONArray("friends");	
-//				System.out.println("This user has friend: " + oldFriendsList.length() );	
-//				
-//			}
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		solo.clickOnText("Friend");	
-//		solo.sleep(3000);		
-//		
-//		if(oldFriendsList.length()>0){
-//			Assert.assertNotNull(imageGridView);
-//		}else{
-//			Assert.assertNull(imageGridView);
-//		}
-//		
-//		solo.clickOnMenuItem("Log out");
-//	}
-	
-	
-	
-//    // passed
-//	public void testSearchAndAddToDB(){
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//		
-//		// setting up
-//		twitter = activityWeTest.getTwitterForTesting();		
-//		userID = activityWeTest.getYourID();			
-//		user = activityWeTest.getCurrentUser();
-//		//****************************************
-//		// begin searching friend
-//		solo.clickOnText("Search");		
-//		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "Paul"); 	
-//		solo.clickOnImageButton(0);
-//		solo.sleep(7000);
-//		Assert.assertNotNull(peopleListView);
-//		
-//		// check friend list BEFORE adding a friend
-//		UserFunctions user = new UserFunctions();
-//		JSONObject jsonOld = user.getAllFriends(userID);
-//		
-//		int success;
-//		try {
-//			success = jsonOld.getInt("success");
-//			if(success==1){
-//				oldFriendsList = jsonOld.getJSONArray("friends");
-//				System.out.println("friends has size : " + oldFriendsList.length());
-//			}
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		// adding a friend		
-//		solo.clickOnScreen(100, 250);
-//		solo.clickOnText("Add to Ever Friend");
-//		solo.sleep(6000);
-//		
-//		// check friend list AFTER adding a friend
-//		JSONObject jsonNew = user.getAllFriends(userID);
-//		
-//		int success1;
-//		try {
-//			success1 = jsonNew.getInt("success");
-//			if(success1==1){
-//				newFriendsList = jsonNew.getJSONArray("friends");
-//				System.out.println("friends has size : " + newFriendsList.length());
-//			}
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		
-//		Assert.assertEquals(newFriendsList.length(), oldFriendsList.length()+1);
-//
-//		solo.clickOnText("Main");
-//		solo.clickOnButton("Logout from Twitter");
-//		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);		
-//	}
-	
-	
-//	public void testDeleteDbFriend(){ // passed
-//		
-//		// check friend list BEFORE deleting a friend
-//		UserFunctions user = new UserFunctions();
-//		JSONObject jsonOld = user.getAllFriends(userID);
-//			
-//		int success;
-//		try {
-//			success = jsonOld.getInt("success");
-//			if(success==1){
-//				oldFriendsList = jsonOld.getJSONArray("friends");	
-//				System.out.println("All oldfl is: " + oldFriendsList.length() );
-//				
-//				JSONObject c = oldFriendsList.getJSONObject(0);
-//				deleThisfriendId = Long.valueOf( c.get("twitterFriend").toString() );
-//					
-//				if (oldFriendsList.length()==0){
-//					return;
-//				}
-//				
-//			}
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		//-----------------------------------------------------------------
-//		long deleteID = deleThisfriendId;
-//						
-//			// delete this first friend of this user			
-//		List<NameValuePair> params = new ArrayList<NameValuePair>();
-//		params.add(new BasicNameValuePair("twitterID", String.valueOf(userID)));
-//		params.add(new BasicNameValuePair("twitterFriend",String.valueOf(deleteID)));			
-//		JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,"POST", params);
-//		
-//		//---------------------------------------------------------------------------------------	
-//			
-//		// check friend list AFTER delete a friend
-//		JSONObject jsonNew = user.getAllFriends(userID);		
-//		int success1;
-//		try {
-//			success1 = jsonNew.getInt("success");
-//			if(success1==1){
-//				newFriendsList = jsonNew.getJSONArray("friends");
-//				System.out.println("All newfl is: " + newFriendsList.length() );	
-//			}
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		if(newFriendsList.length()>0){
-//			Assert.assertEquals(oldFriendsList.length()-1, newFriendsList.length());
-//		}else
-//			return;
-//		
-//		
-////		//----------------------------------------------------------
-////		
-////		JSONObject friendship = user.isEverFriend(userID,deleteID);
-////		int success2;
-////		try {
-////			success2 = friendship.getInt("success");
-////			if (success2==1){
-////				JSONArray friend = friendship.getJSONArray("friends");
-////				System.out.println(friend);
-////				//Assert.assertNull(friend);
-////				System.out.println("Passed isEverFriend method");	
-////			}			
-////			
-////		} catch (JSONException e) {
-////			e.printStackTrace();
-////		}
-//		
-//		
-//		
-//	}
-
-//	 //passed
-//	public void testSearchAndFollowPeople(){
-//		long new_friend_id;
-//		
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//		
-//		twitter = activityWeTest.getTwitterForTesting();
-//		try {
-//			user = twitter.showUser(twitter.getId());
-//		} catch (IllegalStateException e) {		
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		int num_of_friends =  user.getFriendsCount();
-//		
-//		solo.clickOnText("Search");
-//		
-//		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
-//		solo.clickOnImageButton(0);
-//		solo.sleep(7000);
-//		Assert.assertNotNull(peopleListView);
-//		Assert.assertTrue(solo.searchText("steve"));
-//		
-//		solo.clickOnScreen(100, 250);
-//		solo.clickOnText("Follow");
-//		solo.sleep(4000);
-//		
-//		Assert.assertEquals(user.getFriendsCount(), num_of_friends);
-//		
-//		try {
-//			
-//			ids = twitter.getFriendsIDs(-1);
-//			//String new_friend_screenName = twitter.showUser(ids.getIDs()[0]).getScreenName();
-//			new_friend_id = ids.getIDs()[0];						
-//			//System.out.println("ids[0] is: " + ids.getIDs()[0]);
-//			//System.out.println("ids[0]'s screen name is: " +  twitter.showUser(ids.getIDs()[0]).getScreenName());				
-//			Assert.assertTrue(twitter.showFriendship(twitter.getId(), new_friend_id).isSourceFollowingTarget());
-//			
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		solo.clickOnMenuItem("Log out");
-//	}
-
-//	 //passed
-//	public void testSearchAndUnfollowPeople(){
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//		twitter = activityWeTest.getTwitterForTesting();
-//		try {
-//			user = twitter.showUser(twitter.getId());
-//			ids = twitter.getFriendsIDs(-1);
-//			gonna_unfollow_this_friend_id = ids.getIDs()[0];
-//		} catch (IllegalStateException e) {		
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		int num_of_friends =  user.getFriendsCount();
-//		
-//		solo.clickOnText("Search");		
-//		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
-//		solo.clickOnImageButton(0);
-//		solo.sleep(7000);
-//		Assert.assertNotNull(peopleListView);
-//		Assert.assertTrue(solo.searchText("steve"));
-//		
-//		solo.clickOnScreen(100, 250);
-//		solo.clickOnText("Unfollow");
-//		solo.sleep(4000);
-//		
-//		Assert.assertEquals(user.getFriendsCount(), num_of_friends);		
-//		
-//			
-//		try {
-//			Assert.assertFalse(twitter.showFriendship(twitter.getId(), gonna_unfollow_this_friend_id).isSourceFollowingTarget());
-//		} catch (IllegalStateException e) {
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}			
-//		
-//		
-//		solo.clickOnMenuItem("Log out");
-//	}
-	
-	
-//	// passed
-//	public void testBlockUser(){
-//		// login
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//		twitter = activityWeTest.getTwitterForTesting();	
-//		
-//		
-//		try {
-//			user = twitter.showUser(twitter.getId()); // this user is me
-//			
-//			solo.clickOnText("Search");			
-//			solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "steve"); 		
-//			solo.clickOnImageButton(0);
-//			solo.sleep(7000);
-//			
-//			solo.clickOnScreen(100, 500);
-//			solo.clickOnText("Block");
-//			solo.sleep(5000);
-//			
-//			
-//			ResponseList<User> blockedUsers = twitter.getBlockingUsers();			
-//			System.out.println("Block[0] is: " +blockedUsers.get(0).getScreenName());// yelvington	
-//			
-//			ids = twitter.getBlockingUsersIDs();
-//			long new_block_id = ids.getIDs()[0];
-//			
-//			Assert.assertTrue(twitter.existsBlock(new_block_id));
-//			
-//			
-//		} catch (IllegalStateException e) {		
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		solo.clickOnMenuItem("Log out");
-//		
-//	}
-	
-//	// passed
-//	public void testTweetAndTweetEmpty(){
-//		
-//		solo.clickOnButton("Login with Twitter");
-//		solo.sleep(10000);
-//		twitter = activityWeTest.getTwitterForTesting();
-//		try {
-//			user = twitter.showUser(twitter.getId());
-//		} catch (IllegalStateException e) {		
-//			e.printStackTrace();
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}		
-//		
-//		// test tweet an empty message	
-//		
-//		solo.clickOnButton("Tweet");
-//		Assert.assertEquals("",txtUpdate.getText().toString());
-//		Assert.assertTrue(solo.waitForText("Please enter status message"));		
-//		
-//	 
-//		// test sending a not empty tweet
-//		num_of_status = user.getStatusesCount();
-//		String status = "Robotium test tweet 20! Nov 29";
-//		
-//		solo.enterText( (EditText) solo.getView( R.id.txtUpdateStatus ), status);
-//		solo.clickOnButton("Tweet");	
-//		
-//		Assert.assertTrue(solo.waitForText("Updating to twitter..."));
-//		Assert.assertTrue(solo.waitForText("Status tweeted successfully"));
-//		solo.sleep(10000);
-//		
-//		
-//		try {
-//			List<Status> statuses = twitter.getUserTimeline();// was .getHomeTimeline()
-//			Assert.assertEquals(user.getStatusesCount(), num_of_status);			
-//			Assert.assertEquals(status, statuses.get(0).getText().toString());
-//			
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-//
-//		solo.clickOnMenuItem("Log out");
-//	}
-	
-	
-		
-	// passed
-	public void testGetStatus(){
+	public void testGetStatusAndCommentAndReply(){
 		// login
 		solo.clickOnButton("Login with Twitter");
 		solo.sleep(10000);
 		twitter = activityWeTest.getTwitterForTesting();
-		try {
-			user = twitter.showUser(twitter.getId());
-		} catch (IllegalStateException e) {		
-			e.printStackTrace();
-		} catch (TwitterException e) {
+		long firstTweetID = 0;
+			
+		// get recent tweets from db user
+		solo.clickOnText("Status");
+		solo.sleep(3000);
+		
+		UserFunctions user = new UserFunctions();
+		JSONObject json = user.getAllStatus();
+		
+		int success;
+		try{
+			success = json.getInt("success");
+			if(success==1){
+				JSONArray statuses = json.getJSONArray("status");
+				JSONObject c = statuses.getJSONObject(0);
+				firstTweetID = Long.valueOf( c.get("tid").toString() );	
+				
+				
+				if(statuses.length()>0){
+					Assert.assertNotNull(tweetListView);					
+				}
+			}
+		}catch (JSONException e) {
 			e.printStackTrace();
 		}
 		
-		// get recent tweets
-		solo.clickOnText("Status");
-		solo.clickOnMenuItem("Refresh Status");
-		solo.sleep(5000);
-		Assert.assertNotNull(tweetListView);
+		//---------------------------------
+		// Send an empty comment
+		solo.enterText( (EditText) solo.getView( R.id.txtComment ), "");
+		solo.clickOnScreen(100, 250);
+		solo.clickOnText("Send Comment");
+		Assert.assertTrue(solo.waitForText("Your comment can not be empty"));	
 		
+		//---------------------------------
+		// send a non empty comment
+		String comment = "Keep going2";
+		user.tcomment(firstTweetID, userID, comment);		
+		
+		// check the db		
+		JSONObject json2 = user.tgetcomment(firstTweetID);		
+		int success2;
+		try{
+			success2 = json2.getInt("success");
+			if(success2==1){
+				JSONArray comments = json2.getJSONArray("comments");				
+				JSONObject c = comments.getJSONObject(comments.length()-1);
+				String newComment=c.get("comment").toString();
+				Assert.assertEquals(comment, newComment);
+			}
+		}catch (JSONException e) {
+			e.printStackTrace();
+		}		
+		
+		//---------------------------------
+		// Reply
+		String reply = "I will";
+		user.tcomment(firstTweetID, userID, reply);
+		
+		// check the db		
+		JSONObject json3 = user.tgetcomment(firstTweetID);		
+		int success3;
+		try{
+			success3 = json3.getInt("success");
+			if(success3==1){
+				JSONArray comments = json3.getJSONArray("comments");				
+				JSONObject c = comments.getJSONObject(comments.length()-1);
+				String newReply=c.get("comment").toString();
+				Assert.assertEquals(reply, newReply);
+			}
+		}catch (JSONException e) {
+			e.printStackTrace();
+		}
 		// log out
 		solo.clickOnMenuItem("Log out");
 	}
 	
 	
-	// previously passed tests		
-//	public void testAllGuiComponents(){
+	
+	// passed
+	public void testGetEverFriendProfileImages(){
+		
+		solo.clickOnButton("Login with Twitter");
+		solo.sleep(10000);
+				
+		try {
+			twitter = activityWeTest.getTwitterForTesting();	
+			userID = twitter.getId();
+		} catch (IllegalStateException e1) {
+			e1.printStackTrace();
+		} catch (TwitterException e1) {
+			e1.printStackTrace();
+		}
+		
+		
+		// check friend list BEFORE deleting a friend
+		UserFunctions user = new UserFunctions();
+		JSONObject jsonOld = user.getAllFriends(userID);
+			
+		int success;
+		try {
+			success = jsonOld.getInt("success");
+			if(success==1){
+				oldFriendsList = jsonOld.getJSONArray("friends");	
+				System.out.println("This user has friend: " + oldFriendsList.length() );	
+				
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		solo.clickOnText("Friend");	
+		solo.sleep(3000);		
+		
+		if(oldFriendsList.length()>0){
+			Assert.assertNotNull(imageGridView);
+		}else{
+			Assert.assertNull(imageGridView);
+		}
+		
+		solo.clickOnMenuItem("Log out");
+	}
+	
+	
+	
+    // passed
+	public void testAddEverFriend(){
+		solo.clickOnButton("Login with Twitter");
+		solo.sleep(10000);
+		
+		// setting up
+		twitter = activityWeTest.getTwitterForTesting();		
+		userID = activityWeTest.getYourID();			
+		user = activityWeTest.getCurrentUser();
+		//****************************************
+		// begin searching friend
+		solo.clickOnText("Search");		
+		solo.enterText( (EditText) solo.getView( R.id.txtSearchPeople ), "Paul"); 	
+		solo.clickOnImageButton(0);
+		solo.sleep(7000);
+		Assert.assertNotNull(peopleListView);
+		
+		// check friend list BEFORE adding a friend
+		UserFunctions user = new UserFunctions();
+		JSONObject jsonOld = user.getAllFriends(userID);
+		
+		int success;
+		try {
+			success = jsonOld.getInt("success");
+			if(success==1){
+				oldFriendsList = jsonOld.getJSONArray("friends");
+				System.out.println("friends has size : " + oldFriendsList.length());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		// adding a friend		
+		solo.clickOnScreen(100, 250);
+		solo.clickOnText("Add to Ever Friend");
+		solo.sleep(6000);
+		
+		// check friend list AFTER adding a friend
+		JSONObject jsonNew = user.getAllFriends(userID);
+		
+		int success1;
+		try {
+			success1 = jsonNew.getInt("success");
+			if(success1==1){
+				newFriendsList = jsonNew.getJSONArray("friends");
+				System.out.println("friends has size : " + newFriendsList.length());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		
+		Assert.assertEquals(newFriendsList.length(), oldFriendsList.length()+1);
+
+		solo.clickOnText("Main");
+		solo.clickOnButton("Logout from Twitter");
+		solo.assertCurrentActivity("should go to Twitter Login", MainActivity.class);		
+	}
+	
+	
+	public void testDeleteEverFriend(){ // passed
+		
+		// check friend list BEFORE deleting a friend
+		UserFunctions user = new UserFunctions();
+		JSONObject jsonOld = user.getAllFriends(userID);
+			
+		int success;
+		try {
+			success = jsonOld.getInt("success");
+			if(success==1){
+				oldFriendsList = jsonOld.getJSONArray("friends");	
+				System.out.println("All oldfl is: " + oldFriendsList.length() );
+				
+				JSONObject c = oldFriendsList.getJSONObject(0);
+				deleThisfriendId = Long.valueOf( c.get("twitterFriend").toString() );
+					
+				if (oldFriendsList.length()==0){
+					return;
+				}
+				
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		//-----------------------------------------------------------------
+		long deleteID = deleThisfriendId;
+						
+			// delete this first friend of this user			
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("twitterID", String.valueOf(userID)));
+		params.add(new BasicNameValuePair("twitterFriend",String.valueOf(deleteID)));			
+		JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,"POST", params);
+		
+		//---------------------------------------------------------------------------------------	
+			
+		// check friend list AFTER delete a friend
+		JSONObject jsonNew = user.getAllFriends(userID);		
+		int success1;
+		try {
+			success1 = jsonNew.getInt("success");
+			if(success1==1){
+				newFriendsList = jsonNew.getJSONArray("friends");
+				System.out.println("All newfl is: " + newFriendsList.length() );	
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		if(newFriendsList.length()>0){
+			Assert.assertEquals(oldFriendsList.length()-1, newFriendsList.length());
+		}else
+			return;
+		
+		
+//		//----------------------------------------------------------
 //		
-//		assertNotNull(activityWeTest);
-//		assertNotNull(btnLoginTwitter);
-//		assertEquals("Login with Twitter", btnLoginTwitter.getText());
-//		Assert.assertEquals(0, btnLoginTwitter.getVisibility());		
-//		
-//		assertNotNull(btnUpdateStatus);
-//		assertEquals("Tweet", btnUpdateStatus.getText());
-//		Assert.assertEquals(8, btnUpdateStatus.getVisibility());		
-//		
-////		assertNotNull(btnLogoutTwitter);
-////		assertEquals("Logout from Twitter", btnLogoutTwitter.getText());
-////		Assert.assertEquals(8, btnLogoutTwitter.getVisibility());		
-////		
-////		assertNotNull(btnProfileImage);
-////		assertEquals("Show Profile Image", btnProfileImage.getText());
-////		Assert.assertEquals(8, btnProfileImage.getVisibility());		
-////		
-////		assertNotNull(btnGetTweets);
-////		assertEquals("Get Tweets", btnGetTweets.getText());
-////		Assert.assertEquals(8, btnGetTweets.getVisibility());		
-////		
-////		assertNotNull(btnSearchPeople);
-////		Assert.assertEquals(8, btnSearchPeople.getVisibility());
-//		
-//		tweetListView = (ListView) activityWeTest.findViewById(R.id.mylist);
-//		assertNotNull(tweetListView);
-//		
-//		peopleListView = (ListView) activityWeTest.findViewById(R.id.mylist2);
-//		assertNotNull(peopleListView);
-//		
-//		txtUpdate = (EditText) activityWeTest.findViewById(R.id.txtUpdateStatus);
-//		assertNotNull(txtUpdate);
-//		
-//		txtSearchPeople = (EditText) activityWeTest.findViewById(R.id.txtSearchPeople);
-//		assertNotNull(txtSearchPeople);			
-//		
-//		txtTweetComment = (EditText) activityWeTest.findViewById(R.id.txtComment);
-//		assertNotNull(txtTweetComment);	
-//		
-//		lblUpdate = (TextView) activityWeTest.findViewById(R.id.lblUpdate);
-//		assertNotNull(lblUpdate);
-//		assertEquals("Update Status", lblUpdate.getText());	
-//		
-//		lblUserName = (TextView) activityWeTest.findViewById(R.id.lblUserName);
-//		assertNotNull(lblUserName);
-//	
-//		checkboxLocation = (CheckBox) activityWeTest.findViewById(R.id.checkboxlocation);
-//		assertNotNull(checkboxLocation);
-//	
-//	}
+//		JSONObject friendship = user.isEverFriend(userID,deleteID);
+//		int success2;
+//		try {
+//			success2 = friendship.getInt("success");
+//			if (success2==1){
+//				JSONArray friend = friendship.getJSONArray("friends");
+//				System.out.println(friend);
+//				//Assert.assertNull(friend);
+//				System.out.println("Passed isEverFriend method");	
+//			}			
+//			
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}		
+		
+	}
 	
 }
 

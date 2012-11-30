@@ -655,7 +655,6 @@ public class MainActivity extends Activity {
 				    double lat = gps.getLatitude();
 				    double lon = gps.getLongitude();
 				    UserFunctions userFunction = new UserFunctions();
-				    //System.out.println(status+" "+tuser+" "+tid);
 				    JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
 				    JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
 					
@@ -717,12 +716,12 @@ public class MainActivity extends Activity {
 	
 	
 	/**
-	 * Get the most recent 20 tweets from our DB user
+	 * Get the most recent 10 tweets from Ever Friend user
 	 */
 	private void getRecentTweetFromOurDB(){
 		String compare="";
 		
-		// clear tweet array list every time before use
+		// clear tweet, tweetID, comboTweetList array list every time before use
 		tweetList.clear();
 		tweetIdList.clear();
 		comboTweetList.clear();
@@ -750,9 +749,9 @@ public class MainActivity extends Activity {
 					JSONObject c = statuses.getJSONObject(i);
 						
 					long tid = Long.valueOf( c.get("tid").toString() );					
-					String stat = c.get("stat").toString();
+					String stat = c.get("stat").toString();					
 					
-					
+					// save info for future use
 					tweetList.add(stat);						
 					tweetIdList.add(tid);
 					
@@ -760,11 +759,11 @@ public class MainActivity extends Activity {
 						comboTweetList.add(twitter.showStatus(tid).getUser().getName() + ": " + stat);
 					} catch (TwitterException e) {
 						e.printStackTrace();
-					}
-					
+					}					
 					count++;		
 				}
 				
+				// conditions to notify use once there is a new update
 				if(notification == ""){
 					notification = statuses.
 							getJSONObject(statuses.length()-1).get("stat").toString();
@@ -781,7 +780,6 @@ public class MainActivity extends Activity {
 					notification = compare;
 				}
 
-			
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -804,20 +802,26 @@ public class MainActivity extends Activity {
 	
 	/**
 	 * Send Comment on a tweet
+	 * @param comment user's written comment
+	 * @param userId user's tweetID
+     * @param tweetId target tweetID
 	 */
 	private void sendComment(String comment, long userId, long tweetId){		
 		UserFunctions user = new UserFunctions();
-		JSONObject json = user.tcomment(tweetId, userId, comment);
+		user.tcomment(tweetId, userId, comment);
 	}
 	
 	/**
 	 * Get the profile image of all our db friend for the current user
 	 * Return a list of profile image urls
+	 * @param currUid current user's twitterID
 	 */
 	private String[] getAllFriend(long currUid){
+		// clear image and friend list every time before use
 		imageList.clear();
 		friendList.clear();
 		
+		// call db function to get
 		UserFunctions user = new UserFunctions();
 		JSONObject json = user.getAllFriends(currUid);
 		
@@ -829,11 +833,13 @@ public class MainActivity extends Activity {
 				System.out.println("friends has size : " + friends.length());
 				
 				for(int i=0; i< friends.length(); i++){					
-					JSONObject c = friends.getJSONObject(i);			
+					JSONObject c = friends.getJSONObject(i);	
+					// TODO, the following if condition is not needed any more
 						if ( yourID == Long.valueOf( c.get("twitterID").toString() )){							
 							long thisfriendId = Long.valueOf( c.get("twitterFriend").toString() );					
 							String friendImgUrl = c.get("twitterFriendImg").toString();
 							
+							// save info for future use
 							imageList.add(friendImgUrl);						
 							friendList.add(thisfriendId);
 						}					
@@ -851,29 +857,30 @@ public class MainActivity extends Activity {
 	/**
 	 * Fetch all comments in our db for a status(tweet)
 	 * Return false if there is no comment for this status(tweet)
+	 * @param tweetId target tweetID
 	 */
 	private boolean getComment(long tweetId){
-		// 
+		// clear these list every time before use
 		commentList.clear();
 		commentAuthorIdList.clear();
 		comboCommentList.clear();
 		
+		// call db function to get comment for a tweet
 		UserFunctions user=new UserFunctions();
 		JSONObject json=user.tgetcomment(tweetId);
 		try{
-			//get item
 			int success =json.getInt("success");
 			if(success==1)
 			{				
 				JSONArray comments=json.getJSONArray("comments");
 				System.out.println("comments has size : " + comments.length());
 				
+				// Return false if there is no comment for this status(tweet)
 				if(comments.length()==0){
 					return false;
 				}
 				
-				for(int i=0; i< comments.length(); i++)
-				{
+				for(int i=0; i< comments.length(); i++){
 					JSONObject c = comments.getJSONObject(i);
 					
 					long twuserid = Long.valueOf( c.get("twuserid").toString() );
@@ -881,8 +888,7 @@ public class MainActivity extends Activity {
 					System.out.println(twuserid+ " " + comment );
 					
 					try {
-						String comboComment = twitter.showUser(twuserid).getName()
-								               + ": " +comment;
+						String comboComment = twitter.showUser(twuserid).getName() + ": " +comment;
 						
 						commentList.add(comment);// add comment to comment list
 						commentAuthorIdList.add(twuserid); // add userId to comment author list
@@ -890,8 +896,6 @@ public class MainActivity extends Activity {
 					} catch (TwitterException e) {
 						e.printStackTrace();
 					}
-					
-					
 				}
 				
 				// clear the tweet list view
@@ -906,7 +910,6 @@ public class MainActivity extends Activity {
 	            // set array adapter and display in list view
 	            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
 	            commentListView.setAdapter(arrayAdapter2);// was tweetlistview	            
-	            
 			}
 			else{
 				return false;
@@ -919,6 +922,7 @@ public class MainActivity extends Activity {
 	
 	/**
 	 * search other twitter user by user name
+	 * @param name the search key word, user name
 	 */
 	private void searchPeople(String name){
 		try {
@@ -963,7 +967,6 @@ public class MainActivity extends Activity {
 	    		
 				try {
 					int id = item.getItemId();
-					//System.out.println("This menu item has this order " + id);					
 					switch(id)
 					{
 						case R.id.menu0: // show name
@@ -992,7 +995,7 @@ public class MainActivity extends Activity {
 						    new CreateNewFriend().execute();
 						    break;
 						default:
-							Toast.makeText(MainActivity.this,item.toString(),Toast.LENGTH_LONG).show();
+							Toast.makeText(MainActivity.this,"Nothing is clicked",Toast.LENGTH_LONG).show();
 					
 					}
 				} catch (TwitterException e) {					
@@ -1015,17 +1018,14 @@ public class MainActivity extends Activity {
 		friendMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(MenuItem item) {
-				//TODO
 				int id = item.getItemId();
 				switch(id){
 					case R.id.friendmenu1:  // delete friend from DB
 						deleteFriendID = friendList.get(position);
-						//System.out.println("id will be deleted is: "+ deleteFriendID);
 						new DeleteFriend().execute();
 						break;	
 					default:
-						Toast.makeText(MainActivity.this,"Nothing",Toast.LENGTH_LONG).show();
-						
+						Toast.makeText(MainActivity.this,"Nothing is clicked",Toast.LENGTH_LONG).show();						
 				}				
 				return true;
 			}
@@ -1064,10 +1064,8 @@ public class MainActivity extends Activity {
 					Toast.makeText(MainActivity.this,"Nothing is clicked",Toast.LENGTH_LONG).show();
 				}
 				return true;
-			}
-			
-		});
-		
+			}			
+		});		
 		commentMenu.show();
 	}
 	
@@ -1190,7 +1188,6 @@ public class MainActivity extends Activity {
 	 * Delete a friend  from our own data base
 	 */
 	class DeleteFriend extends AsyncTask<String, String, String> {
-		// TODO
 		/**
 		 * Show progress dialog before deleting a friend from our db
 		 */
@@ -1210,23 +1207,18 @@ public class MainActivity extends Activity {
 		protected String doInBackground(String... args) {
 			String twitterID = String.valueOf(yourID);
 			String twitterFriend = String.valueOf(deleteFriendID);
-			//String twitterFriendImg = friendPicUrl;
 
 			// Building Parameters
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("twitterID", twitterID));
-			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
-			//params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
-			
-			//System.out.println("..."+params.toString());
+			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));			
 
 			// getting JSON Object
-			JSONObject json = jasonParsonFriend.makeHttpRequest(url_delete_friend,
-						"POST", params);
+			jasonParsonFriend.makeHttpRequest(url_delete_friend,"POST", params);
 			//System.out.println("Error here?");// get printed
 			
 			
-				
+			// TODO	
 			// check log cat for response
 			//Log.d("Delete Friend Response", json.toString());
 
@@ -1342,8 +1334,7 @@ public class MainActivity extends Activity {
 			tweetIdList.clear(); 
 			comboTweetList.clear();
 			
-			//User user = twitter.verifyCredentials();
-			
+			//User user = twitter.verifyCredentials();			
 			User user = twitter.showUser(twitter.getId());
 			List<Status> statuses = twitter.getHomeTimeline();
 			//List<Status> statuses = twitter.getUserTimeline();
@@ -1355,12 +1346,6 @@ public class MainActivity extends Activity {
             	tweetIdList.add(status.getId());
              
             	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
-            	//System.out.println("pre");
-            	if(status.getGeoLocation()!= null){
-            		//System.out.println(status.getGeoLocation().getLatitude() + status.getGeoLocation().getLongitude());
-            	}else{
-            		//System.out.println("No geo info");
-            	}
             }			
             
             // convert an arraylist to an string array
@@ -1404,12 +1389,6 @@ public class MainActivity extends Activity {
             	
             	// store these follower's profile pic url into an arraylist
             	imageList.add(image.getURL());
-                    	
-                //user = twitter.showUser(id2);
-                //url = user.getProfileImageURL();
-            	
-                //System.out.println("The following with this id: "+ id2 + " has his profile pic link below");
-                //System.out.println(url.toString());  
              }			
 		} catch (IllegalStateException e) {
 			e.printStackTrace();

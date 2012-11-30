@@ -42,12 +42,12 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 	private MapView map;
 	private MapController controller;
 	private Location currentLocation;
-	private MainActivity mainActivity;
+	//private MainActivity mainActivity;
 	customMapOverlay mapOverlay;
 
 	private String[] statArr;
-	private double[] latArr;
-	private double[] lonArr;
+	//private double[] latArr;
+	//private double[] lonArr;
 	private String[] urlArr;
 	private boolean isGpsEnabled, isNetworkEnabled;
 	LocationManager lm;
