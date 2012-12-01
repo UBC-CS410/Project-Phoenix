@@ -55,7 +55,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -535,7 +534,6 @@ public class MainActivity extends Activity {
 	  			success = json.getInt("success");
 	  			if(success==1){
 	  				JSONArray newestStatuses = json.getJSONArray("status");
-	  				System.out.println("newestStatuses has size : " + newestStatuses.length());
 	  				
 	  				for(int i=newestStatuses.length()-1; i>= 0; i--){
 	  					
@@ -607,8 +605,8 @@ public class MainActivity extends Activity {
 			}
 		} else {
 			// user already logged into twitter 
-			logoutFromTwitter(); // already login so log our for user
-			//loginToTwitter();
+			logoutFromTwitter(); // already login so log out for user
+			loginToTwitter();
 			//Toast.makeText(getApplicationContext(),"Already Logged into twitter", Toast.LENGTH_LONG).show();
 		}
 	}
@@ -741,8 +739,6 @@ public class MainActivity extends Activity {
 			if(success==1){
 				JSONArray statuses = json.getJSONArray("status");
 				
-				
-				System.out.println("friends has size : " + statuses.length());
 				int count=0;
 				
 				// reverse the order, display the most recent tweet first
@@ -835,7 +831,6 @@ public class MainActivity extends Activity {
 			success = json.getInt("success");
 			if(success==1){
 				JSONArray friends = json.getJSONArray("friends");
-				System.out.println("friends has size : " + friends.length());
 				
 				for(int i=0; i< friends.length(); i++){					
 					JSONObject c = friends.getJSONObject(i);	
@@ -878,7 +873,6 @@ public class MainActivity extends Activity {
 			if(success==1)
 			{				
 				JSONArray comments=json.getJSONArray("comments");
-				System.out.println("comments has size : " + comments.length());
 				
 				// Return false if there is no comment for this status(tweet)
 				if(comments.length()==0){
@@ -890,7 +884,6 @@ public class MainActivity extends Activity {
 					
 					long twuserid = Long.valueOf( c.get("twuserid").toString() );
 					String comment=c.get("comment").toString();
-					System.out.println(twuserid+ " " + comment );
 					
 					try {
 						String comboComment = twitter.showUser(twuserid).getName() + ": " +comment;
@@ -1146,8 +1139,6 @@ public class MainActivity extends Activity {
 			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));
 			params.add(new BasicNameValuePair("twitterFriendImg", twitterFriendImg));
 			
-			System.out.println(params.toString());
-
 			// getting JSON Object
 			JSONObject json = jasonParsonFriend.makeHttpRequest(url_create_friend,
 					"POST", params);

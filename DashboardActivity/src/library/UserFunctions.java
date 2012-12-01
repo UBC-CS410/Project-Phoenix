@@ -26,9 +26,7 @@ public class UserFunctions {
     private static String getStoredTweets = "http://70.79.75.130:3721/getTweets.php";    
     private static String updateTweets = "http://70.79.75.130:3721/updateStat.php";    
     private static String getNewestTweets = "http://70.79.75.130:3721/getStatus.php";
-    
-    private static String isEverFriend = "http://70.79.75.130:3721/isEverFriend.php";
-    
+        
     private static String login_tag = "login";
     private static String register_tag = "register";
  
@@ -113,10 +111,6 @@ public class UserFunctions {
      * */
     public JSONObject storeTweets(String status, long tuser, long tid, double lat, double lon){
     	List<NameValuePair> params = new ArrayList<NameValuePair>();
-//    	System.out.print(status);
-//    	System.out.print(tuser);
-//    	System.out.print(tid);
-//    	System.out.print(lat + " "+ lon);
     	
     	params.add(new BasicNameValuePair("stat", status));
         params.add(new BasicNameValuePair("tuser", ""+tuser));
@@ -182,18 +176,6 @@ public class UserFunctions {
     	JSONObject json = jsonParser.getJSONFromUrl(get_all_friends,params);
 		return json;   	
     }
-    
-//    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&& for testing
-//    public JSONObject isEverFriend(long sourceID, long targetID){
-//    	
-//    	List<NameValuePair> params = new ArrayList<NameValuePair>();
-//    	params.add(new BasicNameValuePair("twitterID",""+ sourceID));
-//    	params.add(new BasicNameValuePair("twitterFriend",""+ targetID));
-//    	
-//    	JSONObject json = jsonParser.getJSONFromUrl(isEverFriend,params);    	
-//    	return json;
-//    }
-    
     
  
     /**
