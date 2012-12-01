@@ -34,6 +34,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,6 +47,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,6 +55,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -134,50 +137,40 @@ public class MainActivity extends Activity {
 	private String[] imageUrls = {};
 	private DisplayImageOptions options;
 
-	Button btnLoginTwitter;
-	Button btnUpdateStatus;
-	Button btnLogoutTwitter; // no use
+	// Buttons
+	private Button btnLoginTwitter;
+	private Button btnUpdateStatus;
 	
-	// Show profile image button 
-	Button btnProfileImage;  // no use
-	Button btnGetTweets;     // no use
-	Button btnShowMap; // map button // no use
-	Button btnSendComment; // no use
-	
-	ImageButton btnSearchPeople;		
+	// ImageButton
+	private ImageButton btnSearchPeople;		
 	
 	// List Views
-	ListView tweetListView;
-	ListView peopleListView;
-	ListView commentListView;
+	private ListView tweetListView;
+	private ListView peopleListView;
+	private ListView commentListView;
 	
 	// Image Grid view
-	GridView imageGridView;
+	private GridView imageGridView;
 	
 	// EditText for update
-	EditText txtUpdate;
-	EditText txtSearchPeople;
-	EditText txtTweetComment;
+	private EditText txtUpdate;
+	private EditText txtSearchPeople;
+	private EditText txtTweetComment;
 	
 	// lbl update
-	TextView lblUpdate;
-	TextView lblUserName;
+	private TextView lblUpdate;
+	private TextView lblUserName;
 	
 	// location check box
-	CheckBox checkboxLocation;
+	private CheckBox checkboxLocation;
 
 	// Progress dialog
-	ProgressDialog pDialog;
+	private ProgressDialog pDialog;
 
 	// Twitter
 	private static Twitter twitter;
 	private static Twitter twitterForTesting;
 	private static RequestToken requestToken;	
-	
-//	//@#@#
-//	IDs ids;
-//	IDs ids2;
-//	ArrayList<IDs> followerIds = new ArrayList<IDs>();
 	
 	// Shared Preferences
 	private static SharedPreferences mSharedPreferences;
@@ -186,8 +179,8 @@ public class MainActivity extends Activity {
 	private ConnectionDetector cd;
 	
 	// Alert Dialog Manager
-	AlertDialogManager alert = new AlertDialogManager();// was alert
-	gpsTracker gps ;  // gps
+	private AlertDialogManager alert = new AlertDialogManager();// was alert
+	private gpsTracker gps ;  // gps
 
 
 	@Override
@@ -240,50 +233,36 @@ public class MainActivity extends Activity {
 		TabSpec spec4=tabHost.newTabSpec("Tab 4");
 		spec4.setContent(R.id.tab4_Pepple);
 		spec4.setIndicator("Search");
-		
-//		TabSpec spec5=tabHost.newTabSpec("Tab 5");
-//		spec5.setContent(R.id.tab5_Maps);
-//		spec5.setIndicator("Map");
-		
+				
 		tabHost.addTab(spec1);
 		tabHost.addTab(spec2);
 		tabHost.addTab(spec3);
 		tabHost.addTab(spec4);
-		//tabHost.addTab(spec5);
 		
-		//****************************************************************************************************
 		
 		btnLoginTwitter = (Button) findViewById(R.id.btnLoginTwitter);
 		btnUpdateStatus = (Button) findViewById(R.id.btnUpdateStatus);
 		
-		btnProfileImage = (Button) findViewById(R.id.btnProfileImage);  // no use
-		btnGetTweets = (Button) findViewById(R.id.btnGetTweets);  // no use
 		btnSearchPeople = (ImageButton) findViewById(R.id.btnSearchPeople);
-		
-		btnShowMap = (Button) findViewById(R.id.btnShowMap); // no use
 		
 		tweetListView = (ListView) findViewById(R.id.mylist);
 		commentListView = (ListView) findViewById(R.id.mylist3);
 		peopleListView = (ListView) findViewById(R.id.mylist2);
 		imageGridView = (GridView) findViewById(R.id.gridview_test);
 		
-		btnLogoutTwitter = (Button) findViewById(R.id.btnLogoutTwitter);// no use
+		
 		txtUpdate = (EditText) findViewById(R.id.txtUpdateStatus);
+		txtTweetComment = (EditText) findViewById(R.id.txtComment);
 		txtSearchPeople = (EditText) findViewById(R.id.txtSearchPeople);
 		
 		lblUpdate = (TextView) findViewById(R.id.lblUpdate);
-		lblUserName = (TextView) findViewById(R.id.lblUserName);		
-		
-		
-		txtTweetComment = (EditText) findViewById(R.id.txtComment); //!!
+		lblUserName = (TextView) findViewById(R.id.lblUserName);
 		
 		checkboxLocation = (CheckBox) findViewById(R.id.checkboxlocation);
 
 		// Shared Preferences
-		mSharedPreferences = getApplicationContext().getSharedPreferences(
-				"MyPref", 0);
-		
-		
+		mSharedPreferences = getApplicationContext().getSharedPreferences("MyPref", 0);
+		//****************************************************************************************************
 		
 		tabHost.setOnTabChangedListener(new OnTabChangeListener(){
 
@@ -298,7 +277,6 @@ public class MainActivity extends Activity {
 					}	
 				}			
 			}
-
 		});
 		
 
@@ -357,9 +335,8 @@ public class MainActivity extends Activity {
 			
 		});	
 		
-		
+		// initilize image loader for displaying image
 		initiateImageLoader();
-	  
 	  
 		//List view listeners
 		
@@ -372,7 +349,6 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 				showPopupMenu(view, position);	
 			}
-			
 		});
 		
 		/**
@@ -384,7 +360,6 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 				showTweetMenu(view, position);	
 			}
-			
 		});
 		
 		/**
@@ -441,10 +416,6 @@ public class MainActivity extends Activity {
 					txtSearchPeople.setVisibility(View.VISIBLE);
 					btnUpdateStatus.setVisibility(View.VISIBLE);
 					
-					//btnProfileImage.setVisibility(View.VISIBLE);
-					//btnLogoutTwitter.setVisibility(View.VISIBLE);
-					//btnGetTweets.setVisibility(View.VISIBLE);
-					//btnShowMap.setVisibility(View.VISIBLE);
 					btnSearchPeople.setVisibility(View.VISIBLE);
 					checkboxLocation.setVisibility(View.VISIBLE);
 					
@@ -506,7 +477,9 @@ public class MainActivity extends Activity {
 		ImageLoader.getInstance().init(config);
 	}
 	
-	
+	/**
+	 *  load and display image
+	 */
 	private void loadImages(){
 		imageUrls = getAllFriend(yourID);	
 		options = new DisplayImageOptions.Builder()
@@ -687,8 +660,8 @@ public class MainActivity extends Activity {
 				    double lat = gps.getLatitude();
 				    double lon = gps.getLongitude();
 				    UserFunctions userFunction = new UserFunctions();
-				    JSONObject res = userFunction.storeTweets(status, tuser, tid, lat, lon);
-				    JSONObject res1 = userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
+				    userFunction.storeTweets(status, tuser, tid, lat, lon);
+				    userFunction.updateTweets(status, tuser, tid, lat, lon,twitter.showUser(tuser).getProfileImageURL().toString() );
 					
 					Log.d("Status", "> " + response.getText());
 				}
@@ -1246,33 +1219,10 @@ public class MainActivity extends Activity {
 			params.add(new BasicNameValuePair("twitterFriend", twitterFriend));			
 
 			// getting JSON Object
-			jasonParsonFriend.makeHttpRequest(url_delete_friend,"POST", params);
-			//System.out.println("Error here?");// get printed
-			
-			
-			// TODO	
+			jasonParsonFriend.makeHttpRequest(url_delete_friend,"POST", params);		
+		
 			// check log cat for response
 			//Log.d("Delete Friend Response", json.toString());
-
-//			// check for success tag
-//			try {
-//				int success = json.getInt(TAG_SUCCESS);
-//				if (success == 1) {
-//					System.out.println("or here?");
-////					// successfully delete friend
-////					Intent i = new Intent(getApplicationContext(), AllProductsActivity.class);
-////					startActivity(i);
-////					
-////					// closing this screen
-////					finish();
-//						
-//				} else {
-//					// failed to delete friend
-//				}
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-
 			return null;
 		}
 
@@ -1368,6 +1318,16 @@ public class MainActivity extends Activity {
 	protected void onPause(){
 		super.onPause();
 		Log.d("TAG", "-----onPause-----");
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK) {
+	    	// do nothing here
+	    	return true;
+	    }
+
+	    return false;
 	}
 	
 }

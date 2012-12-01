@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <group android:id="@+id/map_menu">
+      <item android:id="@+id/satellite"
+          android:title="Satellite View"/>
+      <item android:id="@+id/Street"
+          android:title="Street View"/>
+      <item android:id="@+id/FindMe"
+          android:title="Find Me"/>
+
+  </group>
+</menu>

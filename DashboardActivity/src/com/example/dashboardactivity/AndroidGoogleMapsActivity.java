@@ -23,6 +23,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
@@ -42,17 +45,12 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 	private MapView map;
 	private MapController controller;
 	private Location currentLocation;
-	//private MainActivity mainActivity;
 	customMapOverlay mapOverlay;
 
 	private String[] statArr;
-	//private double[] latArr;
-	//private double[] lonArr;
 	private String[] urlArr;
 	private boolean isGpsEnabled, isNetworkEnabled;
 	LocationManager lm;
-	// private GeoPoint point;
-	Button btnFindme;
 
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
@@ -65,6 +63,7 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		setContentView(R.layout.map_view);
 		initMapView();
 		initMyLocation();
+		map.setSatellite(false);
 		List<GeoPoint> geoPointList = new ArrayList<GeoPoint>();
 		List<String> statList = new ArrayList<String>();
 		List<Bitmap> bitMapList = new ArrayList<Bitmap>();
@@ -125,13 +124,6 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 
 		}
 
-		// find me button
-		btnFindme = (Button) findViewById(R.id.btnFindMe);
-		btnFindme.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				locationChanged(currentLocation);
-			}
-		});
 
 		if (mapOverlay == null) {
 			mapOverlay = new customMapOverlay(geoPointList, bitMapList,
@@ -145,12 +137,41 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 			map.getOverlays().add(mapOverlay);
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.map_menu, menu);
+		return true;
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.satellite:
+			map.setSatellite(true);
+			return true;
+		case R.id.Street:
+			map.setSatellite(false);
+			return true;
+		case R.id.FindMe:
+			locationChanged(currentLocation);
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
 
 	// initialize map
 	private void initMapView() {
 		map = (MapView) findViewById(R.id.mapView);
 		controller = map.getController();
 		map.setBuiltInZoomControls(true);
+		controller.setZoom(12);
 	}
 
 	// if gps is off, show setting dialog
@@ -228,6 +249,11 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		InputStream input = connection.getInputStream();
 		x = BitmapFactory.decodeStream(input);
 		return x;
+	}
+	
+	protected void onPause(){
+		super.onPause();
+		Log.d("TAG", "-----onPause-----");
 	}
 
 	// @Override
