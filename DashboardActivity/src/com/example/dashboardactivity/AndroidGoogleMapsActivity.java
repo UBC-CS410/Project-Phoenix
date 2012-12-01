@@ -125,7 +125,6 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 
 		}
 
-		System.out.println("herere??");
 		// find me button
 		btnFindme = (Button) findViewById(R.id.btnFindMe);
 		btnFindme.setOnClickListener(new View.OnClickListener() {
@@ -152,14 +151,13 @@ public class AndroidGoogleMapsActivity extends MapActivity implements
 		map = (MapView) findViewById(R.id.mapView);
 		controller = map.getController();
 		map.setBuiltInZoomControls(true);
-
 	}
 
 	// if gps is off, show setting dialog
 	private void showDialog() {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		alertDialog.setTitle("Error");
-		alertDialog.setMessage("Do you want go to turn on GPS");
+		alertDialog.setMessage("Do you want go to turn on GPS?");
 		alertDialog.setPositiveButton("yes", new OnClickListener() {
 			// @Override
 			public void onClick(DialogInterface dialog, int which) {

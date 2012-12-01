@@ -114,7 +114,7 @@ public class customMapOverlay extends Overlay {
 
 			// Animate the map to center on the location
 			mapView.getController().animateTo(newP);
-			mapView.getController().setZoom(10);
+			mapView.getController().setZoom(15);
 		}
 
 		return true;

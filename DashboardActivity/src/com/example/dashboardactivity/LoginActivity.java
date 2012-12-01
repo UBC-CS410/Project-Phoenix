@@ -4,7 +4,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
  
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
  
+import library.ConnectionDetector;
 import library.DatabaseHandler;
 import library.UserFunctions;
  
@@ -21,6 +25,7 @@ public class LoginActivity extends Activity {
     EditText inputEmail;
     EditText inputPassword;
     TextView loginErrorMsg;
+    private ConnectionDetector cd;
  
     // JSON Response node names
     private static String KEY_SUCCESS = "success";
@@ -35,6 +40,7 @@ public class LoginActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        cd = new ConnectionDetector(getApplicationContext());
  
         // Importing all assets like buttons, text fields
         inputEmail = (EditText) findViewById(R.id.loginEmail);
@@ -42,6 +48,11 @@ public class LoginActivity extends Activity {
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
         loginErrorMsg = (TextView) findViewById(R.id.login_error);
+        
+        if (!cd.isConnectingToInternet()){
+        	checkInternetConnection();
+        }
+        
  
         // Login button Click Event
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -98,5 +109,28 @@ public class LoginActivity extends Activity {
                 //finish(); // don't finish this activity
             }
         });
+        
+        
     }
+    
+    private void checkInternetConnection() {
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Error");
+		alertDialog.setMessage("Do you want turn on the Internet?");
+		alertDialog.setPositiveButton("yes", new OnClickListener() {
+			// @Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				startActivity(new Intent(
+						android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+			}
+		});
+		alertDialog.setNegativeButton("cancle", new OnClickListener() {
+			// @Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		alertDialog.show();
+	}
 }

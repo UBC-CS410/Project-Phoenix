@@ -22,8 +22,6 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
-import twitter4j.IDs;
-import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -34,9 +32,12 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -119,7 +120,7 @@ public class MainActivity extends Activity {
     private long createFriendID;
     private long deleteFriendID;
     private String friendPicUrl;
-    private long currentTweetID; // ????
+    private long currentTweetID;
     
     private String notification;
     
@@ -132,8 +133,6 @@ public class MainActivity extends Activity {
     protected ImageLoader imageLoader = ImageLoader.getInstance();
 	private String[] imageUrls = {};
 	private DisplayImageOptions options;
-	
-	private int tabCount =0;
 
 	Button btnLoginTwitter;
 	Button btnUpdateStatus;
@@ -175,10 +174,10 @@ public class MainActivity extends Activity {
 	private static Twitter twitterForTesting;
 	private static RequestToken requestToken;	
 	
-	//@#@#
-	IDs ids;
-	IDs ids2;
-	ArrayList<IDs> followerIds = new ArrayList<IDs>();
+//	//@#@#
+//	IDs ids;
+//	IDs ids2;
+//	ArrayList<IDs> followerIds = new ArrayList<IDs>();
 	
 	// Shared Preferences
 	private static SharedPreferences mSharedPreferences;
@@ -187,7 +186,7 @@ public class MainActivity extends Activity {
 	private ConnectionDetector cd;
 	
 	// Alert Dialog Manager
-	AlertDialogManager alert = new AlertDialogManager();
+	AlertDialogManager alert = new AlertDialogManager();// was alert
 	gpsTracker gps ;  // gps
 
 
@@ -203,8 +202,10 @@ public class MainActivity extends Activity {
 		// Check if Internet present
 		if (!cd.isConnectingToInternet()) {
 			// Internet Connection is not present
-			alert.showAlertDialog(MainActivity.this, "Internet Connection Error",
-					"Please connect to working Internet connection", false);
+//			alert.showAlertDialog(MainActivity.this, "Internet Connection Error",
+//					"Please connect to working Internet connection", false);
+			
+			checkInternectConnection();
 			// stop executing code by return
 			return;
 		}
@@ -288,12 +289,14 @@ public class MainActivity extends Activity {
 
 			public void onTabChanged(String tabID) {				
 
-				if(tabID.equals("Tab 2")){
-					loadImages();
-				}
-				else if (tabID.equals("Tab 3")){
-					getRecentTweetFromOurDB();
-				}				
+				if(isTwitterLoggedInAlready()==true){
+					if(tabID.equals("Tab 2")){
+						loadImages();
+					}
+					else if (tabID.equals("Tab 3")){
+						getRecentTweetFromOurDB();
+					}	
+				}			
 			}
 
 		});
@@ -354,21 +357,8 @@ public class MainActivity extends Activity {
 			
 		});	
 		
-		/**
-		 *  set up image loader
-		 */
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-	    .threadPriority(Thread.NORM_PRIORITY - 2)
-	    .memoryCacheSize(2 * 1024 * 1024) 
-	    .denyCacheImageMultipleSizesInMemory()
-	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
-	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
-	    .tasksProcessingOrder(QueueProcessingType.LIFO)
-	    .enableLogging()
-	    .build();
-    
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config);
+		
+		initiateImageLoader();
 	  
 	  
 		//List view listeners
@@ -476,9 +466,48 @@ public class MainActivity extends Activity {
 		}
 
 	}
+
+	private void checkInternectConnection() {
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+		alertDialog.setTitle("Error");
+		alertDialog.setMessage("Do you want turn on the Internet?");
+		alertDialog.setPositiveButton("yes", new OnClickListener() {
+			// @Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				startActivity(new Intent(
+						android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+			}
+		});
+		alertDialog.setNegativeButton("cancle", new OnClickListener() {
+			// @Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		alertDialog.show();
+	}
+
+	/**
+	 *  set up image loader
+	 */
+	private void initiateImageLoader() {
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+	    .threadPriority(Thread.NORM_PRIORITY - 2)
+	    .memoryCacheSize(2 * 1024 * 1024) 
+	    .denyCacheImageMultipleSizesInMemory()
+	    .discCacheFileNameGenerator(new Md5FileNameGenerator())
+	    .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))
+	    .tasksProcessingOrder(QueueProcessingType.LIFO)
+	    .enableLogging()
+	    .build();
+    
+		// Initialize ImageLoader with configuration.
+		ImageLoader.getInstance().init(config);
+	}
 	
 	
-	public void loadImages(){
+	private void loadImages(){
 		imageUrls = getAllFriend(yourID);	
 		options = new DisplayImageOptions.Builder()
 			.showStubImage(R.drawable.stub_image)
@@ -598,12 +627,15 @@ public class MainActivity extends Activity {
 			try {
 				requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
 				this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthenticationURL())));
+				// end this activity, important!
+				finish();// for testing 
 			} catch (TwitterException e) {
 				e.printStackTrace();
 			}
 		} else {
 			// user already logged into twitter 
 			logoutFromTwitter(); // already login so log our for user
+			//loginToTwitter();
 			//Toast.makeText(getApplicationContext(),"Already Logged into twitter", Toast.LENGTH_LONG).show();
 		}
 	}
@@ -1294,11 +1326,16 @@ public class MainActivity extends Activity {
 	}
 	
 	
-	
+	/**
+	 * Helper method for testing
+	 */
 	private void setTwitterForTesting(Twitter tw){
 		twitterForTesting = tw;
 	}
 	
+	/**
+	 * Helper method for testing
+	 */
 	public Twitter getTwitterForTesting(){
 		return twitterForTesting;
 	}	
@@ -1322,84 +1359,6 @@ public class MainActivity extends Activity {
 		};
 		return user;
 	}
-	
-	/**
-	 * Get the most recent 20 tweets from other real twitter user
-	 * This method is not used for now
-	 */
-	private void getRecentTweets(){	
-		try {			
-			// clear tweet array list every time before use
-			tweetList.clear();
-			tweetIdList.clear(); 
-			comboTweetList.clear();
-			
-			//User user = twitter.verifyCredentials();			
-			User user = twitter.showUser(twitter.getId());
-			List<Status> statuses = twitter.getHomeTimeline();
-			//List<Status> statuses = twitter.getUserTimeline();
-            System.out.println("Showing @" + user.getScreenName() + "'s home timeline.");
-            
-            // add these recent status to corresponding arraylist for future use
-            for (Status status : statuses) {            	
-            	tweetList.add(status.getText());
-            	tweetIdList.add(status.getId());
-             
-            	comboTweetList.add(status.getUser().getName() + ": " + status.getText() ) ;
-            }			
-            
-            // convert an arraylist to an string array
-            String[] simpleArray = new String[comboTweetList.size()];
-            comboTweetList.toArray(simpleArray);
-            
-            // set array adapter and display in list view
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,simpleArray);
-            tweetListView.setAdapter(arrayAdapter);
-			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	/**
-	 * collects follower's profile image urls
-	 * This method is not used for now
-	 */
-	private String[] showProfileImage(){
-		System.out.println("Show image button is clicked");
-		try {
-			
-			imageList.clear();
-			//User user = twitter.showUser(twitter.getId());
-			//URL url = user.getProfileImageURL();
-			//System.out.println(url.toString());	
-			
-			// Specify that the image size is original
-			twitter4j.ProfileImage.ImageSize imageSize = twitter4j.ProfileImage.ORIGINAL;
-			
-            //ids = twitter.getFollowersIDs(-1);
-            ids2= twitter.getFriendsIDs(-1); // friend = following
-                    
-            for (long id2 : ids2.getIDs()) {                    	
-            	twitter4j.ProfileImage image = twitter.getProfileImage(Long.toString(id2), imageSize);
-            	//System.out.println(image.getURL());
-            	
-            	// store these follower's profile pic url into an arraylist
-            	imageList.add(image.getURL());
-             }			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (TwitterException e) {
-			e.printStackTrace();
-		}
-		
-	   String[] url_arr = new String[imageList.size()];
-	    return imageList.toArray(url_arr);
-	}
-	
 
 	protected void onResume() {
 		super.onResume();
